@@ -35,8 +35,8 @@ enum class MouseEventType
 struct ApplicationEvent
 {
     ApplicationEventType Type;
-    i32 Width;
-    i32 Height;
+    i32 Width {};
+    i32 Height {};
 };
 
 struct KeyEvent
@@ -49,7 +49,7 @@ struct MouseEvent
 {
     MouseEventType Type;
     enum Button Button;
-    Vec2i Position;
+    Vec2i Position {};
 };
 
 using Event = const void*;

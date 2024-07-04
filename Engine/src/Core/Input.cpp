@@ -44,7 +44,7 @@ void Input::ProcessButton(Button button, bool isPressed)
 
     if (sState.LastButtons[index] != isPressed)
     {
-        MouseEvent e { isPressed ? MouseEventType::Press : MouseEventType::Release, button, {} };
+        MouseEvent e { isPressed ? MouseEventType::Press : MouseEventType::Release, button };
         EventDispatcher::Dispatch(EventCategory::Mouse, &e);
     }
 }

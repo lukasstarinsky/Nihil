@@ -31,7 +31,7 @@ void Logger::Log(LogLevel severity, std::string_view message, ...)
     va_end(args);
 
     memcpy_s(logMessageCpy, CHAR_LIMIT, logMessage, CHAR_LIMIT);
-    sprintf_s(logMessage, "[%s]: %s\n", severityStr[static_cast<i32>(severity)], logMessageCpy);
+    sprintf_s(logMessage, "%s [%s]: %s\n", Utilities::GetFormattedTime(true).c_str(), severityStr[static_cast<i32>(severity)], logMessageCpy);
 
     Console::Print(logMessage, severity);
 }
