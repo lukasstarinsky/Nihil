@@ -1,4 +1,5 @@
 #include "Platform/Platform.hpp"
+#include "Renderer/Renderer.hpp"
 #include "Engine.hpp"
 
 Engine::Engine(Application* application)
@@ -13,6 +14,12 @@ Engine::Engine(Application* application)
         mApplication->State.IsRunning = false;
         return;
     }
+    if (!Renderer::Initialize(RendererAPI::Vulkan))
+    {
+        LOG_FATAL("Failed to initialize Vulkan renderer. Shutting down...");
+        mApplication->State.IsRunning = false;
+        return;
+    }
 
     SET_EVENT_LISTENER_THIS(EventCategory::Application, OnAppEvent);
 }
@@ -20,6 +27,7 @@ Engine::Engine(Application* application)
 Engine::~Engine()
 {
     LOG_TRACE("Shutting down...");
+    Renderer::Shutdown();
     Platform::Shutdown();
 }
 

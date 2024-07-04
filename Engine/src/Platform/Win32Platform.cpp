@@ -143,6 +143,38 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(handle, msg, wParam, lParam);
 }
 
+bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary* outDynamicLibrary)
+{
+    if (!outDynamicLibrary)
+        return false;
+
+    char buffer[256] { 0 };
+    sprintf_s(buffer, "%s.dll", name);
+
+    HMODULE module { LoadLibrary(buffer) };
+    if (!module)
+        return false;
+
+    outDynamicLibrary->Name = buffer;
+    outDynamicLibrary->Handle = module;
+    return true;
+}
+
+bool Platform::UnloadDynamicLibrary(const DynamicLibrary& dynamicLibrary)
+{
+    return FreeLibrary(static_cast<HMODULE>(dynamicLibrary.Handle));
+}
+
+bool Platform::LoadDynamicLibraryFunction(DynamicLibrary& dynamicLibrary, const char* funName)
+{
+    FARPROC symbolPtr { GetProcAddress((HMODULE)dynamicLibrary.Handle, funName) };
+    if (!symbolPtr)
+        return false;
+
+    dynamicLibrary.Functions.push_back(reinterpret_cast<void*>(symbolPtr));
+    return true;
+}
+
 void Console::Print(std::string_view message, LogLevel severity)
 {
     HANDLE consoleHandle { GetStdHandle((severity == LogLevel::Error || severity == LogLevel::Fatal) ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE) };
