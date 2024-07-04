@@ -1,9 +1,12 @@
-#include "Core/Engine.hpp"
+#include "Core/Logger.hpp"
 
 int main()
 {
-    std::cout << "Hello from sandbox\n";
-    Engine::HelloWorld();
+    LOG_TRACE("hello");
+    LOG_DEBUG("hello");
+    LOG_INFO("hello");
+    LOG_WARN("hello");
+    LOG_ERROR("hello");
 
     return 0;
 }
