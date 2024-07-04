@@ -5,9 +5,9 @@
 #define CHAR_LIMIT 16'384
 
 #ifdef NDEBUG
-LogLevel sLogLevel { LogLevel::Info };
+static LogLevel sLogLevel { LogLevel::Info };
 #else
-LogLevel sLogLevel { LogLevel::Trace };
+static LogLevel sLogLevel { LogLevel::Trace };
 #endif
 
 void Logger::SetLogLevel(LogLevel logLevel)

@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include "Core/Event.hpp"
 #include "Platform.hpp"
 
 struct PlatformState
@@ -9,6 +10,7 @@ struct PlatformState
 };
 
 static PlatformState sState;
+static LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam);
 
 bool Platform::Initialize(const ApplicationConfig& config)
 {
@@ -16,7 +18,7 @@ bool Platform::Initialize(const ApplicationConfig& config)
 
     WNDCLASSEX wndClass {};
     wndClass.cbSize = sizeof(WNDCLASSEX);
-    wndClass.lpfnWndProc = DefWindowProc;
+    wndClass.lpfnWndProc = ProcessMessage;
     wndClass.hInstance = sState.Instance;
     wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wndClass.lpszClassName = "nihil_window";
@@ -59,6 +61,86 @@ void Platform::Shutdown()
 
     DestroyWindow(sState.WindowHandle);
     UnregisterClass("nihil_window", sState.Instance);
+}
+
+void Platform::PollEvents()
+{
+    MSG msg;
+    while (PeekMessage(&msg, sState.WindowHandle, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
+
+LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg)
+    {
+        case WM_CLOSE:
+        {
+            ApplicationEvent e { ApplicationEventType::Quit };
+            EventDispatcher::Dispatch(EventCategory::Application, &e);
+            break;
+        }
+        case WM_DESTROY:
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+        case WM_SIZE:
+        {
+            RECT rect {};
+            GetClientRect(sState.WindowHandle, &rect);
+
+            ApplicationEvent e { ApplicationEventType::Resize, rect.right - rect.left, rect.bottom - rect.top };
+            EventDispatcher::Dispatch(EventCategory::Application, &e);
+            break;
+        }
+        case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
+        case WM_KEYUP:
+        case WM_SYSKEYUP:
+        {
+            BOOL wasKeyDown { (lParam & (1 << 30)) != 0 };
+
+            bool isPressed { msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN };
+            Input::ProcessKey(static_cast<Key>(wParam), isPressed, wasKeyDown);
+
+            break;
+        }
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP:
+        {
+            bool isPressed { msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN };
+
+            Button button { Button::Middle };
+            switch (msg)
+            {
+                case WM_LBUTTONDOWN:
+                case WM_LBUTTONUP:
+                    button = Button::Left;
+                    break;
+                case WM_RBUTTONDOWN:
+                case WM_RBUTTONUP:
+                    button = Button::Right;
+                    break;
+                case WM_MBUTTONDOWN:
+                case WM_MBUTTONUP:
+                    button = Button::Middle;
+                    break;
+            }
+
+            Input::ProcessButton(button, isPressed);
+            break;
+        }
+    }
+
+    return DefWindowProc(handle, msg, wParam, lParam);
 }
 
 void Console::Print(std::string_view message, LogLevel severity)

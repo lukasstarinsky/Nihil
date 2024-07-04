@@ -4,7 +4,7 @@
 Engine::Engine(Application* application)
     : mApplication{application}
 {
-    NASSERT_MSG(application, "Application cannot be nullptr.");
+    NASSERT_MSG(mApplication, "Application cannot be nullptr.");
 
     LOG_TRACE("Initializing...");
     if (!Platform::Initialize(mApplication->Config))
@@ -13,6 +13,8 @@ Engine::Engine(Application* application)
         mApplication->State.IsRunning = false;
         return;
     }
+
+    SET_EVENT_LISTENER_THIS(EventCategory::Application, OnAppEvent);
 }
 
 Engine::~Engine()
@@ -23,5 +25,40 @@ Engine::~Engine()
 
 void Engine::Run() const
 {
-    while (true);
+    while (mApplication->State.IsRunning)
+    {
+        if (!mApplication->State.IsSuspended)
+        {
+            mApplication->OnUpdate();
+            mApplication->OnRender();
+        }
+        Platform::PollEvents();
+    }
+}
+
+bool Engine::OnAppEvent(Event e)
+{
+    auto appEvent { static_cast<const ApplicationEvent*>(e) };
+
+    if (appEvent->Type == ApplicationEventType::Quit)
+    {
+        mApplication->State.IsRunning = false;
+        return true;
+    }
+    else if (appEvent->Type == ApplicationEventType::Resize)
+    {
+        mApplication->Config.WindowWidth = appEvent->Width;
+        mApplication->Config.WindowHeight = appEvent->Height;
+
+        if (appEvent->Width == 0 || appEvent->Height == 0)
+        {
+            mApplication->State.IsSuspended = true;
+        }
+        else
+        {
+            mApplication->State.IsSuspended = false;
+        }
+    }
+
+    return false;
 }

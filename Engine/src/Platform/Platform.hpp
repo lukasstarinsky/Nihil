@@ -7,6 +7,7 @@ namespace Platform
 {
     bool Initialize(const ApplicationConfig& config);
     void Shutdown();
+    void PollEvents();
 }
 
 namespace Console
