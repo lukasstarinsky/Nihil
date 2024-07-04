@@ -1,0 +1,39 @@
+{
+	"version": 6,
+	"configurePresets": [
+		{
+			"name": "Debug",
+			"hidden": true,
+			"binaryDir": "build/debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
+				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/bin/Debug",
+				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/bin/Debug"
+			}
+		},
+		{
+			"name": "Release",
+			"hidden": true,
+			"binaryDir": "build/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
+				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/bin/Release",
+				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/bin/Release"
+			}
+		},
+		{
+			"name": "Ninja-Debug",
+			"description": "Debug build using Ninja",
+			"generator": "Ninja",
+			"inherits": "Debug"
+		},
+		{
+			"name": "Ninja-Release",
+			"description": "Release build using Ninja",
+			"generator": "Ninja",
+			"inherits": "Release"
+		}
+	]
+}
