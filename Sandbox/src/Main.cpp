@@ -1,12 +1,11 @@
-#include "Core/Logger.hpp"
+#include "Sandbox.hpp"
 
 int main()
 {
-    LOG_TRACE("hello");
-    LOG_DEBUG("hello");
-    LOG_INFO("hello");
-    LOG_WARN("hello");
-    LOG_ERROR("hello");
+    Sandbox sandbox;
+    Engine engine { &sandbox };
+
+    engine.Run();
 
     return 0;
 }

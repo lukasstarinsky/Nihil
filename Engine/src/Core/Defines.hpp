@@ -35,6 +35,18 @@
     #endif
 #endif
 
+/* ======= Asserts ======= */
+#define TO_STR_(x) #x
+#define TO_STR(x) TO_STR_(x)
+
+#ifdef NDEBUG
+#define NASSERT_MSG(check, message, ...)
+    #define NASSERT(check)
+#else
+#define NASSERT_MSG(check, message, ...) do { if(!(check)) { LOG_FATAL("Assertion failed [" __FILE__ ":" TO_STR(__LINE__)"]: " message, __VA_ARGS__); DEBUGBREAK(); } } while(0)
+#define NASSERT(check) do { if(!(check)) { LOG_FATAL("Assertion failed [" __FILE__ ":" TO_STR(__LINE__)"]"); DEBUGBREAK(); } } while(0)
+#endif
+
 /* ======= Type Defs ======= */
 #include <cstdint>
 

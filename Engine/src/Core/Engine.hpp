@@ -1,10 +1,14 @@
 #pragma once
 
-#include <iostream>
-#include "Defines.hpp"
+#include "Application.hpp"
 
 class NIHIL_API Engine
 {
 public:
-    static void HelloWorld();
+    explicit Engine(Application* application);
+    ~Engine();
+
+    void Run() const;
+private:
+    Application* mApplication {};
 };
