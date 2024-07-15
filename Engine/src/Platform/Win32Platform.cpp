@@ -6,14 +6,14 @@ struct PlatformState
 {
     HWND WindowHandle;
     HINSTANCE Instance;
-    bool Initialized;
 };
 
 static PlatformState sState;
 static LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam);
 
-bool Platform::Initialize(const ApplicationConfig& config)
+void Platform::Initialize(const ApplicationConfig& config)
 {
+    LOG_TRACE("Initializing Win32 Platform...");
     sState.Instance = GetModuleHandle(nullptr);
 
     WNDCLASSEX wndClass {};
@@ -24,8 +24,7 @@ bool Platform::Initialize(const ApplicationConfig& config)
     wndClass.lpszClassName = "nihil_window";
     if (!RegisterClassEx(&wndClass))
     {
-        LOG_FATAL("Win32: RegisterClassEx() failed with error code: %d.", GetLastError());
-        return false;
+        NTHROW("Win32 RegisterClassEx() failed with error code: " + std::to_string(GetLastError()));
     }
 
     DWORD dwStyle { WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU };
@@ -45,20 +44,15 @@ bool Platform::Initialize(const ApplicationConfig& config)
     );
     if (!sState.WindowHandle)
     {
-        LOG_FATAL("Win32: CreateWindow() failed with error code: %d.", GetLastError());
-        return false;
+        NTHROW("Win32: CreateWindow() failed with error code: %d.");
     }
 
     ShowWindow(sState.WindowHandle, SW_SHOW);
-    sState.Initialized = true;
-    return true;
 }
 
 void Platform::Shutdown()
 {
-    if (!sState.Initialized)
-        return;
-
+    LOG_TRACE("Shutting down Win32 Platform...");
     DestroyWindow(sState.WindowHandle);
     UnregisterClass("nihil_window", sState.Instance);
 }
@@ -143,11 +137,8 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(handle, msg, wParam, lParam);
 }
 
-bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary* outDynamicLibrary)
+bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary& outDynamicLibrary)
 {
-    if (!outDynamicLibrary)
-        return false;
-
     char buffer[256] { 0 };
     sprintf_s(buffer, "%s.dll", name);
 
@@ -155,8 +146,8 @@ bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary* outDynamicLi
     if (!module)
         return false;
 
-    outDynamicLibrary->Name = buffer;
-    outDynamicLibrary->Handle = module;
+    outDynamicLibrary.Name = buffer;
+    outDynamicLibrary.Handle = module;
     return true;
 }
 
@@ -167,7 +158,7 @@ bool Platform::UnloadDynamicLibrary(const DynamicLibrary& dynamicLibrary)
 
 bool Platform::LoadDynamicLibraryFunction(DynamicLibrary& dynamicLibrary, const char* funName)
 {
-    FARPROC symbolPtr { GetProcAddress((HMODULE)dynamicLibrary.Handle, funName) };
+    FARPROC symbolPtr { GetProcAddress(static_cast<HMODULE>(dynamicLibrary.Handle), funName) };
     if (!symbolPtr)
         return false;
 

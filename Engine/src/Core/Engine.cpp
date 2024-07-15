@@ -7,26 +7,15 @@ Engine::Engine(Application* application)
 {
     NASSERT_MSG(mApplication, "Application cannot be nullptr.");
 
-    LOG_TRACE("Initializing...");
-    if (!Platform::Initialize(mApplication->Config))
-    {
-        LOG_FATAL("Failed to initialize platform. Shutting down...");
-        mApplication->State.IsRunning = false;
-        return;
-    }
-    if (!Renderer::Initialize(RendererAPI::Vulkan))
-    {
-        LOG_FATAL("Failed to initialize Vulkan renderer. Shutting down...");
-        mApplication->State.IsRunning = false;
-        return;
-    }
+    Platform::Initialize(mApplication->Config);
+    Renderer::Initialize(RendererAPI::Vulkan);
+    mApplication->OnInitialize();
 
     SET_EVENT_LISTENER_THIS(EventCategory::Application, OnAppEvent);
 }
 
 Engine::~Engine()
 {
-    LOG_TRACE("Shutting down...");
     Renderer::Shutdown();
     Platform::Shutdown();
 }

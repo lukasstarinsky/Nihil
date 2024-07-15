@@ -5,36 +5,28 @@
 static DynamicLibrary sRendererModule;
 static RendererPlugin* sRendererPlugin;
 
-bool Renderer::Initialize(RendererAPI api)
+void Renderer::Initialize(RendererAPI api)
 {
-    if (!Platform::LoadDynamicLibrary(Renderer::ApiToString(api), &sRendererModule))
+    if (!Platform::LoadDynamicLibrary(Renderer::ApiToString(api), sRendererModule))
     {
-        LOG_FATAL("Failed to load '%s' dynamic library", Renderer::ApiToString(api));
-        return false;
+        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(api)));
     }
 
     if (!Platform::LoadDynamicLibraryFunction(sRendererModule, "CreatePlugin") ||
         !Platform::LoadDynamicLibraryFunction(sRendererModule, "DestroyPlugin"))
     {
-        LOG_FATAL("Failed to load functions of module '%s'", Renderer::ApiToString(api));
-        return false;
+        NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(api)));
     }
 
-    auto CreatePlugin { reinterpret_cast<CreateRendererPlugin>(sRendererModule.Functions[0]) };
-    sRendererPlugin = CreatePlugin();
-    sRendererPlugin->Initialize();
-    return true;
+    auto CreatePluginFn { reinterpret_cast<CreateRendererPlugin>(sRendererModule.Functions[0]) };
+    sRendererPlugin = CreatePluginFn();
 }
 
 void Renderer::Shutdown()
 {
-    if (sRendererModule.Handle)
-    {
-        auto DestroyPlugin { reinterpret_cast<void(*)(RendererPlugin*)>(sRendererModule.Functions[1]) };
-        DestroyPlugin(sRendererPlugin);
-
-        Platform::UnloadDynamicLibrary(sRendererModule);
-    }
+    auto DestroyPluginFn { reinterpret_cast<DestroyRendererPlugin>(sRendererModule.Functions[1]) };
+    DestroyPluginFn(sRendererPlugin);
+    Platform::UnloadDynamicLibrary(sRendererModule);
 }
 
 const char* Renderer::ApiToString(RendererAPI api)

@@ -2,10 +2,17 @@
 
 int main()
 {
-    Sandbox sandbox;
-    Engine engine { &sandbox };
+    try
+    {
+        Sandbox sandbox;
+        Engine engine { &sandbox };
 
-    engine.Run();
-
-    return 0;
+        engine.Run();
+        return EXIT_SUCCESS;
+    }
+    catch (const NihilException& e)
+    {
+        LOG_FATAL("%s", e.what());
+        return EXIT_FAILURE;
+    }
 }

@@ -11,7 +11,7 @@ enum class RendererAPI
 
 namespace Renderer
 {
-    bool Initialize(RendererAPI api);
+    void Initialize(RendererAPI api);
     void Shutdown();
 
     static const char* ApiToString(RendererAPI api);

@@ -6,9 +6,8 @@
 class VulkanPlugin : public RendererPlugin
 {
 public:
+    VulkanPlugin();
     ~VulkanPlugin() override;
-
-    void Initialize() override;
 };
 
 extern "C"
