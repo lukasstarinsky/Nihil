@@ -15,4 +15,4 @@ private:
 };
 
 #define NTHROW(message)             throw NihilException(__LINE__, __FILE__, "Exception", message)
-#define NTHROW_TYPE(type, message)  throw NihilException(__LINE__, __FILE__, type, message)
+#define NTHROW_IF(check, message)   if (check) throw NihilException(__LINE__, __FILE__, "Exception", message)

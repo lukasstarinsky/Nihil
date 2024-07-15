@@ -1,3 +1,4 @@
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include "Core/Event.hpp"
 #include "Platform.hpp"
@@ -135,6 +136,11 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
     }
 
     return DefWindowProc(handle, msg, wParam, lParam);
+}
+
+void* Platform::GetState()
+{
+    return &sState;
 }
 
 bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary& outDynamicLibrary)

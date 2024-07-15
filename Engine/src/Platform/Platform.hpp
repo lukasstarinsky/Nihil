@@ -17,6 +17,7 @@ namespace Platform
     void Shutdown();
     void PollEvents();
 
+    NIHIL_API void* GetState();
     NIHIL_API bool LoadDynamicLibrary(const char* name, DynamicLibrary& outDynamicLibrary);
     NIHIL_API bool UnloadDynamicLibrary(const DynamicLibrary& dynamicLibrary);
     NIHIL_API bool LoadDynamicLibraryFunction(DynamicLibrary& dynamicLibrary, const char* funName);
