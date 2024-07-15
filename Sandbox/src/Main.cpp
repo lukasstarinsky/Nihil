@@ -12,7 +12,7 @@ int main()
     }
     catch (const NihilException& e)
     {
-        LOG_FATAL("%s", e.what());
+        LOG_FATAL("{}", e.what());
         return EXIT_FAILURE;
     }
 }

@@ -24,7 +24,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     wndClass.lpszClassName = "nihil_window";
     if (!RegisterClassEx(&wndClass))
     {
-        NTHROW("Win32 RegisterClassEx() failed with error code: " + std::to_string(GetLastError()));
+        NTHROW(std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
     }
 
     DWORD dwStyle { WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU };
@@ -44,7 +44,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     );
     if (!sState.WindowHandle)
     {
-        NTHROW("Win32: CreateWindow() failed with error code: %d.");
+        NTHROW(std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
     }
 
     ShowWindow(sState.WindowHandle, SW_SHOW);
