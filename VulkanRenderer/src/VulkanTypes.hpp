@@ -22,6 +22,9 @@ struct VulkanSwapChainSupportInfo
 struct VulkanDevice
 {
     VkPhysicalDevice PhysicalDevice;
+    VkPhysicalDeviceProperties DeviceProps;
+    VkPhysicalDeviceFeatures DeviceFeatures;
+    VkPhysicalDeviceMemoryProperties DeviceMemoryProps;
     VkDevice LogicalDevice;
 
     VulkanQueueFamilyIndex QueueFamilyIndex;

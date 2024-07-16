@@ -4,11 +4,18 @@
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData)
 {
-    if (messageSeverity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-        return VK_FALSE;
+//    if (messageSeverity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+//        return VK_FALSE;
 
     switch (messageSeverity)
     {
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+        {
+            LOG_INFO("{}", callbackData->pMessage);
+            break;
+        }
+
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
         {
             LOG_WARN("{}", callbackData->pMessage);
@@ -43,10 +50,6 @@ VulkanPlugin::VulkanPlugin()
 #endif
     };
 
-    const char* instanceLayers[] {
-        "VK_LAYER_KHRONOS_validation"
-    };
-
     VkApplicationInfo appInfo {
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pNext = nullptr,
@@ -69,6 +72,10 @@ VulkanPlugin::VulkanPlugin()
     };
     if (enableValidation)
     {
+        const char* instanceLayers[] {
+            "VK_LAYER_KHRONOS_validation"
+        };
+
         u32 layerCount;
         VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
 
@@ -117,7 +124,7 @@ VulkanPlugin::VulkanPlugin()
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
-    u32 deviceCount {};
+    u32 deviceCount;
     VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr));
     NTHROW_IF(deviceCount == 0, "Failed to find GPU with Vulkan support.");
 
@@ -129,17 +136,19 @@ VulkanPlugin::VulkanPlugin()
         VkPhysicalDeviceProperties deviceProps;
         vkGetPhysicalDeviceProperties(device, &deviceProps);
 
-        VkPhysicalDeviceFeatures deviceFeatures;
-        vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-
         if (deviceProps.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         {
             if (DeviceMeetsRequirements(device))
             {
-                LOG_INFO("Selecting GPU: {} | Vulkan API version: {}.{}.{}", deviceProps.deviceName,
+                LOG_INFO("Selecting GPU: {} | Vulkan API version: {}.{}.{}",
+                         deviceProps.deviceName,
                          VK_API_VERSION_MAJOR(deviceProps.apiVersion),
                          VK_API_VERSION_MINOR(deviceProps.apiVersion),
                          VK_API_VERSION_PATCH(deviceProps.apiVersion));
+
+                vkGetPhysicalDeviceFeatures(device, &mDevice.DeviceFeatures);
+                vkGetPhysicalDeviceMemoryProperties(device, &mDevice.DeviceMemoryProps);
+                mDevice.DeviceProps = deviceProps;
                 mDevice.PhysicalDevice = device;
                 break;
             }
@@ -149,7 +158,8 @@ VulkanPlugin::VulkanPlugin()
 
     /* ======= Logical Device ======= */
     std::unordered_set<u32> uniqueQueueFamilies { mDevice.QueueFamilyIndex.Graphics.value(), mDevice.QueueFamilyIndex.Present.value() };
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos(uniqueQueueFamilies.size());
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    queueCreateInfos.reserve(uniqueQueueFamilies.size());
     for (u32 uniqueQueueFamily: uniqueQueueFamilies)
     {
         f32 queuePriority { 1.0f };
@@ -157,14 +167,16 @@ VulkanPlugin::VulkanPlugin()
             .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
-            .queueFamilyIndex = mDevice.QueueFamilyIndex.Graphics.value(),
+            .queueFamilyIndex = uniqueQueueFamily,
             .queueCount = 1,
             .pQueuePriorities = &queuePriority
         };
         queueCreateInfos.push_back(queueCreateInfo);
     }
 
-    VkPhysicalDeviceFeatures deviceFeatures {};
+    VkPhysicalDeviceFeatures deviceFeatures {
+
+    };
 
     VkDeviceCreateInfo deviceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -188,7 +200,7 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     /* ======= Queue Families ======= */
     mDevice.QueueFamilyIndex.Reset();
 
-    u32 queueFamilyCount {};
+    u32 queueFamilyCount;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
