@@ -70,10 +70,12 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     u32 layerCount;
-    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr),
+             "vkEnumerateInstanceLayerProperties(1) failed.");
 
     std::vector<VkLayerProperties> availableLayers(layerCount);
-    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()));
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()),
+             "vkEnumerateInstanceLayerProperties(2) failed.");
 
     bool validationSupported { false };
     for (const auto& layerProperties: availableLayers)
@@ -84,13 +86,17 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
             break;
         }
     }
-    NTHROW_IF(!validationSupported, "Vulkan validation layers are not available.");
+    if (!validationSupported)
+    {
+        NTHROW("Vulkan validation layers are not available");
+    }
 
     instanceCreateInfo.enabledLayerCount = COUNT_OF(instanceLayers);
     instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
 #endif
 
-    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mContext.Instance));
+    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mContext.Instance),
+             "vkCreateInstance failed.");
 
     /* ======= Debug Messenger ======= */
 #ifndef NDEBUG
@@ -105,7 +111,8 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     auto vkCreateDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkCreateDebugUtilsMessengerEXT")) };
-    VK_CHECK(vkCreateDebugUtilsMessengerEXT(mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger));
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT(mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger),
+             "vkCreateDebugUtilsMessengerEXT failed.");
 #endif
 
     /* ======= Surface ======= */
@@ -117,11 +124,12 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     u32 deviceCount;
-    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, nullptr));
-    NTHROW_IF(deviceCount == 0, "Failed to find GPU with Vulkan support.");
+    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, nullptr),
+             "vkEnumeratePhysicalDevices(1) failed.");
 
     std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, physicalDevices.data()));
+    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, physicalDevices.data()),
+             "vkEnumeratePhysicalDevices(2) failed.");
 
     for (const auto device: physicalDevices)
     {
@@ -141,7 +149,10 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
             }
         }
     }
-    NTHROW_IF(!mDevice.PhysicalDevice, "Could not find a GPU that meets the requirements.");
+    if (!mDevice.PhysicalDevice)
+    {
+        NTHROW("Could not find a GPU that meets the requirements.");
+    }
 
     /* ======= Logical Device ======= */
     std::unordered_set<u32> uniqueQueueFamilies { mDevice.GraphicsQueueFamilyIndex, mDevice.PresentQueueFamilyIndex };
@@ -177,7 +188,8 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
         .ppEnabledExtensionNames = deviceExtensions,
         .pEnabledFeatures = &deviceFeatures
     };
-    VK_CHECK(vkCreateDevice(mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice));
+    VK_CHECK(vkCreateDevice(mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice),
+             "vkCreateDevice failed.");
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.PresentQueueFamilyIndex, 0, &mDevice.PresentQueue);
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.GraphicsQueueFamilyIndex, 0, &mDevice.GraphicsQueue);
 
@@ -238,7 +250,8 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
         swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
     }
 
-    VK_CHECK(vkCreateSwapchainKHR(mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain));
+    VK_CHECK(vkCreateSwapchainKHR(mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain),
+             "vkCreateSwapchainKHR failed.");
 }
 
 bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
@@ -273,7 +286,8 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
         }
 
         VkBool32 supportsPresent { VK_FALSE };
-        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mContext.Surface, &supportsPresent));
+        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mContext.Surface, &supportsPresent),
+                 "vkGetPhysicalDeviceSurfaceSupportKHR failed.");
         if (supportsPresent)
         {
             mDevice.PresentQueueFamilyIndex = i;
@@ -288,10 +302,12 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     };
 
     u32 availableExtensionCount;
-    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, nullptr));
+    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, nullptr),
+             "vkEnumerateDeviceExtensionProperties(1) failed.");
 
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
-    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, availableExtensions.data()));
+    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, availableExtensions.data()),
+             "vkEnumerateDeviceExtensionProperties(2) failed.");
 
     for (const char* extension: deviceExtensions)
     {
@@ -308,21 +324,26 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     }
 
     /* ======= SwapChain Support ======= */
-    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mContext.Surface, &mDevice.Capabilities));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mContext.Surface, &mDevice.Capabilities),
+             "vkGetPhysicalDeviceSurfaceCapabilitiesKHR failed.");
 
     u32 formatCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, nullptr));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, nullptr),
+             "vkGetPhysicalDeviceSurfaceFormatsKHR(1) failed.");
     if (formatCount < 1)
         return false;
     mDevice.SurfaceFormats.resize(formatCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data()));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data()),
+             "vkGetPhysicalDeviceSurfaceFormatsKHR(2) failed.");
 
     u32 presentModeCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, nullptr));
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, nullptr),
+             "vkGetPhysicalDeivceSurfacePresentModesKHR(1) failed.");
     if (presentModeCount < 1)
         return false;
     mDevice.PresentModes.resize(presentModeCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data()));
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data()),
+             "vkGetPhysicalDeivceSurfacePresentModesKHR(2) failed.");
 
     return true;
 }

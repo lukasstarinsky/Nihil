@@ -1,8 +1,13 @@
 #pragma once
 
-#include <string>
 #include <Nihil.hpp>
 #include <vulkan/vulkan.h>
+#include "VulkanException.hpp"
 #include "VulkanTypes.hpp"
 
-#define VK_CHECK(fun) do { VkResult result { fun }; NTHROW_IF(result != VK_SUCCESS, "Vulkan call failed with error code: " + std::to_string(result)); } while(0)
+#define VK_CHECK(fun, message)  \
+do {                            \
+    VkResult res = fun;         \
+    if (res != VK_SUCCESS)      \
+        VK_THROW(message, res); \
+} while (false)

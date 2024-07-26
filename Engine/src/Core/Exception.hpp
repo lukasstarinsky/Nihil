@@ -7,12 +7,12 @@
 class NIHIL_API NihilException : public std::exception
 {
 public:
-    NihilException(u32 line, const char* file, std::string_view message);
+    NihilException(const char* file, u32 line, std::string_view kind, std::string_view message);
+    NihilException(const char* file, u32 line, std::string_view message);
 
     const char* what() const noexcept override;
 private:
     std::string mMessage;
 };
 
-#define NTHROW(message)             throw NihilException(__LINE__, __FILE__, message)
-#define NTHROW_IF(check, message)   if (check) throw NihilException(__LINE__, __FILE__, message)
+#define NTHROW(message) throw NihilException(__FILE__, __LINE__, message)

@@ -13,32 +13,23 @@ enum class LogLevel
     Fatal
 };
 
-class NIHIL_API Logger
+namespace Logger
 {
-public:
-    void SetLogLevel(LogLevel logLevel);
+    NIHIL_API auto GetLogLevel() -> LogLevel;
+    NIHIL_API void SetLogLevel(LogLevel logLevel);
+    NIHIL_API void Log(LogLevel severity, std::string_view message);
 
     template<typename... Args>
     void Log(LogLevel severity, std::format_string<Args...> fmt, Args&&... args)
     {
-        if (mLogLevel > severity)
-            return;
-
         std::string logMessage { std::format(fmt, std::forward<Args>(args)...) };
-        LogImpl(severity, logMessage);
+        Log(severity, logMessage);
     }
+}
 
-    static Logger& Get();
-private:
-    void LogImpl(LogLevel severity, std::string_view message);
-private:
-    LogLevel mLogLevel { LogLevel::Trace };
-};
-
-#define LOG_SETLOGLEVEL(level) Logger::Get().SetLogLevel(level)
-#define LOG_TRACE(fmt, ...) Logger::Get().Log(LogLevel::Trace, fmt, __VA_ARGS__)
-#define LOG_DEBUG(fmt, ...) Logger::Get().Log(LogLevel::Debug, fmt, __VA_ARGS__)
-#define LOG_INFO(fmt, ...)  Logger::Get().Log(LogLevel::Info, fmt, __VA_ARGS__)
-#define LOG_WARN(fmt, ...)  Logger::Get().Log(LogLevel::Warn, fmt, __VA_ARGS__)
-#define LOG_ERROR(fmt, ...) Logger::Get().Log(LogLevel::Error, fmt, __VA_ARGS__)
-#define LOG_FATAL(fmt, ...) Logger::Get().Log(LogLevel::Fatal, fmt, __VA_ARGS__)
+#define LOG_TRACE(fmt, ...)     Logger::Log(LogLevel::Trace, fmt, __VA_ARGS__)
+#define LOG_DEBUG(fmt, ...)     Logger::Log(LogLevel::Debug, fmt, __VA_ARGS__)
+#define LOG_INFO(fmt, ...)      Logger::Log(LogLevel::Info, fmt, __VA_ARGS__)
+#define LOG_WARN(fmt, ...)      Logger::Log(LogLevel::Warn, fmt, __VA_ARGS__)
+#define LOG_ERROR(fmt, ...)     Logger::Log(LogLevel::Error, fmt, __VA_ARGS__)
+#define LOG_FATAL(fmt, ...)     Logger::Log(LogLevel::Fatal, fmt, __VA_ARGS__)

@@ -28,7 +28,8 @@ VkSurfaceKHR VulkanPlatform::CreateSurface(VkInstance vkInstance)
     };
 
     VkSurfaceKHR outSurface;
-    VK_CHECK(vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &outSurface));
+    VK_CHECK(vkCreateWin32SurfaceKHR(vkInstance, &surfaceCreateInfo, nullptr, &outSurface),
+             "vkCreateWin32SurfaceKHR failed.");
 
     return outSurface;
 }
