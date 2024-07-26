@@ -42,13 +42,13 @@ struct ApplicationEvent
 struct KeyEvent
 {
     KeyEventType Type;
-    enum Key Key;
+    Key Key;
 };
 
 struct MouseEvent
 {
     MouseEventType Type;
-    enum Button Button;
+    Button Button;
     Vec2i Position {};
 };
 

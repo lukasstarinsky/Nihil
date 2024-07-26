@@ -3,32 +3,30 @@
 #include <Core/Defines.hpp>
 #include <optional>
 
-struct VulkanQueueFamilyIndex
+struct VulkanContext
 {
-    std::optional<u32> Graphics;
-    std::optional<u32> Present;
+    VkSurfaceKHR Surface;
+    VkInstance Instance;
 
-    void Reset() { Graphics = std::nullopt; Present = std::nullopt; }
-    bool IsComplete() const { return Graphics.has_value() && Present.has_value(); }
-};
-
-struct VulkanSwapChainSupportInfo
-{
-    VkSurfaceCapabilitiesKHR Capabilities;
-    std::vector<VkSurfaceFormatKHR> SurfaceFormats;
-    std::vector<VkPresentModeKHR> PresentModes;
+#ifndef NDEBUG
+    VkDebugUtilsMessengerEXT DebugMessenger;
+#endif
 };
 
 struct VulkanDevice
 {
-    VkPhysicalDevice PhysicalDevice;
-    VkPhysicalDeviceProperties DeviceProps;
-    VkPhysicalDeviceFeatures DeviceFeatures;
-    VkPhysicalDeviceMemoryProperties DeviceMemoryProps;
     VkDevice LogicalDevice;
+    VkPhysicalDevice PhysicalDevice;
+    VkPhysicalDeviceProperties DeviceProperties;
+    VkPhysicalDeviceFeatures DeviceFeatures;
 
-    VulkanQueueFamilyIndex QueueFamilyIndex;
+    VkSurfaceCapabilitiesKHR Capabilities;
+    std::vector<VkSurfaceFormatKHR> SurfaceFormats;
+    std::vector<VkPresentModeKHR> PresentModes;
 
+    // NOTE: intended wrap
+    u32 GraphicsQueueFamilyIndex = -1;
+    u32 PresentQueueFamilyIndex = -1;
     VkQueue GraphicsQueue;
     VkQueue PresentQueue;
 };

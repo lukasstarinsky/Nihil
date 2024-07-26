@@ -4,8 +4,8 @@
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData)
 {
-//    if (messageSeverity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-//        return VK_FALSE;
+    if (messageSeverity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        return VK_FALSE;
 
     switch (messageSeverity)
     {
@@ -31,15 +31,9 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSev
     return VK_FALSE;
 }
 
-VulkanPlugin::VulkanPlugin()
+VulkanPlugin::VulkanPlugin(i32 width, i32 height)
 {
     LOG_TRACE("Initializing Vulkan renderer...");
-
-#ifdef NDEBUG
-    bool enableValidation { false };
-#else
-    bool enableValidation { true };
-#endif
 
     /* ======= Instance ======= */
     const char* instanceExtensions[] {
@@ -70,54 +64,52 @@ VulkanPlugin::VulkanPlugin()
         .enabledExtensionCount = COUNT_OF(instanceExtensions),
         .ppEnabledExtensionNames = instanceExtensions
     };
-    if (enableValidation)
+#ifndef NDEBUG
+    const char* instanceLayers[] {
+        "VK_LAYER_KHRONOS_validation"
+    };
+
+    u32 layerCount;
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()));
+
+    bool validationSupported { false };
+    for (const auto& layerProperties: availableLayers)
     {
-        const char* instanceLayers[] {
-            "VK_LAYER_KHRONOS_validation"
-        };
-
-        u32 layerCount;
-        VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
-
-        std::vector<VkLayerProperties> availableLayers(layerCount);
-        VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()));
-
-        bool validationSupported { false };
-        for (const auto& layerProperties: availableLayers)
+        if (!strcmp(instanceLayers[0], layerProperties.layerName))
         {
-            if (!strcmp(instanceLayers[0], layerProperties.layerName))
-            {
-                validationSupported = true;
-                break;
-            }
+            validationSupported = true;
+            break;
         }
-        NTHROW_IF(!validationSupported, "Vulkan validation layers are not available.");
-
-        instanceCreateInfo.enabledLayerCount = COUNT_OF(instanceLayers);
-        instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
     }
+    NTHROW_IF(!validationSupported, "Vulkan validation layers are not available.");
 
-    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mInstance));
+    instanceCreateInfo.enabledLayerCount = COUNT_OF(instanceLayers);
+    instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
+#endif
+
+    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mContext.Instance));
 
     /* ======= Debug Messenger ======= */
-    if (enableValidation)
-    {
-        VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo {
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-            .pNext = nullptr,
-            .flags = 0,
-            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-            .pfnUserCallback = VulkanDebugCallback,
-            .pUserData = nullptr
-        };
+#ifndef NDEBUG
+    VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo {
+        .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+        .pNext = nullptr,
+        .flags = 0,
+        .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+        .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+        .pfnUserCallback = VulkanDebugCallback,
+        .pUserData = nullptr
+    };
 
-        auto vkCreateDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT")) };
-        VK_CHECK(vkCreateDebugUtilsMessengerEXT(mInstance, &debugMessengerCreateInfo, nullptr, &mDebugMessenger));
-    }
+    auto vkCreateDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkCreateDebugUtilsMessengerEXT")) };
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT(mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger));
+#endif
 
     /* ======= Surface ======= */
-    mSurface = VulkanPlatform::CreateSurface(mInstance);
+    mContext.Surface = VulkanPlatform::CreateSurface(mContext.Instance);
 
     /* ======= Physical Device ======= */
     const char* deviceExtensions[] {
@@ -125,30 +117,25 @@ VulkanPlugin::VulkanPlugin()
     };
 
     u32 deviceCount;
-    VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr));
+    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, nullptr));
     NTHROW_IF(deviceCount == 0, "Failed to find GPU with Vulkan support.");
 
     std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-    VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &deviceCount, physicalDevices.data()));
+    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, physicalDevices.data()));
 
     for (const auto device: physicalDevices)
     {
-        VkPhysicalDeviceProperties deviceProps;
-        vkGetPhysicalDeviceProperties(device, &deviceProps);
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-        if (deviceProps.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         {
             if (DeviceMeetsRequirements(device))
             {
-                LOG_INFO("Selecting GPU: {} | Vulkan API version: {}.{}.{}",
-                         deviceProps.deviceName,
-                         VK_API_VERSION_MAJOR(deviceProps.apiVersion),
-                         VK_API_VERSION_MINOR(deviceProps.apiVersion),
-                         VK_API_VERSION_PATCH(deviceProps.apiVersion));
+                LOG_INFO("Selecting GPU: {}", deviceProperties.deviceName);
 
                 vkGetPhysicalDeviceFeatures(device, &mDevice.DeviceFeatures);
-                vkGetPhysicalDeviceMemoryProperties(device, &mDevice.DeviceMemoryProps);
-                mDevice.DeviceProps = deviceProps;
+                mDevice.DeviceProperties = deviceProperties;
                 mDevice.PhysicalDevice = device;
                 break;
             }
@@ -157,7 +144,7 @@ VulkanPlugin::VulkanPlugin()
     NTHROW_IF(!mDevice.PhysicalDevice, "Could not find a GPU that meets the requirements.");
 
     /* ======= Logical Device ======= */
-    std::unordered_set<u32> uniqueQueueFamilies { mDevice.QueueFamilyIndex.Graphics.value(), mDevice.QueueFamilyIndex.Present.value() };
+    std::unordered_set<u32> uniqueQueueFamilies { mDevice.GraphicsQueueFamilyIndex, mDevice.PresentQueueFamilyIndex };
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     queueCreateInfos.reserve(uniqueQueueFamilies.size());
     for (u32 uniqueQueueFamily: uniqueQueueFamilies)
@@ -191,17 +178,78 @@ VulkanPlugin::VulkanPlugin()
         .pEnabledFeatures = &deviceFeatures
     };
     VK_CHECK(vkCreateDevice(mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice));
-    vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.QueueFamilyIndex.Present.value(), 0, &mDevice.PresentQueue);
-    vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.QueueFamilyIndex.Graphics.value(), 0, &mDevice.GraphicsQueue);
+    vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.PresentQueueFamilyIndex, 0, &mDevice.PresentQueue);
+    vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.GraphicsQueueFamilyIndex, 0, &mDevice.GraphicsQueue);
+
+    /* ======= SwapChain ======= */
+    VkSurfaceFormatKHR selectedSurfaceFormat { mDevice.SurfaceFormats[0] };
+    for (const auto& surfaceFormat: mDevice.SurfaceFormats)
+    {
+        if (surfaceFormat.format == VK_FORMAT_B8G8R8A8_UNORM && surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        {
+            selectedSurfaceFormat = surfaceFormat;
+            break;
+        }
+    }
+
+    VkPresentModeKHR selectedPresentMode { VK_PRESENT_MODE_FIFO_KHR };
+    for (auto presentMode: mDevice.PresentModes)
+    {
+        if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            selectedPresentMode = presentMode;
+            break;
+        }
+    }
+
+    u32 imageCount { mDevice.Capabilities.minImageCount + 1 };
+    if (mDevice.Capabilities.maxImageCount > 0 && mDevice.Capabilities.maxImageCount < imageCount)
+    {
+        imageCount = mDevice.Capabilities.maxImageCount;
+    }
+
+    VkSwapchainCreateInfoKHR swapChainCreateInfo {
+        .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+        .pNext = nullptr,
+        .flags = 0,
+        .surface = mContext.Surface,
+        .minImageCount = imageCount,
+        .imageFormat = selectedSurfaceFormat.format,
+        .imageColorSpace = selectedSurfaceFormat.colorSpace,
+        // TODO: take from constructor args
+        .imageExtent = mDevice.Capabilities.currentExtent,
+        .imageArrayLayers = 1,
+        .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .queueFamilyIndexCount = 0,
+        .pQueueFamilyIndices = nullptr,
+        .preTransform = mDevice.Capabilities.currentTransform,
+        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+        .presentMode = selectedPresentMode,
+        .clipped = VK_TRUE,
+        .oldSwapchain = nullptr
+    };
+
+    u32 queueFamilyIndices[] { mDevice.GraphicsQueueFamilyIndex, mDevice.PresentQueueFamilyIndex };
+    if (queueFamilyIndices[0] != queueFamilyIndices[1])
+    {
+        swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT,
+        swapChainCreateInfo.queueFamilyIndexCount = COUNT_OF(queueFamilyIndices);
+        swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
+    }
+
+    VK_CHECK(vkCreateSwapchainKHR(mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain));
 }
 
 bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
 {
     /* ======= Queue Families ======= */
-    mDevice.QueueFamilyIndex.Reset();
+    mDevice.GraphicsQueueFamilyIndex = -1;
+    mDevice.PresentQueueFamilyIndex = -1;
 
     u32 queueFamilyCount;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
@@ -211,7 +259,7 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
 
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
-            mDevice.QueueFamilyIndex.Graphics = i;
+            mDevice.GraphicsQueueFamilyIndex = i;
         }
 
         if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)
@@ -225,13 +273,13 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
         }
 
         VkBool32 supportsPresent { VK_FALSE };
-        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mSurface, &supportsPresent));
+        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mContext.Surface, &supportsPresent));
         if (supportsPresent)
         {
-            mDevice.QueueFamilyIndex.Present = i;
+            mDevice.PresentQueueFamilyIndex = i;
         }
     }
-    if (!mDevice.QueueFamilyIndex.IsComplete())
+    if (mDevice.GraphicsQueueFamilyIndex == -1u || mDevice.PresentQueueFamilyIndex == -1u)
         return false;
 
     /* ======= Device Extensions ======= */
@@ -260,21 +308,21 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     }
 
     /* ======= SwapChain Support ======= */
-    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mSurface, &mSwapChainSupport.Capabilities));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mContext.Surface, &mDevice.Capabilities));
 
     u32 formatCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, nullptr));
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, nullptr));
     if (formatCount < 1)
         return false;
-    mSwapChainSupport.SurfaceFormats.resize(formatCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, mSwapChainSupport.SurfaceFormats.data()));
+    mDevice.SurfaceFormats.resize(formatCount);
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data()));
 
     u32 presentModeCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, nullptr));
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, nullptr));
     if (presentModeCount < 1)
         return false;
-    mSwapChainSupport.PresentModes.resize(presentModeCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, mSwapChainSupport.PresentModes.data()));
+    mDevice.PresentModes.resize(presentModeCount);
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data()));
 
     return true;
 }
@@ -282,20 +330,21 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
 VulkanPlugin::~VulkanPlugin()
 {
     LOG_TRACE("Shutting down Vulkan renderer...");
-    vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
+    vkDestroySwapchainKHR(mDevice.LogicalDevice, mSwapChain, nullptr);
+    vkDestroySurfaceKHR(mContext.Instance, mContext.Surface, nullptr);
     vkDestroyDevice(mDevice.LogicalDevice, nullptr);
 
 #ifndef NDEBUG
-    auto vkDestroyDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugUtilsMessengerEXT")) };
-    vkDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
+    auto vkDestroyDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkDestroyDebugUtilsMessengerEXT")) };
+    vkDestroyDebugUtilsMessengerEXT(mContext.Instance, mContext.DebugMessenger, nullptr);
 #endif
 
-    vkDestroyInstance(mInstance, nullptr);
+    vkDestroyInstance(mContext.Instance, nullptr);
 }
 
-RendererPlugin* CreatePlugin()
+RendererPlugin* CreatePlugin(i32 width, i32 height)
 {
-    return new VulkanPlugin();
+    return new VulkanPlugin(width, height);
 }
 
 void DestroyPlugin(RendererPlugin* plugin)

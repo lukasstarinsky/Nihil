@@ -6,23 +6,18 @@
 class VulkanPlugin : public RendererPlugin
 {
 public:
-    VulkanPlugin();
+    explicit VulkanPlugin(i32 width, i32 height);
     ~VulkanPlugin() override;
 private:
     bool DeviceMeetsRequirements(VkPhysicalDevice device);
 private:
+    VulkanContext mContext {};
     VulkanDevice mDevice {};
-    VkSurfaceKHR mSurface {};
-    VkInstance mInstance {};
-    VulkanSwapChainSupportInfo mSwapChainSupport {};
-
-#ifndef NDEBUG
-    VkDebugUtilsMessengerEXT mDebugMessenger {};
-#endif
+    VkSwapchainKHR mSwapChain {};
 };
 
 extern "C"
 {
-    NIHIL_API auto CreatePlugin() -> RendererPlugin*;
+    NIHIL_API auto CreatePlugin(i32 width, i32 height) -> RendererPlugin*;
     NIHIL_API void DestroyPlugin(RendererPlugin* plugin);
 }

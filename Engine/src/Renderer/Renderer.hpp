@@ -11,8 +11,8 @@ enum class RendererAPI
 
 namespace Renderer
 {
-    void Initialize(RendererAPI api);
+    void Initialize(i32 width, i32 height, RendererAPI api);
     void Shutdown();
 
-    static const char* ApiToString(RendererAPI api);
+    const char* ApiToString(RendererAPI api);
 }

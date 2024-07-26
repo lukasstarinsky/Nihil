@@ -8,7 +8,7 @@ Engine::Engine(Application* application)
     NASSERT_MSG(mApplication, "Application cannot be nullptr.");
 
     Platform::Initialize(mApplication->Config);
-    Renderer::Initialize(RendererAPI::Vulkan);
+    Renderer::Initialize(mApplication->Config.WindowWidth, mApplication->Config.WindowHeight, mApplication->Config.RendererAPI);
     mApplication->OnInitialize();
 
     SET_EVENT_LISTENER_THIS(EventCategory::Application, OnAppEvent);

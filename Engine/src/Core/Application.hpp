@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Renderer/Renderer.hpp"
 #include "Defines.hpp"
 
 struct ApplicationConfig
@@ -7,6 +8,7 @@ struct ApplicationConfig
     i32 WindowWidth { 1024 };
     i32 WindowHeight { 768 };
     const char* WindowTitle { "Nihil Application" };
+    RendererAPI RendererAPI { RendererAPI::Vulkan };
 };
 
 struct ApplicationState

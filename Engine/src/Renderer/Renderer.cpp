@@ -5,7 +5,7 @@
 static DynamicLibrary sRendererModule;
 static RendererPlugin* sRendererPlugin;
 
-void Renderer::Initialize(RendererAPI api)
+void Renderer::Initialize(i32 width, i32 height, RendererAPI api)
 {
     if (!Platform::LoadDynamicLibrary(Renderer::ApiToString(api), sRendererModule))
     {
@@ -19,7 +19,7 @@ void Renderer::Initialize(RendererAPI api)
     }
 
     auto CreatePluginFn { reinterpret_cast<CreateRendererPlugin>(sRendererModule.Functions[0]) };
-    sRendererPlugin = CreatePluginFn();
+    sRendererPlugin = CreatePluginFn(width, height);
 }
 
 void Renderer::Shutdown()
