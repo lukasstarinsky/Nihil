@@ -70,12 +70,10 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     u32 layerCount;
-    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr),
-             "vkEnumerateInstanceLayerProperties(1) failed.");
+    VK_CHECK(vkEnumerateInstanceLayerProperties, &layerCount, nullptr);
 
     std::vector<VkLayerProperties> availableLayers(layerCount);
-    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()),
-             "vkEnumerateInstanceLayerProperties(2) failed.");
+    VK_CHECK(vkEnumerateInstanceLayerProperties, &layerCount, availableLayers.data());
 
     bool validationSupported { false };
     for (const auto& layerProperties: availableLayers)
@@ -95,8 +93,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
 #endif
 
-    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mContext.Instance),
-             "vkCreateInstance failed.");
+    VK_CHECK(vkCreateInstance, &instanceCreateInfo, nullptr, &mContext.Instance);
 
     /* ======= Debug Messenger ======= */
 #ifndef NDEBUG
@@ -111,8 +108,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     auto vkCreateDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkCreateDebugUtilsMessengerEXT")) };
-    VK_CHECK(vkCreateDebugUtilsMessengerEXT(mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger),
-             "vkCreateDebugUtilsMessengerEXT failed.");
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT, mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger);
 #endif
 
     /* ======= Surface ======= */
@@ -124,12 +120,10 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     u32 deviceCount;
-    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, nullptr),
-             "vkEnumeratePhysicalDevices(1) failed.");
+    VK_CHECK(vkEnumeratePhysicalDevices, mContext.Instance, &deviceCount, nullptr);
 
     std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, physicalDevices.data()),
-             "vkEnumeratePhysicalDevices(2) failed.");
+    VK_CHECK(vkEnumeratePhysicalDevices, mContext.Instance, &deviceCount, physicalDevices.data());
 
     for (const auto device: physicalDevices)
     {
@@ -188,8 +182,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
         .ppEnabledExtensionNames = deviceExtensions,
         .pEnabledFeatures = &deviceFeatures
     };
-    VK_CHECK(vkCreateDevice(mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice),
-             "vkCreateDevice failed.");
+    VK_CHECK(vkCreateDevice, mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice);
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.PresentQueueFamilyIndex, 0, &mDevice.PresentQueue);
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.GraphicsQueueFamilyIndex, 0, &mDevice.GraphicsQueue);
 
@@ -250,8 +243,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
         swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
     }
 
-    VK_CHECK(vkCreateSwapchainKHR(mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain),
-             "vkCreateSwapchainKHR failed.");
+    VK_CHECK(vkCreateSwapchainKHR, mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain);
 }
 
 bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
@@ -286,8 +278,7 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
         }
 
         VkBool32 supportsPresent { VK_FALSE };
-        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mContext.Surface, &supportsPresent),
-                 "vkGetPhysicalDeviceSurfaceSupportKHR failed.");
+        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR, device, i, mContext.Surface, &supportsPresent);
         if (supportsPresent)
         {
             mDevice.PresentQueueFamilyIndex = i;
@@ -302,12 +293,10 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     };
 
     u32 availableExtensionCount;
-    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, nullptr),
-             "vkEnumerateDeviceExtensionProperties(1) failed.");
+    VK_CHECK(vkEnumerateDeviceExtensionProperties, device, nullptr, &availableExtensionCount, nullptr);
 
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
-    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, availableExtensions.data()),
-             "vkEnumerateDeviceExtensionProperties(2) failed.");
+    VK_CHECK(vkEnumerateDeviceExtensionProperties, device, nullptr, &availableExtensionCount, availableExtensions.data());
 
     for (const char* extension: deviceExtensions)
     {
@@ -324,26 +313,21 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     }
 
     /* ======= SwapChain Support ======= */
-    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mContext.Surface, &mDevice.Capabilities),
-             "vkGetPhysicalDeviceSurfaceCapabilitiesKHR failed.");
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR, device, mContext.Surface, &mDevice.Capabilities);
 
     u32 formatCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, nullptr),
-             "vkGetPhysicalDeviceSurfaceFormatsKHR(1) failed.");
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR, device, mContext.Surface, &formatCount, nullptr);
     if (formatCount < 1)
         return false;
     mDevice.SurfaceFormats.resize(formatCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data()),
-             "vkGetPhysicalDeviceSurfaceFormatsKHR(2) failed.");
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR, device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data());
 
     u32 presentModeCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, nullptr),
-             "vkGetPhysicalDeivceSurfacePresentModesKHR(1) failed.");
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR, device, mContext.Surface, &presentModeCount, nullptr);
     if (presentModeCount < 1)
         return false;
     mDevice.PresentModes.resize(presentModeCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data()),
-             "vkGetPhysicalDeivceSurfacePresentModesKHR(2) failed.");
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR, device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data());
 
     return true;
 }
