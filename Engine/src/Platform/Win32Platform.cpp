@@ -143,7 +143,7 @@ void* Platform::GetState()
     return &sState;
 }
 
-bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary& outDynamicLibrary)
+bool DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary)
 {
     char buffer[256] { 0 };
     sprintf_s(buffer, "%s.dll", name);
@@ -152,23 +152,27 @@ bool Platform::LoadDynamicLibrary(const char* name, DynamicLibrary& outDynamicLi
     if (!module)
         return false;
 
-    outDynamicLibrary.Name = buffer;
-    outDynamicLibrary.Handle = module;
+    outDynamicLibrary->Name = buffer;
+    outDynamicLibrary->Handle = module;
     return true;
 }
 
-bool Platform::UnloadDynamicLibrary(const DynamicLibrary& dynamicLibrary)
+bool DynamicLibrary::Unload() const
 {
-    return FreeLibrary(static_cast<HMODULE>(dynamicLibrary.Handle));
+    NASSERT(Handle);
+
+    return FreeLibrary(static_cast<HMODULE>(Handle));
 }
 
-bool Platform::LoadDynamicLibraryFunction(DynamicLibrary& dynamicLibrary, const char* funName)
+bool DynamicLibrary::LoadFunction(const char* name)
 {
-    FARPROC symbolPtr { GetProcAddress(static_cast<HMODULE>(dynamicLibrary.Handle), funName) };
+    NASSERT(Handle);
+
+    FARPROC symbolPtr { GetProcAddress(static_cast<HMODULE>(Handle), name) };
     if (!symbolPtr)
         return false;
 
-    dynamicLibrary.Functions.push_back(reinterpret_cast<void*>(symbolPtr));
+    Functions[name] = reinterpret_cast<void*>(symbolPtr);
     return true;
 }
 

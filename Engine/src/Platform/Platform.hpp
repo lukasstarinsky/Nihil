@@ -1,14 +1,28 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 #include "Core/Application.hpp"
 #include "Core/Logger.hpp"
 
-struct DynamicLibrary
+class DynamicLibrary
 {
+public:
+    static bool Load(const char* name, DynamicLibrary* outDynamicLibrary);
+
+    bool Unload() const;
+    bool LoadFunction(const char* name);
+
+    template<typename T>
+    T GetFunction(const char* name)
+    {
+        NASSERT(Functions.contains(name));
+        return reinterpret_cast<T>(Functions[name]);
+    }
+public:
     std::string Name;
     void* Handle;
-    std::vector<void*> Functions;
+    std::unordered_map<std::string, void*> Functions;
 };
 
 namespace Platform
@@ -18,9 +32,6 @@ namespace Platform
     void PollEvents();
 
     NIHIL_API void* GetState();
-    NIHIL_API bool LoadDynamicLibrary(const char* name, DynamicLibrary& outDynamicLibrary);
-    NIHIL_API bool UnloadDynamicLibrary(const DynamicLibrary& dynamicLibrary);
-    NIHIL_API bool LoadDynamicLibraryFunction(DynamicLibrary& dynamicLibrary, const char* funName);
 }
 
 namespace Console

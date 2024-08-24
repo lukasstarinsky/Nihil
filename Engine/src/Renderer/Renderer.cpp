@@ -7,26 +7,22 @@ static RendererPlugin* sRendererPlugin;
 
 void Renderer::Initialize(i32 width, i32 height, RendererAPI api)
 {
-    if (!Platform::LoadDynamicLibrary(Renderer::ApiToString(api), sRendererModule))
-    {
+    if (!DynamicLibrary::Load(Renderer::ApiToString(api), &sRendererModule))
         NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(api)));
-    }
 
-    if (!Platform::LoadDynamicLibraryFunction(sRendererModule, "CreatePlugin") ||
-        !Platform::LoadDynamicLibraryFunction(sRendererModule, "DestroyPlugin"))
-    {
+    if (!sRendererModule.LoadFunction("CreatePlugin") || !sRendererModule.LoadFunction("DestroyPlugin"))
         NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(api)));
-    }
 
-    auto CreatePluginFn { reinterpret_cast<CreateRendererPlugin>(sRendererModule.Functions[0]) };
+    auto CreatePluginFn { sRendererModule.GetFunction<CreateRendererPlugin>("CreatePlugin") };
     sRendererPlugin = CreatePluginFn(width, height);
 }
 
 void Renderer::Shutdown()
 {
-    auto DestroyPluginFn { reinterpret_cast<DestroyRendererPlugin>(sRendererModule.Functions[1]) };
-    DestroyPluginFn(sRendererPlugin);
-    Platform::UnloadDynamicLibrary(sRendererModule);
+    delete sRendererPlugin;
+//    auto DestroyPluginFn { sRendererModule.GetFunction<DestroyRendererPlugin>("DestroyPlugin") };
+//    DestroyPluginFn(sRendererPlugin);
+    sRendererModule.Unload();
 }
 
 const char* Renderer::ApiToString(RendererAPI api)
