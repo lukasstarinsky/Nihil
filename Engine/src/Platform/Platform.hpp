@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <unordered_map>
 #include "Core/Application.hpp"
 #include "Core/Logger.hpp"
@@ -16,13 +15,13 @@ public:
     template<typename T>
     T GetFunction(const char* name)
     {
-        NASSERT(Functions.contains(name));
-        return reinterpret_cast<T>(Functions[name]);
+        NASSERT(mFunctions.contains(name));
+        return reinterpret_cast<T>(mFunctions[name]);
     }
-public:
-    std::string Name;
-    void* Handle;
-    std::unordered_map<std::string, void*> Functions;
+private:
+    std::string mName;
+    void* mHandle;
+    std::unordered_map<const char*, void*> mFunctions;
 };
 
 namespace Platform

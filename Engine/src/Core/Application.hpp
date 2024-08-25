@@ -1,14 +1,15 @@
 #pragma once
 
-#include "Renderer/Renderer.hpp"
 #include "Defines.hpp"
+
+enum class RendererAPI;
 
 struct ApplicationConfig
 {
     i32 WindowWidth { 1024 };
     i32 WindowHeight { 768 };
     const char* WindowTitle { "Nihil Application" };
-    RendererAPI RendererAPI { RendererAPI::Vulkan };
+    RendererAPI RendererAPI { };
 };
 
 struct ApplicationState
@@ -21,8 +22,6 @@ class NIHIL_API Application
 {
 public:
     Application() = default;
-    explicit Application(const ApplicationConfig& config)
-        : Config{config} {}
 
     virtual ~Application() = default;
     virtual void OnInitialize() = 0;

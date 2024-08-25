@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Application.hpp"
+
 enum class RendererAPI
 {
     Vulkan = 0,
@@ -11,7 +13,7 @@ enum class RendererAPI
 
 namespace Renderer
 {
-    void Initialize(i32 width, i32 height, RendererAPI api);
+    void Initialize(const ApplicationConfig& config);
     void Shutdown();
 
     const char* ApiToString(RendererAPI api);

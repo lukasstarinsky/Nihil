@@ -7,3 +7,14 @@
 #include <Core/Application.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Platform/Platform.hpp>
+
+#define CREATE_APPLICATION(Application) \
+try {                                   \
+    Application application;            \
+    Engine engine { &application };     \
+    engine.Run();                       \
+    return EXIT_SUCCESS;                \
+} catch (const NihilException& e) {     \
+    LOG_FATAL("{}", e.what());          \
+    return EXIT_FAILURE;                \
+} while(0)

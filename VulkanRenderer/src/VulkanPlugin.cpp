@@ -258,7 +258,7 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-    for (u32 i { 0 }; i < queueFamilyCount; ++i)
+    for (u32 i {0}; i < queueFamilyCount; ++i)
     {
         const auto& queueFamily { queueFamilies[i] };
 

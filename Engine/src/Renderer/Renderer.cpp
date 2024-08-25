@@ -5,23 +5,26 @@
 static DynamicLibrary sRendererModule;
 static RendererPlugin* sRendererPlugin;
 
-void Renderer::Initialize(i32 width, i32 height, RendererAPI api)
+void Renderer::Initialize(const ApplicationConfig& config)
 {
-    if (!DynamicLibrary::Load(Renderer::ApiToString(api), &sRendererModule))
-        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(api)));
+    if (!DynamicLibrary::Load(Renderer::ApiToString(config.RendererAPI), &sRendererModule))
+    {
+        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(config.RendererAPI)));
+    }
 
     if (!sRendererModule.LoadFunction("CreatePlugin") || !sRendererModule.LoadFunction("DestroyPlugin"))
-        NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(api)));
+    {
+        NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(config.RendererAPI)));
+    }
 
-    auto CreatePluginFn { sRendererModule.GetFunction<CreateRendererPlugin>("CreatePlugin") };
-    sRendererPlugin = CreatePluginFn(width, height);
+    auto CreatePluginFn { sRendererModule.GetFunction<CreateRendererPluginFn>("CreatePlugin") };
+    sRendererPlugin = CreatePluginFn(config.WindowWidth, config.WindowHeight);
 }
 
 void Renderer::Shutdown()
 {
+    // TODO: investigate occasional crash when deleting object allocated from dll
     delete sRendererPlugin;
-//    auto DestroyPluginFn { sRendererModule.GetFunction<DestroyRendererPlugin>("DestroyPlugin") };
-//    DestroyPluginFn(sRendererPlugin);
     sRendererModule.Unload();
 }
 

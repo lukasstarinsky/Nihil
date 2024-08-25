@@ -4,63 +4,50 @@
 #include "Defines.hpp"
 #include "Input.hpp"
 
-enum class EventCategory
-{
-    Application = 0,
-    Key,
-    Mouse,
-    Total
-};
-
-enum class ApplicationEventType
-{
-    Quit = 0,
-    Resize
-};
-
-enum class KeyEventType
-{
-    Press = 0,
-    Release
-};
-
-enum class MouseEventType
-{
-    Press = 0,
-    Release,
-    Scroll,
-    Move
-};
-
 struct ApplicationEvent
 {
-    ApplicationEventType Type;
     i32 Width {};
     i32 Height {};
 };
 
-struct KeyEvent
-{
-    KeyEventType Type;
-    Key Key;
-};
-
 struct MouseEvent
 {
-    MouseEventType Type;
-    Button Button;
+    Button Button { Button::Middle };
     Vec2i Position {};
 };
 
-using Event = const void*;
+struct Event
+{
+    enum EventType
+    {
+        ApplicationQuit     = 1 << 0,
+        ApplicationResize   = 1 << 1,
+
+        KeyPress            = 1 << 2,
+        KeyRelease          = 1 << 3,
+
+        MousePress          = 1 << 4,
+        MouseRelease        = 1 << 5,
+        MouseScroll         = 1 << 6,
+        MouseMove           = 1 << 7
+    };
+
+    EventType Type;
+    union
+    {
+        struct ApplicationEvent ApplicationEvent;
+        struct MouseEvent MouseEvent;
+        Key KeyEvent;
+    };
+};
 
 namespace EventDispatcher
 {
-    using EventCallback = std::function<bool(Event)>;
+    using EventCallback = std::function<bool(const Event&)>;
 
-    NIHIL_API void AddListener(EventCategory category, const EventCallback& callback);
-    NIHIL_API void Dispatch(EventCategory category, Event e);
+    NIHIL_API void AddListener(u64 flag, const EventCallback& callback);
+    NIHIL_API void Dispatch(const Event& e);
 }
 
-#define SET_EVENT_LISTENER_THIS(category, fn) EventDispatcher::AddListener(category, [this](Event e) -> bool { return fn(e); })
-#define SET_EVENT_LISTENER(category, fn)      EventDispatcher::AddListener(category, fn)
+#define ADD_EVENT_LISTENER_THIS(flag, fn) EventDispatcher::AddListener(flag, [this](const Event& e) -> bool { return fn(e); })
+#define ADD_EVENT_LISTENER(flag, fn)      EventDispatcher::AddListener(flag, fn)

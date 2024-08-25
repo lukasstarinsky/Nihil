@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Core/Defines.hpp>
-#include <optional>
 
 struct VulkanContext
 {

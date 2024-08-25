@@ -8,10 +8,10 @@ Engine::Engine(Application* application)
     NASSERT_MSG(mApplication, "Application cannot be nullptr.");
 
     Platform::Initialize(mApplication->Config);
-    Renderer::Initialize(mApplication->Config.WindowWidth, mApplication->Config.WindowHeight, mApplication->Config.RendererAPI);
+    Renderer::Initialize(mApplication->Config);
     mApplication->OnInitialize();
 
-    SET_EVENT_LISTENER_THIS(EventCategory::Application, OnAppEvent);
+    ADD_EVENT_LISTENER_THIS(Event::ApplicationQuit | Event::ApplicationResize, OnAppEvent);
 }
 
 Engine::~Engine()
@@ -26,6 +26,7 @@ void Engine::Run() const
     {
         if (!mApplication->State.IsSuspended)
         {
+            // TODO: should update when suspended?
             mApplication->OnUpdate();
             mApplication->OnRender();
         }
@@ -33,21 +34,21 @@ void Engine::Run() const
     }
 }
 
-bool Engine::OnAppEvent(Event e)
+bool Engine::OnAppEvent(const Event& e)
 {
-    auto appEvent { static_cast<const ApplicationEvent*>(e) };
-
-    if (appEvent->Type == ApplicationEventType::Quit)
+    if (e.Type == Event::ApplicationQuit)
     {
         mApplication->State.IsRunning = false;
         return true;
     }
-    else if (appEvent->Type == ApplicationEventType::Resize)
+    else if (e.Type == Event::ApplicationResize)
     {
-        mApplication->Config.WindowWidth = appEvent->Width;
-        mApplication->Config.WindowHeight = appEvent->Height;
+        const auto& appEvent { e.ApplicationEvent };
 
-        if (appEvent->Width == 0 || appEvent->Height == 0)
+        mApplication->Config.WindowWidth = appEvent.Width;
+        mApplication->Config.WindowHeight = appEvent.Height;
+
+        if (appEvent.Width == 0 || appEvent.Height == 0)
         {
             mApplication->State.IsSuspended = true;
         }

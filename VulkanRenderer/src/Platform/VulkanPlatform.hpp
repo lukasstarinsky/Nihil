@@ -4,6 +4,6 @@
 
 namespace VulkanPlatform
 {
-    const char* GetSurfaceExtension();
-    VkSurfaceKHR CreateSurface(VkInstance vkInstance);
+    auto GetSurfaceExtension() -> const char*;
+    auto CreateSurface(VkInstance vkInstance) -> VkSurfaceKHR;
 }

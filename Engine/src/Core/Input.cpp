@@ -30,8 +30,7 @@ void Input::ProcessKey(Key key, bool isPressed, bool wasPressed)
 
     if (sState.LastKeys[index] != isPressed)
     {
-        KeyEvent e { isPressed ? KeyEventType::Press : KeyEventType::Release, key };
-        EventDispatcher::Dispatch(EventCategory::Key, &e);
+        EventDispatcher::Dispatch({ .Type = isPressed ? Event::KeyPress : Event::KeyRelease , .KeyEvent = key });
     }
 }
 
@@ -44,8 +43,8 @@ void Input::ProcessButton(Button button, bool isPressed)
 
     if (sState.LastButtons[index] != isPressed)
     {
-        MouseEvent e { isPressed ? MouseEventType::Press : MouseEventType::Release, button };
-        EventDispatcher::Dispatch(EventCategory::Mouse, &e);
+        MouseEvent e { .Button = button };
+        EventDispatcher::Dispatch({ .Type = isPressed ? Event::MousePress : Event::MouseRelease, .MouseEvent = e });
     }
 }
 
@@ -53,8 +52,8 @@ void Input::ProcessMouseMove(const Vec2i& position)
 {
     sState.MousePos = position;
 
-    MouseEvent e { MouseEventType::Move, Button::Middle, position };
-    EventDispatcher::Dispatch(EventCategory::Mouse, &e);
+    MouseEvent e { .Position = position };
+    EventDispatcher::Dispatch({ .Type = Event::MouseMove, .MouseEvent = e });
 }
 
 void Input::PushMouseRawDelta(const Vec2i& delta)

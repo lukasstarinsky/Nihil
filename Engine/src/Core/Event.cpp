@@ -1,20 +1,17 @@
 #include "Event.hpp"
 
-static std::vector<EventDispatcher::EventCallback> sEventListeners[static_cast<i32>(EventCategory::Total)];
+static std::vector<std::pair<u64, EventDispatcher::EventCallback>> sEventListeners;
 
-void EventDispatcher::AddListener(EventCategory category, const EventDispatcher::EventCallback& callback)
+void EventDispatcher::AddListener(u64 flag, const EventCallback& callback)
 {
-    sEventListeners[static_cast<i32>(category)].push_back(callback);
+    sEventListeners.emplace_back(flag, callback);
 }
 
-void EventDispatcher::Dispatch(EventCategory category, Event e)
+void EventDispatcher::Dispatch(const Event& e)
 {
-    if (!e || sEventListeners[static_cast<i32>(category)].empty())
-        return;
-
-    for (const auto& callback : sEventListeners[static_cast<i32>(category)])
+    for (const auto& [flag, callback]: sEventListeners)
     {
-        if (callback(e))
+        if ((flag & e.Type) && callback(e))
             return;
     }
 }

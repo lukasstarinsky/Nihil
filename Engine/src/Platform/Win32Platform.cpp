@@ -74,8 +74,7 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
     {
         case WM_CLOSE:
         {
-            ApplicationEvent e { ApplicationEventType::Quit };
-            EventDispatcher::Dispatch(EventCategory::Application, &e);
+            EventDispatcher::Dispatch({ .Type = Event::ApplicationQuit, .ApplicationEvent = { } });
             break;
         }
         case WM_DESTROY:
@@ -88,8 +87,8 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
             RECT rect {};
             GetClientRect(sState.WindowHandle, &rect);
 
-            ApplicationEvent e { ApplicationEventType::Resize, rect.right - rect.left, rect.bottom - rect.top };
-            EventDispatcher::Dispatch(EventCategory::Application, &e);
+            ApplicationEvent e { .Width = rect.right - rect.left, .Height = rect.bottom - rect.top };
+            EventDispatcher::Dispatch({ .Type = Event::ApplicationResize, .ApplicationEvent = e });
             break;
         }
         case WM_KEYDOWN:
@@ -152,27 +151,27 @@ bool DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary)
     if (!module)
         return false;
 
-    outDynamicLibrary->Name = buffer;
-    outDynamicLibrary->Handle = module;
+    outDynamicLibrary->mName = buffer;
+    outDynamicLibrary->mHandle = module;
     return true;
 }
 
 bool DynamicLibrary::Unload() const
 {
-    NASSERT(Handle);
+    NASSERT(mHandle);
 
-    return FreeLibrary(static_cast<HMODULE>(Handle));
+    return FreeLibrary(static_cast<HMODULE>(mHandle));
 }
 
 bool DynamicLibrary::LoadFunction(const char* name)
 {
-    NASSERT(Handle);
+    NASSERT(mHandle);
 
-    FARPROC symbolPtr { GetProcAddress(static_cast<HMODULE>(Handle), name) };
+    FARPROC symbolPtr { GetProcAddress(static_cast<HMODULE>(mHandle), name) };
     if (!symbolPtr)
         return false;
 
-    Functions[name] = reinterpret_cast<void*>(symbolPtr);
+    mFunctions[name] = reinterpret_cast<void*>(symbolPtr);
     return true;
 }
 

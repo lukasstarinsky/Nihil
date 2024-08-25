@@ -12,7 +12,7 @@ struct PlatformState
 
 const char* VulkanPlatform::GetSurfaceExtension()
 {
-    return "VK_KHR_win32_surface";
+    return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 }
 
 VkSurfaceKHR VulkanPlatform::CreateSurface(VkInstance vkInstance)
