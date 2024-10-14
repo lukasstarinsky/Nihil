@@ -18,3 +18,9 @@ namespace Renderer
 
     const char* ApiToString(RendererAPI api);
 }
+
+class RendererBackend
+{
+public:
+    virtual ~RendererBackend() = default;
+};

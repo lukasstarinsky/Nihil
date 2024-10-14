@@ -1,5 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include "Win32.hpp"
 #include "Core/Event.hpp"
 #include "Platform.hpp"
 

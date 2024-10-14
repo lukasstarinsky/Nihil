@@ -30,7 +30,7 @@ namespace Platform
     void Shutdown();
     void PollEvents();
 
-    NIHIL_API void* GetState();
+    void* GetState();
 }
 
 namespace Console

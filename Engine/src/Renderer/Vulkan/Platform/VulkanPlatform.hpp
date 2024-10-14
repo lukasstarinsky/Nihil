@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VulkanCommon.hpp"
+#include "Renderer/Vulkan/VulkanCommon.hpp"
 
 namespace VulkanPlatform
 {

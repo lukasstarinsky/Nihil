@@ -5,6 +5,7 @@
 #include "Core/Utilities.hpp"
 #include "Core/Exception.hpp"
 
+#include <unordered_set>
 #include <string>
 #include <format>
 #include <memory>

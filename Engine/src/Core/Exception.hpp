@@ -4,7 +4,7 @@
 #include <format>
 #include "Defines.hpp"
 
-class NIHIL_API NihilException : public std::exception
+class NihilException : public std::exception
 {
 public:
     NihilException(const char* file, u32 line, std::string_view kind, std::string_view message);

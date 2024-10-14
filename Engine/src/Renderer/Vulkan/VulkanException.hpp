@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Nihil.hpp>
 #include <vulkan/vulkan.h>
 
 class VulkanException : public NihilException

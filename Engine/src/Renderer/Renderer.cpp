@@ -1,41 +1,51 @@
 #include "Renderer.hpp"
-#include "RendererPlugin.hpp"
-#include "Platform/Platform.hpp"
+#include "Vulkan/VulkanBackend.hpp"
 
-static DynamicLibrary sRendererModule;
-static RendererPlugin* sRendererPlugin;
+static RendererBackend* sRendererBackend;
 
 void Renderer::Initialize(const ApplicationConfig& config)
 {
-    if (!DynamicLibrary::Load(Renderer::ApiToString(config.RendererAPI), &sRendererModule))
+    switch (config.RendererAPI)
     {
-        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(config.RendererAPI)));
+        case RendererAPI::Vulkan:
+            sRendererBackend = new VulkanBackend(config.WindowWidth, config.WindowHeight);
+            break;
+        case RendererAPI::OpenGL:
+            break;
+        case RendererAPI::Direct3D11:
+            break;
+        case RendererAPI::Direct3D12:
+            break;
+        case RendererAPI::Metal:
+            break;
     }
-
-    if (!sRendererModule.LoadFunction("CreatePlugin") || !sRendererModule.LoadFunction("DestroyPlugin"))
-    {
-        NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(config.RendererAPI)));
-    }
-
-    auto CreatePluginFn { sRendererModule.GetFunction<CreateRendererPluginFn>("CreatePlugin") };
-    sRendererPlugin = CreatePluginFn(config.WindowWidth, config.WindowHeight);
+//    if (!DynamicLibrary::Load(Renderer::ApiToString(config.RendererAPI), &sRendererModule))
+//    {
+//        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(config.RendererAPI)));
+//    }
+//
+//    if (!sRendererModule.LoadFunction("CreatePlugin") || !sRendererModule.LoadFunction("DestroyPlugin"))
+//    {
+//        NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(config.RendererAPI)));
+//    }
+//
+//    auto CreatePluginFn { sRendererModule.GetFunction<CreateRendererPluginFn>("CreatePlugin") };
+//    sRendererPlugin = CreatePluginFn(config.WindowWidth, config.WindowHeight);
 }
 
 void Renderer::Shutdown()
 {
-    // TODO: investigate occasional crash when deleting object allocated from dll
-    delete sRendererPlugin;
-    sRendererModule.Unload();
+    delete sRendererBackend;
 }
 
 const char* Renderer::ApiToString(RendererAPI api)
 {
     switch (api)
     {
-        case RendererAPI::Vulkan:     return "VulkanRenderer";
-        case RendererAPI::OpenGL:     return "OpenGLRenderer";
-        case RendererAPI::Direct3D11: return "Direct3D11Renderer";
-        case RendererAPI::Direct3D12: return "Direct3D12Renderer";
-        case RendererAPI::Metal:      return "MetalRenderer";
+        case RendererAPI::Vulkan:     return "Vulkan";
+        case RendererAPI::OpenGL:     return "OpenGL";
+        case RendererAPI::Direct3D11: return "Direct3D11";
+        case RendererAPI::Direct3D12: return "Direct3D12";
+        case RendererAPI::Metal:      return "Metal";
     }
 }

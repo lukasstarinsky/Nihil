@@ -1,5 +1,4 @@
-#include <unordered_set>
-#include "VulkanPlugin.hpp"
+#include "VulkanBackend.hpp"
 #include "Platform/VulkanPlatform.hpp"
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData)
@@ -31,7 +30,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSev
     return VK_FALSE;
 }
 
-VulkanPlugin::VulkanPlugin(i32 width, i32 height)
+VulkanBackend::VulkanBackend(i32 width, i32 height)
 {
     LOG_TRACE("Initializing Vulkan renderer...");
 
@@ -70,10 +69,10 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     u32 layerCount;
-    VK_CHECK(vkEnumerateInstanceLayerProperties, &layerCount, nullptr);
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
 
     std::vector<VkLayerProperties> availableLayers(layerCount);
-    VK_CHECK(vkEnumerateInstanceLayerProperties, &layerCount, availableLayers.data());
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()));
 
     bool validationSupported { false };
     for (const auto& layerProperties: availableLayers)
@@ -93,7 +92,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
 #endif
 
-    VK_CHECK(vkCreateInstance, &instanceCreateInfo, nullptr, &mContext.Instance);
+    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mContext.Instance));
 
     /* ======= Debug Messenger ======= */
 #ifndef NDEBUG
@@ -108,7 +107,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     auto vkCreateDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkCreateDebugUtilsMessengerEXT")) };
-    VK_CHECK(vkCreateDebugUtilsMessengerEXT, mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger);
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT(mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger));
 #endif
 
     /* ======= Surface ======= */
@@ -120,10 +119,10 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
     };
 
     u32 deviceCount;
-    VK_CHECK(vkEnumeratePhysicalDevices, mContext.Instance, &deviceCount, nullptr);
+    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, nullptr));
 
     std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-    VK_CHECK(vkEnumeratePhysicalDevices, mContext.Instance, &deviceCount, physicalDevices.data());
+    VK_CHECK(vkEnumeratePhysicalDevices(mContext.Instance, &deviceCount, physicalDevices.data()));
 
     for (const auto device: physicalDevices)
     {
@@ -182,7 +181,7 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
         .ppEnabledExtensionNames = deviceExtensions,
         .pEnabledFeatures = &deviceFeatures
     };
-    VK_CHECK(vkCreateDevice, mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice);
+    VK_CHECK(vkCreateDevice(mDevice.PhysicalDevice, &deviceCreateInfo, nullptr, &mDevice.LogicalDevice));
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.PresentQueueFamilyIndex, 0, &mDevice.PresentQueue);
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.GraphicsQueueFamilyIndex, 0, &mDevice.GraphicsQueue);
 
@@ -243,10 +242,10 @@ VulkanPlugin::VulkanPlugin(i32 width, i32 height)
         swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
     }
 
-    VK_CHECK(vkCreateSwapchainKHR, mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain);
+    VK_CHECK(vkCreateSwapchainKHR(mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain));
 }
 
-bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
+bool VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device)
 {
     /* ======= Queue Families ======= */
     mDevice.GraphicsQueueFamilyIndex = -1;
@@ -278,7 +277,7 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
         }
 
         VkBool32 supportsPresent { VK_FALSE };
-        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR, device, i, mContext.Surface, &supportsPresent);
+        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mContext.Surface, &supportsPresent));
         if (supportsPresent)
         {
             mDevice.PresentQueueFamilyIndex = i;
@@ -293,10 +292,10 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     };
 
     u32 availableExtensionCount;
-    VK_CHECK(vkEnumerateDeviceExtensionProperties, device, nullptr, &availableExtensionCount, nullptr);
+    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, nullptr));
 
     std::vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
-    VK_CHECK(vkEnumerateDeviceExtensionProperties, device, nullptr, &availableExtensionCount, availableExtensions.data());
+    VK_CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &availableExtensionCount, availableExtensions.data()));
 
     for (const char* extension: deviceExtensions)
     {
@@ -313,26 +312,26 @@ bool VulkanPlugin::DeviceMeetsRequirements(VkPhysicalDevice device)
     }
 
     /* ======= SwapChain Support ======= */
-    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR, device, mContext.Surface, &mDevice.Capabilities);
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mContext.Surface, &mDevice.Capabilities));
 
     u32 formatCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR, device, mContext.Surface, &formatCount, nullptr);
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, nullptr));
     if (formatCount < 1)
         return false;
     mDevice.SurfaceFormats.resize(formatCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR, device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data());
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, mContext.Surface, &formatCount, mDevice.SurfaceFormats.data()));
 
     u32 presentModeCount;
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR, device, mContext.Surface, &presentModeCount, nullptr);
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, nullptr));
     if (presentModeCount < 1)
         return false;
     mDevice.PresentModes.resize(presentModeCount);
-    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR, device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data());
+    VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, mContext.Surface, &presentModeCount, mDevice.PresentModes.data()));
 
     return true;
 }
 
-VulkanPlugin::~VulkanPlugin()
+VulkanBackend::~VulkanBackend()
 {
     LOG_TRACE("Shutting down Vulkan renderer...");
     vkDestroySwapchainKHR(mDevice.LogicalDevice, mSwapChain, nullptr);
@@ -345,14 +344,4 @@ VulkanPlugin::~VulkanPlugin()
 #endif
 
     vkDestroyInstance(mContext.Instance, nullptr);
-}
-
-RendererPlugin* CreatePlugin(i32 width, i32 height)
-{
-    return new VulkanPlugin(width, height);
-}
-
-void DestroyPlugin(RendererPlugin* plugin)
-{
-    delete plugin;
 }
