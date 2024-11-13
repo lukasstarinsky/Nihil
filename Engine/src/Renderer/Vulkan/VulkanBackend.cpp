@@ -74,7 +74,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
     std::vector<VkLayerProperties> availableLayers(layerCount);
     VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data()));
 
-    bool validationSupported { false };
+    bool validationSupported = false;
     for (const auto& layerProperties: availableLayers)
     {
         if (!strcmp(instanceLayers[0], layerProperties.layerName))
@@ -106,7 +106,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
         .pUserData = nullptr
     };
 
-    auto vkCreateDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkCreateDebugUtilsMessengerEXT")) };
+    auto vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkCreateDebugUtilsMessengerEXT"));
     VK_CHECK(vkCreateDebugUtilsMessengerEXT(mContext.Instance, &debugMessengerCreateInfo, nullptr, &mContext.DebugMessenger));
 #endif
 
@@ -153,7 +153,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
     queueCreateInfos.reserve(uniqueQueueFamilies.size());
     for (u32 uniqueQueueFamily: uniqueQueueFamilies)
     {
-        f32 queuePriority { 1.0f };
+        f32 queuePriority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo {
             .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
             .pNext = nullptr,
@@ -186,7 +186,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
     vkGetDeviceQueue(mDevice.LogicalDevice, mDevice.GraphicsQueueFamilyIndex, 0, &mDevice.GraphicsQueue);
 
     /* ======= SwapChain ======= */
-    VkSurfaceFormatKHR selectedSurfaceFormat { mDevice.SurfaceFormats[0] };
+    VkSurfaceFormatKHR selectedSurfaceFormat = mDevice.SurfaceFormats[0];
     for (const auto& surfaceFormat: mDevice.SurfaceFormats)
     {
         if (surfaceFormat.format == VK_FORMAT_B8G8R8A8_UNORM && surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
@@ -196,7 +196,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
         }
     }
 
-    VkPresentModeKHR selectedPresentMode { VK_PRESENT_MODE_FIFO_KHR };
+    VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR;
     for (auto presentMode: mDevice.PresentModes)
     {
         if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
@@ -206,7 +206,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
         }
     }
 
-    u32 imageCount { mDevice.Capabilities.minImageCount + 1 };
+    u32 imageCount = mDevice.Capabilities.minImageCount + 1;
     if (mDevice.Capabilities.maxImageCount > 0 && mDevice.Capabilities.maxImageCount < imageCount)
     {
         imageCount = mDevice.Capabilities.maxImageCount;
@@ -245,7 +245,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
     VK_CHECK(vkCreateSwapchainKHR(mDevice.LogicalDevice, &swapChainCreateInfo, nullptr, &mSwapChain));
 }
 
-bool VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device)
+auto VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device) -> bool
 {
     /* ======= Queue Families ======= */
     mDevice.GraphicsQueueFamilyIndex = -1;
@@ -257,9 +257,9 @@ bool VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device)
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-    for (u32 i {0}; i < queueFamilyCount; ++i)
+    for (u32 i = 0; i < queueFamilyCount; ++i)
     {
-        const auto& queueFamily { queueFamilies[i] };
+        const auto& queueFamily = queueFamilies[i];
 
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
@@ -276,7 +276,7 @@ bool VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device)
 
         }
 
-        VkBool32 supportsPresent { VK_FALSE };
+        VkBool32 supportsPresent = VK_FALSE;
         VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mContext.Surface, &supportsPresent));
         if (supportsPresent)
         {
@@ -299,7 +299,7 @@ bool VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device)
 
     for (const char* extension: deviceExtensions)
     {
-        bool available { false };
+        bool available = false;
         for (const auto& availableExtension: availableExtensions)
         {
             if (!strcmp(availableExtension.extensionName, extension))
@@ -339,7 +339,7 @@ VulkanBackend::~VulkanBackend()
     vkDestroyDevice(mDevice.LogicalDevice, nullptr);
 
 #ifndef NDEBUG
-    auto vkDestroyDebugUtilsMessengerEXT { reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkDestroyDebugUtilsMessengerEXT")) };
+    auto vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mContext.Instance, "vkDestroyDebugUtilsMessengerEXT"));
     vkDestroyDebugUtilsMessengerEXT(mContext.Instance, mContext.DebugMessenger, nullptr);
 #endif
 

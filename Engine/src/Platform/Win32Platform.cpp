@@ -9,7 +9,7 @@ struct PlatformState
 };
 
 static PlatformState sState;
-static LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam);
+static auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 void Platform::Initialize(const ApplicationConfig& config)
 {
@@ -27,7 +27,7 @@ void Platform::Initialize(const ApplicationConfig& config)
         NTHROW(std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
     }
 
-    DWORD dwStyle { WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU };
+    DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
     RECT rect { 0, 0, config.WindowWidth, config.WindowHeight };
     AdjustWindowRect(&rect, dwStyle, false);
 
@@ -67,7 +67,7 @@ void Platform::PollEvents()
     }
 }
 
-LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
+auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESULT
 {
     switch (msg)
     {
@@ -95,9 +95,9 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
         case WM_KEYUP:
         case WM_SYSKEYUP:
         {
-            BOOL wasKeyDown { (lParam & (1 << 30)) != 0 };
+            BOOL wasKeyDown = (lParam & (1 << 30)) != 0;
 
-            bool isPressed { msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN };
+            bool isPressed = msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN;
             Input::ProcessKey(static_cast<Key>(wParam), isPressed, wasKeyDown);
 
             break;
@@ -109,9 +109,9 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
         case WM_RBUTTONUP:
         case WM_MBUTTONUP:
         {
-            bool isPressed { msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN };
+            bool isPressed = msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN;
 
-            Button button { Button::Middle };
+            Button button = Button::Middle;
             switch (msg)
             {
                 case WM_LBUTTONDOWN:
@@ -136,17 +136,17 @@ LRESULT ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(handle, msg, wParam, lParam);
 }
 
-void* Platform::GetState()
+auto Platform::GetState() -> void*
 {
     return &sState;
 }
 
-bool DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary)
+auto DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary) -> bool
 {
-    char buffer[256] { 0 };
+    char buffer[256] {};
     sprintf_s(buffer, "%s.dll", name);
 
-    HMODULE module { LoadLibrary(buffer) };
+    HMODULE module = LoadLibrary(buffer);
     if (!module)
         return false;
 
@@ -155,18 +155,18 @@ bool DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary)
     return true;
 }
 
-bool DynamicLibrary::Unload() const
+auto DynamicLibrary::Unload() const -> bool
 {
     NASSERT(mHandle);
 
     return FreeLibrary(static_cast<HMODULE>(mHandle));
 }
 
-bool DynamicLibrary::LoadFunction(const char* name)
+auto DynamicLibrary::LoadFunction(const char* name) -> bool
 {
     NASSERT(mHandle);
 
-    FARPROC symbolPtr { GetProcAddress(static_cast<HMODULE>(mHandle), name) };
+    FARPROC symbolPtr = GetProcAddress(static_cast<HMODULE>(mHandle), name);
     if (!symbolPtr)
         return false;
 
@@ -176,7 +176,7 @@ bool DynamicLibrary::LoadFunction(const char* name)
 
 void Console::Print(std::string_view message, LogLevel severity)
 {
-    HANDLE consoleHandle { GetStdHandle((severity == LogLevel::Error || severity == LogLevel::Fatal) ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE) };
+    auto consoleHandle = GetStdHandle((severity == LogLevel::Error || severity == LogLevel::Fatal) ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO consoleSbi {};
     GetConsoleScreenBufferInfo(consoleHandle, &consoleSbi);
 

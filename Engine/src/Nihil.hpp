@@ -11,7 +11,7 @@
 #define CREATE_APPLICATION(Application) \
 try {                                   \
     Application application;            \
-    Engine engine { &application };     \
+    Engine engine(&application);        \
     engine.Run();                       \
     return EXIT_SUCCESS;                \
 } catch (const NihilException& e) {     \

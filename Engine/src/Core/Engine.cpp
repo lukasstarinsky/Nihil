@@ -34,7 +34,7 @@ void Engine::Run() const
     }
 }
 
-bool Engine::OnAppEvent(const Event& e)
+auto Engine::OnAppEvent(const Event& e) -> bool
 {
     if (e.Type == Event::ApplicationQuit)
     {
@@ -43,7 +43,7 @@ bool Engine::OnAppEvent(const Event& e)
     }
     else if (e.Type == Event::ApplicationResize)
     {
-        const auto& appEvent { e.ApplicationEvent };
+        const auto& appEvent = e.ApplicationEvent;
 
         mApplication->Config.WindowWidth = appEvent.Width;
         mApplication->Config.WindowHeight = appEvent.Height;

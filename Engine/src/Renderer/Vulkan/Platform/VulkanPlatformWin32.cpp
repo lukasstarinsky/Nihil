@@ -8,14 +8,14 @@ struct PlatformState
     HINSTANCE Instance;
 };
 
-const char* VulkanPlatform::GetSurfaceExtension()
+auto VulkanPlatform::GetSurfaceExtension() -> const char*
 {
     return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 }
 
-VkSurfaceKHR VulkanPlatform::CreateSurface(VkInstance vkInstance)
+auto VulkanPlatform::CreateSurface(VkInstance vkInstance) -> VkSurfaceKHR
 {
-    auto* platformState { static_cast<PlatformState*>(Platform::GetState()) };
+    auto* platformState = static_cast<PlatformState*>(Platform::GetState());
 
     VkWin32SurfaceCreateInfoKHR surfaceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,

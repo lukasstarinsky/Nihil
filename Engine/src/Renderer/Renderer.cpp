@@ -37,15 +37,3 @@ void Renderer::Shutdown()
 {
     delete sRendererBackend;
 }
-
-const char* Renderer::ApiToString(RendererAPI api)
-{
-    switch (api)
-    {
-        case RendererAPI::Vulkan:     return "Vulkan";
-        case RendererAPI::OpenGL:     return "OpenGL";
-        case RendererAPI::Direct3D11: return "Direct3D11";
-        case RendererAPI::Direct3D12: return "Direct3D12";
-        case RendererAPI::Metal:      return "Metal";
-    }
-}

@@ -1,9 +1,9 @@
 #include "Platform/Platform.hpp"
 #include "Logger.hpp"
 
-static LogLevel sLogLevel { LogLevel::Trace };
+static LogLevel sLogLevel = LogLevel::Trace;
 
-LogLevel Logger::GetLogLevel()
+auto Logger::GetLogLevel() -> LogLevel
 {
     return sLogLevel;
 }
@@ -20,6 +20,6 @@ void Logger::Log(LogLevel severity, std::string_view message)
 
     const char* severityStr[] { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL" };
 
-    std::string logMessage { std::format("{} [{}]: {}\n", Utilities::GetFormattedTime(true), severityStr[static_cast<i32>(severity)], message) };
+    auto logMessage = std::format("{} [{}]: {}\n", Utilities::GetFormattedTime(true), severityStr[static_cast<i32>(severity)], message);
     Console::Print(logMessage, severity);
 }

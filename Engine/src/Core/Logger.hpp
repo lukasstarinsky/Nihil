@@ -22,7 +22,7 @@ namespace Logger
     template<typename... Args>
     void Log(LogLevel severity, std::format_string<Args...> fmt, Args&&... args)
     {
-        std::string logMessage { std::format(fmt, std::forward<Args>(args)...) };
+        std::string logMessage = std::format(fmt, std::forward<Args>(args)...);
         Log(severity, logMessage);
     }
 }

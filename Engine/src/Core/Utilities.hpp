@@ -5,5 +5,5 @@
 
 namespace Utilities
 {
-    NIHIL_API std::string GetFormattedTime(bool includeDate = false);
+    NIHIL_API auto GetFormattedTime(bool includeDate = false) -> std::string;
 }

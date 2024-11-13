@@ -15,8 +15,6 @@ namespace Renderer
 {
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
-
-    const char* ApiToString(RendererAPI api);
 }
 
 class RendererBackend

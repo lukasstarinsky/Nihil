@@ -7,20 +7,20 @@
 class DynamicLibrary
 {
 public:
-    static bool Load(const char* name, DynamicLibrary* outDynamicLibrary);
+    static auto Load(const char* name, DynamicLibrary* outDynamicLibrary) -> bool;
 
-    bool Unload() const;
-    bool LoadFunction(const char* name);
+    auto Unload() const -> bool;
+    auto LoadFunction(const char* name) -> bool;
 
     template<typename T>
-    T GetFunction(const char* name)
+    auto GetFunction(const char* name) -> T
     {
         NASSERT(mFunctions.contains(name));
         return reinterpret_cast<T>(mFunctions[name]);
     }
 private:
     std::string mName;
-    void* mHandle;
+    void* mHandle {};
     std::unordered_map<const char*, void*> mFunctions;
 };
 
@@ -29,8 +29,7 @@ namespace Platform
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
     void PollEvents();
-
-    void* GetState();
+    auto GetState() -> void*;
 }
 
 namespace Console

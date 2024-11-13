@@ -9,7 +9,7 @@ public:
     explicit VulkanBackend(i32 width, i32 height);
     ~VulkanBackend() override;
 private:
-    bool DeviceMeetsRequirements(VkPhysicalDevice device);
+    auto DeviceMeetsRequirements(VkPhysicalDevice device) -> bool;
 private:
     VulkanContext mContext {};
     VulkanDevice mDevice {};
