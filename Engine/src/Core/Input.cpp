@@ -30,7 +30,8 @@ void Input::ProcessKey(Key key, bool isPressed, bool wasPressed)
 
     if (sState.LastKeys[index] != isPressed)
     {
-        EventDispatcher::Dispatch({ .Type = isPressed ? Event::KeyPress : Event::KeyRelease , .KeyEvent = key });
+        KeyEvent e { .Key = key };
+        EventDispatcher::Dispatch({ .Type = isPressed ? Event::KeyPress : Event::KeyRelease , .KeyEvent = e });
     }
 }
 

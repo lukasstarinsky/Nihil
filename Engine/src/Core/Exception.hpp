@@ -1,18 +1,19 @@
 #pragma once
 
 #include <exception>
-#include <format>
-#include "Defines.hpp"
+#include <stacktrace>
 
-class NihilException : public std::exception
+class NIHIL_API NihilException : public std::exception
 {
 public:
-    NihilException(const char* file, u32 line, std::string_view kind, std::string_view message);
-    NihilException(const char* file, u32 line, std::string_view message);
+    explicit NihilException(std::string_view message);
+    NihilException(std::string_view kind, std::string_view message);
 
-    const char* what() const noexcept override;
+    auto what() const noexcept -> const char* override;
+    auto StackTrace() const -> std::string;
 private:
     std::string mMessage;
+    std::stacktrace mStackTrace;
 };
 
-#define NTHROW(message) throw NihilException(__FILE__, __LINE__, message)
+#define THROW(message) throw NihilException(message)

@@ -5,20 +5,7 @@ static RendererBackend* sRendererBackend;
 
 void Renderer::Initialize(const ApplicationConfig& config)
 {
-    switch (config.RendererAPI)
-    {
-        case RendererAPI::Vulkan:
-            sRendererBackend = new VulkanBackend(config.WindowWidth, config.WindowHeight);
-            break;
-        case RendererAPI::OpenGL:
-            break;
-        case RendererAPI::Direct3D11:
-            break;
-        case RendererAPI::Direct3D12:
-            break;
-        case RendererAPI::Metal:
-            break;
-    }
+    SWITCH_RENDERER_API(sRendererBackend = new, Backend(config.WindowWidth, config.WindowHeight));
 //    if (!DynamicLibrary::Load(Renderer::ApiToString(config.RendererAPI), &sRendererModule))
 //    {
 //        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(config.RendererAPI)));

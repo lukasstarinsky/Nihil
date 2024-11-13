@@ -27,6 +27,7 @@ public:
     virtual void OnInitialize() = 0;
     virtual void OnUpdate() = 0;
     virtual void OnRender() = 0;
+    virtual void OnShutdown() = 0;
 public:
     ApplicationConfig Config {};
     ApplicationState State {};

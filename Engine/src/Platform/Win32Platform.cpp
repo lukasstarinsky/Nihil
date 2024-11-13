@@ -2,12 +2,6 @@
 #include "Core/Event.hpp"
 #include "Platform.hpp"
 
-struct PlatformState
-{
-    HWND WindowHandle;
-    HINSTANCE Instance;
-};
-
 static PlatformState sState;
 static auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
@@ -24,7 +18,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     wndClass.lpszClassName = "nihil_window";
     if (!RegisterClassEx(&wndClass))
     {
-        NTHROW(std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
+        THROW(std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
     }
 
     DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
@@ -44,7 +38,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     );
     if (!sState.WindowHandle)
     {
-        NTHROW(std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
+        THROW(std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
     }
 
     ShowWindow(sState.WindowHandle, SW_SHOW);
@@ -136,7 +130,7 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
     return DefWindowProc(handle, msg, wParam, lParam);
 }
 
-auto Platform::GetState() -> void*
+auto Platform::GetState() -> PlatformState*
 {
     return &sState;
 }
@@ -157,14 +151,14 @@ auto DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary) -
 
 auto DynamicLibrary::Unload() const -> bool
 {
-    NASSERT(mHandle);
+    ASSERT(mHandle);
 
     return FreeLibrary(static_cast<HMODULE>(mHandle));
 }
 
 auto DynamicLibrary::LoadFunction(const char* name) -> bool
 {
-    NASSERT(mHandle);
+    ASSERT(mHandle);
 
     FARPROC symbolPtr = GetProcAddress(static_cast<HMODULE>(mHandle), name);
     if (!symbolPtr)

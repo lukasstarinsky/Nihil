@@ -85,7 +85,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
     }
     if (!validationSupported)
     {
-        NTHROW("Vulkan validation layers are not available");
+        THROW("Vulkan validation layers are not available");
     }
 
     instanceCreateInfo.enabledLayerCount = COUNT_OF(instanceLayers);
@@ -144,7 +144,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
     }
     if (!mDevice.PhysicalDevice)
     {
-        NTHROW("Could not find a GPU that meets the requirements.");
+        THROW("Could not find a GPU that meets the requirements.");
     }
 
     /* ======= Logical Device ======= */

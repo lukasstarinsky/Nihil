@@ -1,16 +1,25 @@
 #include "Exception.hpp"
 
-NihilException::NihilException(const char* file, u32 line, std::string_view message)
+NihilException::NihilException(std::string_view message)
+    : mMessage{std::format("Exception thrown: {}", message)}
+    , mStackTrace{std::stacktrace::current(1)}
 {
-    mMessage = std::format("Exception thrown in [{}:{}]: {}", file, line, message);
+
 }
 
-NihilException::NihilException(const char* file, u32 line, std::string_view kind, std::string_view message)
+NihilException::NihilException(std::string_view kind, std::string_view message)
+    : mMessage{std::format("{} Exception thrown: {}", kind, message)}
+    , mStackTrace{std::stacktrace::current(1)}
 {
-    mMessage = std::format("{} Exception thrown in [{}:{}]: {}", kind, file, line, message);
+
 }
 
-const char* NihilException::what() const noexcept
+auto NihilException::what() const noexcept -> const char*
 {
     return mMessage.c_str();
+}
+
+auto NihilException::StackTrace() const -> std::string
+{
+    return std::to_string(mStackTrace);
 }

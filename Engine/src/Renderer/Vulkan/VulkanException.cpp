@@ -1,12 +1,12 @@
 #include "VulkanException.hpp"
 
-VulkanException::VulkanException(const char* file, u32 line, std::string_view message, VkResult result)
-    : NihilException{file, line, "Vulkan", std::format("{} {}", message, VkResultToDescription(result))}
+VulkanException::VulkanException(VkResult result)
+    : NihilException{"Vulkan", VkResultToDescription(result)}
 {
 
 }
 
-const char* VulkanException::VkResultToDescription(VkResult result)
+auto VulkanException::VkResultToDescription(VkResult result) -> const char*
 {
     switch (result)
     {

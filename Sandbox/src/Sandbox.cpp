@@ -22,3 +22,8 @@ void Sandbox::OnRender()
 {
 
 }
+
+void Sandbox::OnShutdown()
+{
+
+}

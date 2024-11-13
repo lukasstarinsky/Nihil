@@ -5,9 +5,9 @@
 class VulkanException : public NihilException
 {
 public:
-    VulkanException(const char* file, u32 line, std::string_view message, VkResult result);
+    explicit VulkanException(VkResult result);
 private:
-    const char* VkResultToDescription(VkResult result);
+    static auto VkResultToDescription(VkResult result) -> const char*;
 };
 
-#define VK_THROW(message, result) throw VulkanException(__FILE__, __LINE__, message, result)
+#define VK_THROW(result) throw VulkanException(result)

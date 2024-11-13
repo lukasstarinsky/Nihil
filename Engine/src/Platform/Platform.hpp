@@ -4,6 +4,8 @@
 #include "Core/Application.hpp"
 #include "Core/Logger.hpp"
 
+struct PlatformState;
+
 class DynamicLibrary
 {
 public:
@@ -15,7 +17,7 @@ public:
     template<typename T>
     auto GetFunction(const char* name) -> T
     {
-        NASSERT(mFunctions.contains(name));
+        ASSERT(mFunctions.contains(name));
         return reinterpret_cast<T>(mFunctions[name]);
     }
 private:
@@ -29,7 +31,7 @@ namespace Platform
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
     void PollEvents();
-    auto GetState() -> void*;
+    auto GetState() -> PlatformState*;
 }
 
 namespace Console

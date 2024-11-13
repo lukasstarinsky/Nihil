@@ -22,3 +22,18 @@ class RendererBackend
 public:
     virtual ~RendererBackend() = default;
 };
+
+#define SWITCH_RENDERER_API(exprStart, exprEnd) \
+do {                                    \
+    switch (config.RendererAPI)         \
+    {                                   \
+        case RendererAPI::Vulkan:       \
+            exprStart Vulkan##exprEnd;  \
+            break;                      \
+        case RendererAPI::OpenGL:       \
+        case RendererAPI::Direct3D11:   \
+        case RendererAPI::Direct3D12:   \
+        case RendererAPI::Metal:        \
+            break;                      \
+    }                                   \
+} while(0)
