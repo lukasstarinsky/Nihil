@@ -1,6 +1,6 @@
 #include "Win32.hpp"
 #include "Core/Event.hpp"
-#include "Platform.hpp"
+#include "Platform/Platform.hpp"
 
 static PlatformState sState;
 static auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
