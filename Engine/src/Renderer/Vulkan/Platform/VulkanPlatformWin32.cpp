@@ -1,7 +1,7 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "VulkanPlatform.hpp"
 #include "Platform/Platform.hpp"
-#include "Platform/Win32.hpp"
+#include "Platform/Win32/Win32.hpp"
 
 auto VulkanPlatform::GetSurfaceExtension() -> const char*
 {
@@ -10,14 +10,14 @@ auto VulkanPlatform::GetSurfaceExtension() -> const char*
 
 auto VulkanPlatform::CreateSurface(VkInstance vkInstance) -> VkSurfaceKHR
 {
-    auto* platformState = Platform::GetState();
+    const auto& platformState = Platform::GetState();
 
     VkWin32SurfaceCreateInfoKHR surfaceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
         .pNext = nullptr,
         .flags = 0,
-        .hinstance = platformState->Instance,
-        .hwnd = platformState->WindowHandle
+        .hinstance = platformState.Instance,
+        .hwnd = platformState.WindowHandle
     };
 
     VkSurfaceKHR outSurface;

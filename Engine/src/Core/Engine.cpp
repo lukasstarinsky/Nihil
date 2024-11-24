@@ -16,6 +16,7 @@ Engine::Engine(Application* application)
 
 Engine::~Engine()
 {
+    mApplication->OnShutdown();
     Renderer::Shutdown();
     Platform::Shutdown();
 }

@@ -15,21 +15,41 @@ enum class LogLevel
 
 namespace Logger
 {
-    NIHIL_API auto GetLogLevel() -> LogLevel;
-    NIHIL_API void SetLogLevel(LogLevel logLevel);
     NIHIL_API void Log(LogLevel severity, std::string_view message);
 
     template<typename... Args>
-    void Log(LogLevel severity, std::format_string<Args...> fmt, Args&&... args)
+    void Trace(std::format_string<Args...> fmt, Args&&... args)
     {
-        std::string logMessage = std::format(fmt, std::forward<Args>(args)...);
-        Log(severity, logMessage);
+        Log(LogLevel::Trace, std::format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void Debug(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log(LogLevel::Debug, std::format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void Info(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log(LogLevel::Info, std::format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void Warn(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log(LogLevel::Warn, std::format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void Error(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log(LogLevel::Error, std::format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void Fatal(std::format_string<Args...> fmt, Args&&... args)
+    {
+        Log(LogLevel::Fatal, std::format(fmt, std::forward<Args>(args)...));
     }
 }
-
-#define LOG_TRACE(fmt, ...)     Logger::Log(LogLevel::Trace, fmt, __VA_ARGS__)
-#define LOG_DEBUG(fmt, ...)     Logger::Log(LogLevel::Debug, fmt, __VA_ARGS__)
-#define LOG_INFO(fmt, ...)      Logger::Log(LogLevel::Info, fmt, __VA_ARGS__)
-#define LOG_WARN(fmt, ...)      Logger::Log(LogLevel::Warn, fmt, __VA_ARGS__)
-#define LOG_ERROR(fmt, ...)     Logger::Log(LogLevel::Error, fmt, __VA_ARGS__)
-#define LOG_FATAL(fmt, ...)     Logger::Log(LogLevel::Fatal, fmt, __VA_ARGS__)

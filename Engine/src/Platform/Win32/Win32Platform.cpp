@@ -7,7 +7,7 @@ static auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -
 
 void Platform::Initialize(const ApplicationConfig& config)
 {
-    LOG_TRACE("Initializing Win32 Platform...");
+    Logger::Trace("Initializing Win32 Platform...");
     sState.Instance = GetModuleHandle(nullptr);
 
     WNDCLASSEX wndClass {};
@@ -46,7 +46,7 @@ void Platform::Initialize(const ApplicationConfig& config)
 
 void Platform::Shutdown()
 {
-    LOG_TRACE("Shutting down Win32 Platform...");
+    Logger::Trace("Shutting down Win32 Platform...");
     DestroyWindow(sState.WindowHandle);
     UnregisterClass("nihil_window", sState.Instance);
 }
@@ -130,9 +130,9 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
     return DefWindowProc(handle, msg, wParam, lParam);
 }
 
-auto Platform::GetState() -> PlatformState*
+auto Platform::GetState() -> const PlatformState&
 {
-    return &sState;
+    return sState;
 }
 
 auto DynamicLibrary::Load(const char* name, DynamicLibrary* outDynamicLibrary) -> bool

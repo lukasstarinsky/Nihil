@@ -11,18 +11,18 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSev
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
         {
-            LOG_INFO("{}", callbackData->pMessage);
+            Logger::Info("{}", callbackData->pMessage);
             break;
         }
 
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
         {
-            LOG_WARN("{}", callbackData->pMessage);
+            Logger::Warn("{}", callbackData->pMessage);
             break;
         }
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
         {
-            LOG_ERROR("{}", callbackData->pMessage);
+            Logger::Error("{}", callbackData->pMessage);
             break;
         }
     }
@@ -32,7 +32,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSev
 
 VulkanBackend::VulkanBackend(i32 width, i32 height)
 {
-    LOG_TRACE("Initializing Vulkan renderer...");
+    Logger::Trace("Initializing Vulkan renderer...");
 
     /* ======= Instance ======= */
     const char* instanceExtensions[] {
@@ -133,7 +133,7 @@ VulkanBackend::VulkanBackend(i32 width, i32 height)
         {
             if (DeviceMeetsRequirements(device))
             {
-                LOG_INFO("Selecting GPU: {}", deviceProperties.deviceName);
+                Logger::Info("Selecting GPU: {}", deviceProperties.deviceName);
 
                 vkGetPhysicalDeviceFeatures(device, &mDevice.DeviceFeatures);
                 mDevice.DeviceProperties = deviceProperties;
@@ -333,7 +333,7 @@ auto VulkanBackend::DeviceMeetsRequirements(VkPhysicalDevice device) -> bool
 
 VulkanBackend::~VulkanBackend()
 {
-    LOG_TRACE("Shutting down Vulkan renderer...");
+    Logger::Trace("Shutting down Vulkan renderer...");
     vkDestroySwapchainKHR(mDevice.LogicalDevice, mSwapChain, nullptr);
     vkDestroySurfaceKHR(mContext.Instance, mContext.Surface, nullptr);
     vkDestroyDevice(mDevice.LogicalDevice, nullptr);

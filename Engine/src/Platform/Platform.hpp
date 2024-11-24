@@ -11,5 +11,5 @@ namespace Platform
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
     void PollEvents();
-    auto GetState() -> PlatformState*;
+    auto GetState() -> const PlatformState&;
 }
