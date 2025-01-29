@@ -2,7 +2,6 @@
 
 #include <vulkan/vulkan.h>
 #include "VulkanException.hpp"
-#include "VulkanTypes.hpp"
 
 #define VK_CHECK(fun)       \
 do {                        \

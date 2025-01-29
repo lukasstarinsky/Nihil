@@ -1,17 +1,19 @@
 #pragma once
 
+#include "Core/Application.hpp"
 #include "Renderer/Renderer.hpp"
 #include "VulkanCommon.hpp"
+#include "VulkanContext.hpp"
+#include "VulkanDevice.hpp"
+#include "VulkanSwapchain.hpp"
 
 class VulkanBackend : public RendererBackend
 {
 public:
-    explicit VulkanBackend(i32 width, i32 height);
+    explicit VulkanBackend(const ApplicationConfig& config);
     ~VulkanBackend() override;
 private:
-    auto DeviceMeetsRequirements(VkPhysicalDevice device) -> bool;
-private:
-    VulkanContext mContext {};
-    VulkanDevice mDevice {};
-    VkSwapchainKHR mSwapChain {};
+    VulkanContext mContext;
+    VulkanDevice mDevice;
+    VulkanSwapchain mSwapchain;
 };

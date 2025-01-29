@@ -22,12 +22,12 @@ void Platform::Initialize(const ApplicationConfig& config)
     }
 
     DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
-    RECT rect { 0, 0, config.WindowWidth, config.WindowHeight };
+    RECT rect { 0, 0, static_cast<i32>(config.WindowWidth), static_cast<i32>(config.WindowHeight) };
     AdjustWindowRect(&rect, dwStyle, false);
 
     sState.WindowHandle = CreateWindow(
         wndClass.lpszClassName,
-        config.WindowTitle,
+        config.Name.c_str(),
         dwStyle,
         CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right - rect.left, rect.bottom - rect.top,

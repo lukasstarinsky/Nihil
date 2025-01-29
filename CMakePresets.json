@@ -4,23 +4,23 @@
 		{
 			"name": "Debug",
 			"hidden": true,
-			"binaryDir": "build/debug",
+			"binaryDir": "Build/Debug",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
 				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
-				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/bin/Debug",
-				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/bin/Debug"
+				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Debug",
+				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Debug"
 			}
 		},
 		{
 			"name": "Release",
 			"hidden": true,
-			"binaryDir": "build/release",
+			"binaryDir": "Build/Release",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
-				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/bin/Release",
-				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/bin/Release"
+				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Release",
+				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Release"
 			}
 		},
 		{
