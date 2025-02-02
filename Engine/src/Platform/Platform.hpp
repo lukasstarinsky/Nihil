@@ -11,5 +11,6 @@ namespace Platform
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
     void PollEvents();
-    auto GetState() -> const PlatformState&;
+
+    NIHIL_API auto GetState() -> const PlatformState&;
 }

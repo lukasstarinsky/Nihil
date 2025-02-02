@@ -1,48 +1,39 @@
 #include "Renderer.hpp"
-#include "Vulkan/VulkanBackend.hpp"
+#include "Platform/DynamicLibrary.hpp"
 
+static DynamicLibrary sRendererModule;
 static RendererBackend* sRendererBackend;
 
 void Renderer::Initialize(const ApplicationConfig& config)
 {
-    switch (config.RendererAPI)
+    if (!DynamicLibrary::Load(Renderer::ApiToModuleString(config.RendererAPI), &sRendererModule))
     {
-        case RendererAPI::Vulkan:
-            sRendererBackend = new VulkanBackend(config);
-            break;
-        case RendererAPI::OpenGL:
-        case RendererAPI::Direct3D11:
-        case RendererAPI::Direct3D12:
-        case RendererAPI::Metal:
-            THROW(std::format("Renderer API '{}' not supported", ApiToString(config.RendererAPI)));
+        THROW(std::format("Failed to load plugin '{}'", Renderer::ApiToModuleString(config.RendererAPI)));
     }
-//    if (!DynamicLibrary::Load(Renderer::ApiToString(config.RendererAPI), &sRendererModule))
-//    {
-//        NTHROW(std::format("Failed to load '{}' dynamic library.", Renderer::ApiToString(config.RendererAPI)));
-//    }
-//
-//    if (!sRendererModule.LoadFunction("CreatePlugin") || !sRendererModule.LoadFunction("DestroyPlugin"))
-//    {
-//        NTHROW(std::format("Failed to load functions of module '{}'.", Renderer::ApiToString(config.RendererAPI)));
-//    }
-//
-//    auto CreatePluginFn { sRendererModule.GetFunction<CreateRendererPluginFn>("CreatePlugin") };
-//    sRendererPlugin = CreatePluginFn(config.WindowWidth, config.WindowHeight);
+
+    if (!sRendererModule.LoadSymbol("CreatePlugin") || !sRendererModule.LoadSymbol("DestroyPlugin"))
+    {
+        THROW(std::format("Failed to load symbols of plugin '{}'.", Renderer::ApiToModuleString(config.RendererAPI)));
+    }
+
+    auto CreatePluginFn = sRendererModule.GetSymbol<CreateRendererPluginFn>("CreatePlugin");
+    sRendererBackend = CreatePluginFn(config);
 }
 
 void Renderer::Shutdown()
 {
-    delete sRendererBackend;
+    auto DestroyPluginFn = sRendererModule.GetSymbol<DestroyRendererPluginFn>("DestroyPlugin");
+    DestroyPluginFn(sRendererBackend);
 }
 
-auto Renderer::ApiToString(RendererAPI api) -> const char*
+auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
 {
     switch (api)
     {
-        case RendererAPI::Vulkan:       return "Vulkan";
-        case RendererAPI::OpenGL:       return "OpenGL";
-        case RendererAPI::Direct3D11:   return "Direct3D11";
-        case RendererAPI::Direct3D12:   return "Direct3D12";
-        case RendererAPI::Metal:        return "Metal";
+        case RendererAPI::Vulkan:       return "VulkanRenderer";
+        case RendererAPI::OpenGL:       return "OpenGLRenderer";
+        case RendererAPI::Direct3D11:   return "Direct3D11Renderer";
+        case RendererAPI::Direct3D12:   return "Direct3D12Renderer";
+        case RendererAPI::Metal:        return "MetalRenderer";
     }
 }

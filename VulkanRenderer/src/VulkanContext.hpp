@@ -8,11 +8,13 @@ class VulkanContext
 public:
     explicit VulkanContext(const ApplicationConfig& appConfig);
     ~VulkanContext();
-public:
-    VkSurfaceKHR Surface {};
-    VkInstance Instance {};
-#ifndef NDEBUG
+
+    auto GetSurface() const -> VkSurfaceKHR;
+    auto GetInstance() const -> VkInstance;
 private:
+    VkSurfaceKHR mSurface {};
+    VkInstance mInstance {};
+#ifndef NDEBUG
     VkDebugUtilsMessengerEXT mDebugMessenger {};
 #endif
 };

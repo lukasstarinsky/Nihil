@@ -49,6 +49,8 @@
     #define ASSERT(check) do { if(!(check)) { Logger::Fatal("Assertion failed [" __FILE__ ":" TO_STR(__LINE__)"]"); DEBUGBREAK(); } } while(0)
 #endif
 
+#define ENSURE(check, message) if (!(check)) THROW(message)
+
 /* ======= Type Defs ======= */
 #include <cstdint>
 

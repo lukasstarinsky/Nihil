@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "Core/Exception.hpp"
+
 class VulkanException : public NihilException
 {
 public:

@@ -1,4 +1,3 @@
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "VulkanPlatform.hpp"
 #include "Platform/Platform.hpp"
 #include "Platform/Win32/Win32.hpp"

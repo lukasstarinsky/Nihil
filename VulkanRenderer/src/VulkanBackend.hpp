@@ -12,6 +12,9 @@ class VulkanBackend : public RendererBackend
 public:
     explicit VulkanBackend(const ApplicationConfig& config);
     ~VulkanBackend() override;
+
+    auto GetType() const -> RendererAPI override;
+    auto GetTypeString() const -> const char* override;
 private:
     VulkanContext mContext;
     VulkanDevice mDevice;

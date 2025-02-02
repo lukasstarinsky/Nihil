@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+
 #include "VulkanException.hpp"
 
 #define VK_CHECK(fun)       \

@@ -1,7 +1,7 @@
 #include "VulkanException.hpp"
 
 VulkanException::VulkanException(VkResult result)
-    : NihilException{"Vulkan", VkResultToDescription(result)}
+    : NihilException{"Vulkan", VkResultToDescription(result), 2}
 {
 
 }

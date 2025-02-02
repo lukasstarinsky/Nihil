@@ -1,4 +1,4 @@
-#include "Platform/VulkanPlatform.hpp"
+#include "VulkanPlatform.hpp"
 #include "VulkanContext.hpp"
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, [[maybe_unused]] void* userData)
@@ -81,16 +81,13 @@ VulkanContext::VulkanContext(const ApplicationConfig& appConfig)
             break;
         }
     }
-    if (!validationSupported)
-    {
-        THROW("Vulkan validation layers are not available");
-    }
+    ENSURE(validationSupported, "Vulkan validation layers are not available.");
 
     instanceCreateInfo.enabledLayerCount = COUNT_OF(instanceLayers);
     instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
 #endif
 
-    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &Instance));
+    VK_CHECK(vkCreateInstance(&instanceCreateInfo, nullptr, &mInstance));
 
 #ifndef NDEBUG
     VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo {
@@ -103,19 +100,29 @@ VulkanContext::VulkanContext(const ApplicationConfig& appConfig)
         .pUserData = nullptr
     };
 
-    auto vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(Instance, "vkCreateDebugUtilsMessengerEXT"));
-    VK_CHECK(vkCreateDebugUtilsMessengerEXT(Instance, &debugMessengerCreateInfo, nullptr, &mDebugMessenger));
+    auto vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT"));
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT(mInstance, &debugMessengerCreateInfo, nullptr, &mDebugMessenger));
 #endif
 
-    Surface = VulkanPlatform::CreateSurface(Instance);
+    mSurface = VulkanPlatform::CreateSurface(mInstance);
 }
 
 VulkanContext::~VulkanContext()
 {
-    vkDestroySurfaceKHR(Instance, Surface, nullptr);
+    vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 #ifndef NDEBUG
-    auto vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(Instance, "vkDestroyDebugUtilsMessengerEXT"));
-    vkDestroyDebugUtilsMessengerEXT(Instance, mDebugMessenger, nullptr);
+    auto vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugUtilsMessengerEXT"));
+    vkDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
 #endif
-    vkDestroyInstance(Instance, nullptr);
+    vkDestroyInstance(mInstance, nullptr);
+}
+
+auto VulkanContext::GetSurface() const -> VkSurfaceKHR
+{
+    return mSurface;
+}
+
+auto VulkanContext::GetInstance() const -> VkInstance
+{
+    return mInstance;
 }

@@ -16,10 +16,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     wndClass.hInstance = sState.Instance;
     wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wndClass.lpszClassName = "nihil_window";
-    if (!RegisterClassEx(&wndClass))
-    {
-        THROW(std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
-    }
+    ENSURE(RegisterClassEx(&wndClass), std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
 
     DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
     RECT rect { 0, 0, static_cast<i32>(config.WindowWidth), static_cast<i32>(config.WindowHeight) };
@@ -36,10 +33,7 @@ void Platform::Initialize(const ApplicationConfig& config)
         sState.Instance,
         nullptr
     );
-    if (!sState.WindowHandle)
-    {
-        THROW(std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
-    }
+    ENSURE(sState.WindowHandle, std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
 
     ShowWindow(sState.WindowHandle, SW_SHOW);
 }
@@ -156,7 +150,7 @@ auto DynamicLibrary::Unload() const -> bool
     return FreeLibrary(static_cast<HMODULE>(mHandle));
 }
 
-auto DynamicLibrary::LoadFunction(const char* name) -> bool
+auto DynamicLibrary::LoadSymbol(const char* name) -> bool
 {
     ASSERT(mHandle);
 
@@ -164,7 +158,7 @@ auto DynamicLibrary::LoadFunction(const char* name) -> bool
     if (!symbolPtr)
         return false;
 
-    mFunctions[name] = reinterpret_cast<void*>(symbolPtr);
+    mSymbols[name] = reinterpret_cast<void*>(symbolPtr);
     return true;
 }
 

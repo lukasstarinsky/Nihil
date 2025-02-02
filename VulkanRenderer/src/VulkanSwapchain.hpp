@@ -9,10 +9,9 @@ class VulkanSwapchain
 public:
     VulkanSwapchain(const VulkanContext& context, const VulkanDevice& device);
     ~VulkanSwapchain();
-public:
-    VkSwapchainKHR Swapchain {};
-    std::vector<VkImage> Images;
-    std::vector<VkImageView> ImageViews;
 private:
-    const VulkanDevice* mDevice;
+    VkSwapchainKHR mSwapchain {};
+    VkDevice mDevice {};
+    std::vector<VkImage> mImages;
+    std::vector<VkImageView> mImageViews;
 };
