@@ -16,4 +16,20 @@ private:
     std::stacktrace mStackTrace;
 };
 
+template <>
+class std::formatter<NihilException>
+{
+public:
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return ctx.begin();
+    }
+
+    template <typename Context>
+    auto format(const NihilException& e, Context& ctx) const
+    {
+        return std::format_to(ctx.out(), "{}\n{}", e.what(), e.StackTrace());
+    }
+};
+
 #define THROW(message) throw NihilException(message)

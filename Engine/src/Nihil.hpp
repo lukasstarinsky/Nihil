@@ -15,6 +15,6 @@ try {                                                   \
     engine.Run();                                       \
     return EXIT_SUCCESS;                                \
 } catch (const NihilException& e) {                     \
-    Logger::Fatal("{}\n{}", e.what(), e.StackTrace());  \
+    Logger::Fatal("{}", e);                             \
     return EXIT_FAILURE;                                \
 } while(0)
