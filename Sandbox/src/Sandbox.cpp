@@ -5,7 +5,7 @@ Sandbox::Sandbox()
     Config.WindowWidth = 1280;
     Config.WindowHeight = 960;
     Config.Name = "Nihil Sandbox";
-    Config.RendererAPI = RendererAPI::Vulkan;
+    Config.RendererAPI = RendererAPI::OpenGL;
 }
 
 void Sandbox::OnInitialize()

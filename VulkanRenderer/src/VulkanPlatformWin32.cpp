@@ -1,6 +1,6 @@
 #include "VulkanPlatform.hpp"
 #include "Platform/Platform.hpp"
-#include "Platform/Win32/Win32.hpp"
+#include "Platform/PlatformWin32.hpp"
 
 auto VulkanPlatform::GetSurfaceExtension() -> const char*
 {

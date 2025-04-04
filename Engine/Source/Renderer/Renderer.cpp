@@ -16,13 +16,19 @@ void Renderer::Initialize(const ApplicationConfig& config)
         THROW(std::format("Failed to load symbols of plugin '{}'.", Renderer::ApiToModuleString(config.RendererAPI)));
     }
 
-    auto CreatePluginFn = sRendererModule.GetSymbol<CreateRendererPluginFn>("CreatePlugin");
-    sRendererBackend = CreatePluginFn(config);
+    std::exception_ptr exception;
+    auto CreatePluginFn = sRendererModule.GetSymbol<Renderer::CreatePluginFn>("CreatePlugin");
+    sRendererBackend = CreatePluginFn(config, exception);
+
+    if (exception)
+    {
+        std::rethrow_exception(exception);
+    }
 }
 
 void Renderer::Shutdown()
 {
-    auto DestroyPluginFn = sRendererModule.GetSymbol<DestroyRendererPluginFn>("DestroyPlugin");
+    auto DestroyPluginFn = sRendererModule.GetSymbol<Renderer::DestroyPluginFn>("DestroyPlugin");
     DestroyPluginFn(sRendererBackend);
 }
 

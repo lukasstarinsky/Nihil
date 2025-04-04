@@ -1,4 +1,4 @@
-#include "Win32.hpp"
+#include "PlatformWin32.hpp"
 #include "Core/Event.hpp"
 #include "Platform/Platform.hpp"
 
@@ -16,7 +16,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     wndClass.hInstance = sState.Instance;
     wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wndClass.lpszClassName = "nihil_window";
-    ENSURE(RegisterClassEx(&wndClass), std::format("Win32 RegisterClassEx() failed with error code: {}", GetLastError()));
+    ENSURE(RegisterClassEx(&wndClass), std::format("Win32: RegisterClassEx() failed with error code: {}", GetLastError()));
 
     DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
     RECT rect { 0, 0, static_cast<i32>(config.WindowWidth), static_cast<i32>(config.WindowHeight) };
@@ -34,6 +34,7 @@ void Platform::Initialize(const ApplicationConfig& config)
         nullptr
     );
     ENSURE(sState.WindowHandle, std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
+    sState.DeviceContext = GetDC(sState.WindowHandle);
 
     ShowWindow(sState.WindowHandle, SW_SHOW);
 }
@@ -41,6 +42,7 @@ void Platform::Initialize(const ApplicationConfig& config)
 void Platform::Shutdown()
 {
     Logger::Trace("Shutting down Win32 Platform...");
+    ReleaseDC(sState.WindowHandle, sState.DeviceContext);
     DestroyWindow(sState.WindowHandle);
     UnregisterClass("nihil_window", sState.Instance);
 }

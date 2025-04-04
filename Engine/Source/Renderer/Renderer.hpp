@@ -11,14 +11,6 @@ enum class RendererAPI
     Metal
 };
 
-namespace Renderer
-{
-    void Initialize(const ApplicationConfig& config);
-    void Shutdown();
-
-    auto ApiToModuleString(RendererAPI api) -> const char*;
-}
-
 class RendererBackend
 {
 public:
@@ -28,5 +20,13 @@ public:
     virtual auto GetTypeString() const -> const char* = 0;
 };
 
-using CreateRendererPluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig);
-using DestroyRendererPluginFn = void(*)(RendererBackend*);
+namespace Renderer
+{
+    void Initialize(const ApplicationConfig& config);
+    void Shutdown();
+
+    auto ApiToModuleString(RendererAPI api) -> const char*;
+
+    using CreatePluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig, std::exception_ptr& exceptionPtr);
+    using DestroyPluginFn = void(*)(RendererBackend*);
+}

@@ -21,13 +21,20 @@ auto VulkanBackend::GetTypeString() const -> const char*
     return "Vulkan";
 }
 
-// TODO: This works, but exceptions propagated from extern "C" functions is probably undefined behavior, investigate work arounds
 extern "C"
 {
-    NIHIL_API auto CreatePlugin(const ApplicationConfig& appConfig) -> RendererBackend*
+    NIHIL_API auto CreatePlugin(const ApplicationConfig& appConfig, std::exception_ptr& exceptionPtr) -> RendererBackend*
     {
         Logger::Trace("Initializing Vulkan renderer...");
-        return new VulkanBackend(appConfig);
+        try
+        {
+            return new VulkanBackend(appConfig);
+        }
+        catch (...)
+        {
+            exceptionPtr = std::current_exception();
+            return nullptr;
+        }
     }
 
     NIHIL_API void DestroyPlugin(VulkanBackend* plugin)
