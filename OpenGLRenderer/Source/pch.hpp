@@ -12,3 +12,4 @@
 #include "Core/Exception.hpp"
 
 #include "OpenGLCommon.hpp"
+#include "OpenGLLoader.hpp"

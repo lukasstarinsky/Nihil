@@ -27,9 +27,12 @@ void Engine::Run() const
     {
         if (!mApplication->State.IsSuspended)
         {
-            // TODO: should update when suspended?
+            Renderer::BeginFrame(0.4f, 0.4f, 0.4f, 1.0f);
+
             mApplication->OnUpdate();
             mApplication->OnRender();
+
+            Renderer::EndFrame();
         }
         Platform::PollEvents();
     }

@@ -28,8 +28,21 @@ void Renderer::Initialize(const ApplicationConfig& config)
 
 void Renderer::Shutdown()
 {
+    ASSERT(sRendererBackend);
     auto DestroyPluginFn = sRendererModule.GetSymbol<Renderer::DestroyPluginFn>("DestroyPlugin");
     DestroyPluginFn(sRendererBackend);
+}
+
+void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
+{
+    ASSERT(sRendererBackend);
+    sRendererBackend->BeginFrame(r, g, b, a);
+}
+
+void Renderer::EndFrame()
+{
+    ASSERT(sRendererBackend);
+    sRendererBackend->EndFrame();
 }
 
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*

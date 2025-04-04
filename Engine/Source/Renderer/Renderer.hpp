@@ -18,15 +18,21 @@ public:
 
     virtual auto GetType() const -> RendererAPI = 0;
     virtual auto GetTypeString() const -> const char* = 0;
+
+    virtual void BeginFrame(f32 r, f32 g, f32 b, f32 a) const = 0;
+    virtual void EndFrame() const = 0;
 };
 
 namespace Renderer
 {
+    using CreatePluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig, std::exception_ptr& exceptionPtr);
+    using DestroyPluginFn = void(*)(RendererBackend*);
+
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
 
-    auto ApiToModuleString(RendererAPI api) -> const char*;
+    void BeginFrame(f32 r, f32 g, f32 b, f32 a);
+    void EndFrame();
 
-    using CreatePluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig, std::exception_ptr& exceptionPtr);
-    using DestroyPluginFn = void(*)(RendererBackend*);
+    auto ApiToModuleString(RendererAPI api) -> const char*;
 }

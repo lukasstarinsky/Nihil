@@ -11,6 +11,7 @@ public:
 
     auto GetType() const -> RendererAPI override;
     auto GetTypeString() const -> const char* override;
-private:
-    void ResolveGLFunctions() const;
+
+    void BeginFrame(f32 r, f32 g, f32 b, f32 a) const override;
+    void EndFrame() const override;
 };

@@ -10,7 +10,3 @@
 #endif
 
 #include <glext.h>
-
-#define RESOLVE_GL_FUNCTION(name) name = std::bit_cast<typeof(name)>(GET_PROC_ADDRESS(#name))
-
-inline PFNGLCREATESHADERPROC glCreateShader;
