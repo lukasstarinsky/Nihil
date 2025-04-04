@@ -23,7 +23,7 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
     i32 pixelFormat = 0;
     u32 numFormats = 0;
     wglChoosePixelFormatARB(platformState.DeviceContext, pixelFormatAttribs, nullptr, 1, &pixelFormat, &numFormats);
-    ENSURE(numFormats != 0, "OpenGL WGL: Failed to choose a pixel format");
+    Ensure(numFormats != 0, "OpenGL WGL: Failed to choose a pixel format");
 
     i32 attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -33,7 +33,7 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
     };
 
     auto context = wglCreateContextAttribsARB(platformState.DeviceContext, nullptr, attribs);
-    ENSURE(context, "OpenGL WGL: Failed to create context");
+    Ensure(context, "OpenGL WGL: Failed to create context");
 
     wglMakeCurrent(platformState.DeviceContext, context);
     Logger::Info("Initialized OpenGL: {}", (char*)glGetString(GL_VERSION));

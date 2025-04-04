@@ -16,7 +16,7 @@ void Platform::Initialize(const ApplicationConfig& config)
     wndClass.hInstance = sState.Instance;
     wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wndClass.lpszClassName = "nihil_window";
-    ENSURE(RegisterClassEx(&wndClass), std::format("Win32: RegisterClassEx() failed with error code: {}", GetLastError()));
+    Ensure(RegisterClassEx(&wndClass), "Win32: RegisterClassEx() failed with error code: {}", GetLastError());
 
     DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
     RECT rect { 0, 0, static_cast<i32>(config.WindowWidth), static_cast<i32>(config.WindowHeight) };
@@ -33,7 +33,7 @@ void Platform::Initialize(const ApplicationConfig& config)
         sState.Instance,
         nullptr
     );
-    ENSURE(sState.WindowHandle, std::format("Win32: CreateWindow() failed with error code: {}", GetLastError()));
+    Ensure(sState.WindowHandle, "Win32: CreateWindow() failed with error code: {}", GetLastError());
     sState.DeviceContext = GetDC(sState.WindowHandle);
 
     ShowWindow(sState.WindowHandle, SW_SHOW);

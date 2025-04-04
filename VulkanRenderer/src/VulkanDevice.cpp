@@ -27,7 +27,7 @@ VulkanDevice::VulkanDevice(const VulkanContext& context)
             }
         }
     }
-    ENSURE(mPhysicalDevice, "Could not find a GPU that meets the requirements.");
+    Ensure(mPhysicalDevice, "Could not find a GPU that meets the requirements.");
 
     /* ======= Logical Device ======= */
     std::unordered_set<u32> uniqueQueueFamilies { mGraphicsFamilyIndex, mPresentFamilyIndex };

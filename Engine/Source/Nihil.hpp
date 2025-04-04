@@ -17,4 +17,6 @@ try {                                                   \
 } catch (const NihilException& e) {                     \
     Logger::Fatal("{}", e);                             \
     return EXIT_FAILURE;                                \
+} catch (...) {                                         \
+    Logger::Fatal("Unknown exception occured.");        \
 } while(0)

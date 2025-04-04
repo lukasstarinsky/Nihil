@@ -3,6 +3,8 @@
 #include <exception>
 #include <stacktrace>
 
+#define THROW(message) throw NihilException(message)
+
 class NIHIL_API NihilException : public std::exception
 {
 public:
@@ -32,4 +34,11 @@ public:
     }
 };
 
-#define THROW(message) throw NihilException(message)
+template <typename... Args>
+void Ensure(bool predicate, std::format_string<Args...> msg, Args&&... args)
+{
+    if (!predicate)
+    {
+        throw NihilException(std::format(msg, std::forward<Args>(args)...), 2);
+    }
+}

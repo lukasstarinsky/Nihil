@@ -81,7 +81,7 @@ VulkanContext::VulkanContext(const ApplicationConfig& appConfig)
             break;
         }
     }
-    ENSURE(validationSupported, "Vulkan validation layers are not available.");
+    Ensure(validationSupported, "Vulkan validation layers are not available.");
 
     instanceCreateInfo.enabledLayerCount = COUNT_OF(instanceLayers);
     instanceCreateInfo.ppEnabledLayerNames = instanceLayers;
