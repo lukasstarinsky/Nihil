@@ -8,6 +8,6 @@ void Logger::Log(LogLevel severity, std::string_view message)
 
     const char* severityStr[] { "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL" };
 
-    auto logMessage = std::format("{} [{}]: {}\n", Utilities::GetFormattedTime(true), severityStr[static_cast<i32>(severity)], message);
+    auto logMessage = std::format("{} [{}]: {}\n", Time::GetFormattedTime(true), severityStr[static_cast<i32>(severity)], message);
     Console::Print(logMessage, severity);
 }

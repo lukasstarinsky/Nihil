@@ -38,6 +38,8 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
     wglMakeCurrent(platformState.DeviceContext, context);
     Logger::Info("Initialized OpenGL: {}", (char*)glGetString(GL_VERSION));
 #endif
+
+    OpenGLLoader::LoadGLFunctions();
 }
 
 OpenGLBackend::~OpenGLBackend()

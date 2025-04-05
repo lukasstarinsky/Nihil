@@ -4,8 +4,8 @@
 
 enum class RendererAPI
 {
-    Vulkan = 0,
-    OpenGL,
+    OpenGL = 0,
+    Vulkan,
     Direct3D11,
     Direct3D12,
     Metal

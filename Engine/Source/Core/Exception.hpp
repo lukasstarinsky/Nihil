@@ -30,7 +30,7 @@ public:
     template <typename Context>
     auto format(const NihilException& e, Context& ctx) const
     {
-        return std::format_to(ctx.out(), "{}\n{}", e.what(), e.StackTrace());
+        return std::format_to(ctx.out(), "{}\nStack Trace:\n{}", e.what(), e.StackTrace());
     }
 };
 

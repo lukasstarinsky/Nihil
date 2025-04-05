@@ -1,7 +1,8 @@
+#include <fstream>
 #include <chrono>
 #include "Utilities.hpp"
 
-auto Utilities::GetFormattedTime(bool includeDate) -> std::string
+auto Time::GetFormattedTime(bool includeDate) -> std::string
 {
     using namespace std::chrono;
 
@@ -11,4 +12,28 @@ auto Utilities::GetFormattedTime(bool includeDate) -> std::string
         return std::format("{:%D %T}", now);
     else
         return std::format("{:%T}", now);
+}
+
+auto File::ReadAll(const char* filePath) -> std::string
+{
+    std::ifstream file(filePath);
+    Ensure(file.is_open(), "Failed to open file: {}", filePath);
+
+    return {std::istreambuf_iterator<char>(file), {}};
+}
+
+auto File::ReadAllBytes(const char* filePath) -> std::vector<u8>
+{
+    std::ifstream file(filePath, std::ios::binary);
+    Ensure(file.is_open(), "Failed to open file: {}", filePath);
+
+    return {std::istream_iterator<u8>(file), {}};
+}
+
+auto File::ReadAllLines(const char* filePath) -> std::vector<std::string>
+{
+    std::ifstream file(filePath);
+    Ensure(file.is_open(), "Failed to open file: {}", filePath);
+
+    return {std::istream_iterator<std::string>(file), {}};
 }
