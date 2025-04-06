@@ -2,8 +2,16 @@
 	"version": 6,
 	"configurePresets": [
 		{
+			"name": "VCPKG",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+			}
+		},
+		{
 			"name": "Debug",
 			"hidden": true,
+			"inherits": "VCPKG",
 			"binaryDir": "Build/Debug",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
@@ -15,6 +23,7 @@
 		{
 			"name": "Release",
 			"hidden": true,
+			"inherits": "VCPKG",
 			"binaryDir": "Build/Release",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",

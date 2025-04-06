@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Application.hpp"
+#include "Shader.hpp"
 
 enum class RendererAPI
 {

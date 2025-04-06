@@ -56,3 +56,8 @@ auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
         case RendererAPI::Metal:        return "MetalRenderer";
     }
 }
+
+auto Shader::Create(std::string_view fileName)
+{
+    ASSERT(sRendererBackend);
+}

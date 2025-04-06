@@ -37,3 +37,11 @@ auto File::ReadAllLines(const char* filePath) -> std::vector<std::string>
 
     return {std::istream_iterator<std::string>(file), {}};
 }
+
+void File::WriteAllBytes(const char* filePath, const std::vector<u8>& bytes)
+{
+    std::ofstream file(filePath, std::ios::binary);
+    Ensure(file.is_open(), "Failed to open file: {}", filePath);
+
+    file.write(reinterpret_cast<const char*>(&bytes[0]), static_cast<std::streamsize>(bytes.size() * sizeof(u8)));
+}
