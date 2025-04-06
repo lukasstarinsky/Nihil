@@ -31,5 +31,9 @@ void OpenGLLoader::LoadWGLFunctions()
 
 void OpenGLLoader::LoadGLFunctions()
 {
-
+    RESOLVE_GL_FUNCTION(glCreateShader);
+    RESOLVE_GL_FUNCTION(glShaderBinary);
+    RESOLVE_GL_FUNCTION(glSpecializeShader);
+    RESOLVE_GL_FUNCTION(glGetShaderiv);
+    RESOLVE_GL_FUNCTION(glDeleteShader);
 }

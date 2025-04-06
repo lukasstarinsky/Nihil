@@ -22,6 +22,8 @@ public:
 
     virtual void BeginFrame(f32 r, f32 g, f32 b, f32 a) const = 0;
     virtual void EndFrame() const = 0;
+
+    virtual auto CreateShader(std::string_view filePath, ShaderType shaderType) const -> std::shared_ptr<Shader> = 0;
 };
 
 namespace Renderer

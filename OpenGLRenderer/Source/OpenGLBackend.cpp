@@ -1,4 +1,5 @@
 #include "OpenGLBackend.hpp"
+#include "OpenGLShader.hpp"
 #include "Platform/Platform.hpp"
 
 OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
@@ -69,6 +70,11 @@ void OpenGLBackend::EndFrame() const
 #ifdef NIHIL_PLATFORM_WINDOWS
     ::SwapBuffers(platformState.DeviceContext);
 #endif
+}
+
+auto OpenGLBackend::CreateShader(std::string_view filePath, ShaderType shaderType) const -> std::shared_ptr<Shader>
+{
+    return std::make_shared<OpenGLShader>(filePath, shaderType);
 }
 
 extern "C"

@@ -35,7 +35,7 @@ public:
 };
 
 template <typename... Args>
-void Ensure(bool predicate, std::format_string<Args...> msg, Args&&... args)
+inline void Ensure(bool predicate, std::format_string<Args...> msg, Args&&... args)
 {
     if (!predicate)
     {

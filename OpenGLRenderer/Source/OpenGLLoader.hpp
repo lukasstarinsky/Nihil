@@ -15,6 +15,10 @@ namespace OpenGLLoader
 #endif
 
 inline PFNGLCREATESHADERPROC glCreateShader;
+inline PFNGLSHADERBINARYPROC glShaderBinary;
+inline PFNGLSPECIALIZESHADERPROC glSpecializeShader;
+inline PFNGLGETSHADERIVPROC glGetShaderiv;
+inline PFNGLDELETESHADERPROC glDeleteShader;
 
 namespace OpenGLLoader
 {

@@ -4,10 +4,10 @@
 
 #include "Core/Exception.hpp"
 
-class VulkanException : public NihilException
+class OpenGLException : public NihilException
 {
 public:
-    explicit VulkanException(VkResult result);
+    explicit OpenGLException(VkResult result);
 private:
     static auto VkResultToDescription(VkResult result) -> const char*;
 };

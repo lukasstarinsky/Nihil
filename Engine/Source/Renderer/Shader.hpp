@@ -9,8 +9,7 @@ enum class ShaderType
 class Shader
 {
 public:
-    Shader() = default;
-    virtual ~Shader() = 0;
+    virtual ~Shader() = default;
 
-    static auto Create(std::string_view fileName);
+    static auto Create(std::string_view filePath, ShaderType shaderType) -> std::shared_ptr<Shader>;
 };

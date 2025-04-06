@@ -1,12 +1,12 @@
 #include "VulkanException.hpp"
 
-VulkanException::VulkanException(VkResult result)
+OpenGLException::OpenGLException(VkResult result)
     : NihilException{"Vulkan", VkResultToDescription(result), 2}
 {
 
 }
 
-auto VulkanException::VkResultToDescription(VkResult result) -> const char*
+auto OpenGLException::VkResultToDescription(VkResult result) -> const char*
 {
     switch (result)
     {
