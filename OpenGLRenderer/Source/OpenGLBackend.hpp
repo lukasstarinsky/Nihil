@@ -15,5 +15,5 @@ public:
     void BeginFrame(f32 r, f32 g, f32 b, f32 a) const override;
     void EndFrame() const override;
 
-    auto CreateShader(std::string_view filePath, ShaderType shaderType) const -> std::shared_ptr<Shader> override;
+    auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> std::shared_ptr<Shader> override;
 };

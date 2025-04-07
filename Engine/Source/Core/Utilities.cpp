@@ -14,34 +14,18 @@ auto Time::GetFormattedTime(bool includeDate) -> std::string
         return std::format("{:%T}", now);
 }
 
-auto File::ReadAll(const char* filePath) -> std::string
+auto File::ReadAll(std::string_view filePath) -> std::string
 {
-    std::ifstream file(filePath);
-    Ensure(file.is_open(), "Failed to open file: {}", filePath);
+    std::ifstream file(filePath.data());
+    Ensure(file.is_open(), "Failed to open file: {}", filePath.data());
 
     return {std::istreambuf_iterator<char>(file), {}};
 }
 
-auto File::ReadAllBytes(const char* filePath) -> std::vector<u8>
+auto File::ReadAllLines(std::string_view filePath) -> std::vector<std::string>
 {
-    std::ifstream file(filePath, std::ios::binary);
-    Ensure(file.is_open(), "Failed to open file: {}", filePath);
-
-    return {std::istream_iterator<u8>(file), {}};
-}
-
-auto File::ReadAllLines(const char* filePath) -> std::vector<std::string>
-{
-    std::ifstream file(filePath);
-    Ensure(file.is_open(), "Failed to open file: {}", filePath);
+    std::ifstream file(filePath.data());
+    Ensure(file.is_open(), "Failed to open file: {}", filePath.data());
 
     return {std::istream_iterator<std::string>(file), {}};
-}
-
-void File::WriteAllBytes(const char* filePath, const std::vector<u8>& bytes)
-{
-    std::ofstream file(filePath, std::ios::binary);
-    Ensure(file.is_open(), "Failed to open file: {}", filePath);
-
-    file.write(reinterpret_cast<const char*>(&bytes[0]), static_cast<std::streamsize>(bytes.size() * sizeof(u8)));
 }

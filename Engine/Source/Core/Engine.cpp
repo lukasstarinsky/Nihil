@@ -11,8 +11,6 @@ Engine::Engine(Application* application)
     Renderer::Initialize(mApplication->Config);
     mApplication->OnInitialize();
 
-    Shader::Create("test.glsl", ShaderType::Fragment);
-
     ADD_EVENT_LISTENER_THIS(Event::ApplicationQuit | Event::ApplicationResize, OnAppEvent);
 }
 

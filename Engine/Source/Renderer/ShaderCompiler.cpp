@@ -13,13 +13,14 @@ static auto ShaderTypeToShaderc(ShaderType shaderType) -> shaderc_shader_kind
     return shaderc_glsl_vertex_shader;
 }
 
-auto ShaderCompiler::GlslToSpv(const std::string& glslSource, ShaderType shaderType) -> std::vector<u32>
+auto ShaderCompiler::GlslToSpv(std::string_view filePath, ShaderType shaderType) -> std::vector<u32>
 {
+    auto sourceCode = File::ReadAll(filePath);
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
     options.SetOptimizationLevel(shaderc_optimization_level_size);
 
-    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(glslSource, ShaderTypeToShaderc(shaderType), "Shader", options);
+    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(sourceCode, ShaderTypeToShaderc(shaderType), "Shader", options);
     Ensure(module.GetCompilationStatus() == shaderc_compilation_status_success, "Failed to compiler shader to Spv. {}", module.GetErrorMessage());
 
     return {module.begin(), module.end()};

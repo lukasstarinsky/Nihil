@@ -57,7 +57,7 @@ auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
     }
 }
 
-auto Shader::Create(std::string_view filePath, ShaderType shaderType) -> std::shared_ptr<Shader>
+auto Shader::Create(const std::string& filePath, ShaderType shaderType) -> std::shared_ptr<Shader>
 {
     ASSERT(sRendererBackend);
     return sRendererBackend->CreateShader(filePath, shaderType);

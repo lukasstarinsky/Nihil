@@ -1,6 +1,8 @@
 #include "OpenGLLoader.hpp"
 #include "Platform/Platform.hpp"
 
+#define RESOLVE_GL_FUNCTION_DEFINITION(type, name) name = std::bit_cast<type>(GET_PROC_ADDRESS(#name));
+
 #ifdef NIHIL_PLATFORM_WINDOWS
 void OpenGLLoader::LoadWGLFunctions()
 {
@@ -21,8 +23,7 @@ void OpenGLLoader::LoadWGLFunctions()
     auto dummyContext = wglCreateContext(platformState.DeviceContext);
     wglMakeCurrent(platformState.DeviceContext, dummyContext);
 
-    RESOLVE_GL_FUNCTION(wglCreateContextAttribsARB);
-    RESOLVE_GL_FUNCTION(wglChoosePixelFormatARB);
+    FOR_OPENGL_WGL_FUNCTIONS(RESOLVE_GL_FUNCTION_DEFINITION)
 
     wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(dummyContext);
@@ -31,9 +32,5 @@ void OpenGLLoader::LoadWGLFunctions()
 
 void OpenGLLoader::LoadGLFunctions()
 {
-    RESOLVE_GL_FUNCTION(glCreateShader);
-    RESOLVE_GL_FUNCTION(glShaderBinary);
-    RESOLVE_GL_FUNCTION(glSpecializeShader);
-    RESOLVE_GL_FUNCTION(glGetShaderiv);
-    RESOLVE_GL_FUNCTION(glDeleteShader);
+    FOR_OPENGL_FUNCTIONS(RESOLVE_GL_FUNCTION_DEFINITION)
 }
