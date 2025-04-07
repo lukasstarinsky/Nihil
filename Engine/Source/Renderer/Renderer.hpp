@@ -2,6 +2,7 @@
 
 #include "Core/Application.hpp"
 #include "Shader.hpp"
+#include "Material.hpp"
 
 enum class RendererAPI
 {
@@ -23,7 +24,8 @@ public:
     virtual void BeginFrame(f32 r, f32 g, f32 b, f32 a) const = 0;
     virtual void EndFrame() const = 0;
 
-    virtual auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> std::shared_ptr<Shader> = 0;
+    virtual auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr = 0;
+    virtual auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr = 0;
 };
 
 namespace Renderer

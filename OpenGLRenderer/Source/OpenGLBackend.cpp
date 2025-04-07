@@ -1,10 +1,11 @@
 #include "OpenGLBackend.hpp"
 #include "OpenGLShader.hpp"
+#include "OpenGLMaterial.hpp"
 #include "Platform/Platform.hpp"
 
 std::shared_ptr<OpenGLShader> vert {};
 std::shared_ptr<OpenGLShader> frag {};
-GLuint program {};
+std::shared_ptr<OpenGLMaterial> material {};
 GLuint vao {};
 GLuint vbo {};
 
@@ -57,11 +58,7 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
     // TODO: temp, abstract
     vert = std::make_shared<OpenGLShader>("Assets/Shaders/test.vert", ShaderType::Vertex);
     frag = std::make_shared<OpenGLShader>("Assets/Shaders/test.frag", ShaderType::Fragment);
-    GL_CHECK(program = glCreateProgram());
-
-    GL_CHECK(glAttachShader(program, vert->mHandle));
-    GL_CHECK(glAttachShader(program, frag->mHandle));
-    GL_CHECK(glLinkProgram(program));
+    material = std::make_shared<OpenGLMaterial>(vert, frag);
 
     GL_CHECK(glGenVertexArrays(1, &vao));
     GL_CHECK(glGenBuffers(1, &vbo));
@@ -79,10 +76,6 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
 
 OpenGLBackend::~OpenGLBackend()
 {
-    if (program)
-    {
-        glDeleteProgram(program);
-    }
 }
 
 auto OpenGLBackend::GetType() const -> RendererAPI
@@ -100,7 +93,7 @@ void OpenGLBackend::BeginFrame(f32 r, f32 g, f32 b, f32 a) const
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    GL_CHECK(glUseProgram(program));
+    material->Bind();
     GL_CHECK(glBindVertexArray(vao));
     GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 3));
 }
@@ -114,9 +107,14 @@ void OpenGLBackend::EndFrame() const
 #endif
 }
 
-auto OpenGLBackend::CreateShader(const std::string& filePath, ShaderType shaderType) const -> std::shared_ptr<Shader>
+auto OpenGLBackend::CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr
 {
     return std::make_shared<OpenGLShader>(filePath, shaderType);
+}
+
+auto OpenGLBackend::CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr
+{
+    return std::make_shared<OpenGLMaterial>(vertexShader, fragmentShader);
 }
 
 extern "C"

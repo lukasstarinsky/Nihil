@@ -6,10 +6,13 @@ enum class ShaderType
     Fragment
 };
 
+class Shader;
+using ShaderPtr = std::shared_ptr<Shader>;
+
 class Shader
 {
 public:
     virtual ~Shader() = default;
 
-    static auto Create(const std::string& filePath, ShaderType shaderType) -> std::shared_ptr<Shader>;
+    static auto Create(const std::string& filePath, ShaderType shaderType) -> ShaderPtr;
 };

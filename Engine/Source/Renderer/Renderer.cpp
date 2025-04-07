@@ -57,8 +57,14 @@ auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
     }
 }
 
-auto Shader::Create(const std::string& filePath, ShaderType shaderType) -> std::shared_ptr<Shader>
+auto Shader::Create(const std::string& filePath, ShaderType shaderType) -> ShaderPtr
 {
     ASSERT(sRendererBackend);
     return sRendererBackend->CreateShader(filePath, shaderType);
+}
+
+auto Material::Create(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) -> MaterialPtr
+{
+    ASSERT(sRendererBackend);
+    return sRendererBackend->CreateMaterial(vertexShader, fragmentShader);
 }

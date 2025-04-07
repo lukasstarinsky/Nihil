@@ -18,7 +18,7 @@ auto ShaderCompiler::GlslToSpv(std::string_view filePath, ShaderType shaderType)
     auto sourceCode = File::ReadAll(filePath);
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
-    options.SetOptimizationLevel(shaderc_optimization_level_size);
+    options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
     shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(sourceCode, ShaderTypeToShaderc(shaderType), "Shader", options);
     Ensure(module.GetCompilationStatus() == shaderc_compilation_status_success, "Failed to compiler shader to Spv. {}", module.GetErrorMessage());
