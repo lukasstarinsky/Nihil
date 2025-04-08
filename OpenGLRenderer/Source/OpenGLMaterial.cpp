@@ -7,10 +7,10 @@ OpenGLMaterial::OpenGLMaterial(const ShaderPtr& vertexShader, const ShaderPtr& f
     ASSERT(mVertexShader->GetType() == ShaderType::Vertex);
     ASSERT(mFragmentShader->GetType() == ShaderType::Fragment);
 
-    GL_CHECK(mHandle = glCreateProgram());
-    GL_CHECK(glAttachShader(mHandle, mVertexShader->GetHandle()));
-    GL_CHECK(glAttachShader(mHandle, mFragmentShader->GetHandle()));
-    GL_CHECK(glLinkProgram(mHandle));
+    mHandle = glCreateProgram();
+    glAttachShader(mHandle, mVertexShader->GetHandle());
+    glAttachShader(mHandle, mFragmentShader->GetHandle());
+    glLinkProgram(mHandle);
 }
 
 OpenGLMaterial::~OpenGLMaterial()
@@ -23,5 +23,5 @@ OpenGLMaterial::~OpenGLMaterial()
 
 void OpenGLMaterial::Bind() const
 {
-    GL_CHECK(glUseProgram(mHandle));
+    glUseProgram(mHandle);
 }

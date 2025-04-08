@@ -15,6 +15,19 @@ f32 vertexData[] = {
     0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
 };
 
+static void OpenGLDebugCallback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* msg, const void* user_param)
+{
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_LOW:
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            Logger::Warn("OpenGL message: {}", msg);
+            break;
+        case GL_DEBUG_SEVERITY_HIGH:
+            Throw("OpenGL Exception: {}", msg);
+    }
+}
+
 OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
 {
     const auto& platformState = Platform::GetState();
@@ -55,22 +68,25 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
 
     OpenGLLoader::LoadGLFunctions();
 
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(OpenGLDebugCallback, nullptr);
+
     // TODO: temp, abstract
     vert = std::make_shared<OpenGLShader>("Assets/Shaders/test.vert", ShaderType::Vertex);
     frag = std::make_shared<OpenGLShader>("Assets/Shaders/test.frag", ShaderType::Fragment);
     material = std::make_shared<OpenGLMaterial>(vert, frag);
 
-    GL_CHECK(glGenVertexArrays(1, &vao));
-    GL_CHECK(glGenBuffers(1, &vbo));
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
 
-    GL_CHECK(glBindVertexArray(vao));
-    GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-    GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW));
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
 
-    GL_CHECK(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), reinterpret_cast<void*>(0)));
-    GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), reinterpret_cast<void*>(3 * sizeof(f32))));
-    GL_CHECK(glEnableVertexAttribArray(1));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), reinterpret_cast<void*>(3 * sizeof(f32)));
+    glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 }
 
@@ -94,8 +110,8 @@ void OpenGLBackend::BeginFrame(f32 r, f32 g, f32 b, f32 a) const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     material->Bind();
-    GL_CHECK(glBindVertexArray(vao));
-    GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 3));
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void OpenGLBackend::EndFrame() const

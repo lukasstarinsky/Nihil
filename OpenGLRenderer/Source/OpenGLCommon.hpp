@@ -12,10 +12,3 @@
 #include <glext.h>
 
 #include "Renderer/Renderer.hpp"
-#include "OpenGLException.hpp"
-
-#define GL_CHECK(fun) \
-    while (glGetError() != GL_NO_ERROR); \
-    fun; \
-    if (GLenum error = glGetError()) \
-        GL_THROW(error)

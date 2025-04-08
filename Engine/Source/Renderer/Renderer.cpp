@@ -8,12 +8,12 @@ void Renderer::Initialize(const ApplicationConfig& config)
 {
     if (!DynamicLibrary::Load(Renderer::ApiToModuleString(config.RendererAPI), &sRendererModule))
     {
-        THROW(std::format("Failed to load plugin '{}'", Renderer::ApiToModuleString(config.RendererAPI)));
+        Throw("Failed to load plugin '{}'", Renderer::ApiToModuleString(config.RendererAPI));
     }
 
     if (!sRendererModule.LoadSymbol("CreatePlugin") || !sRendererModule.LoadSymbol("DestroyPlugin"))
     {
-        THROW(std::format("Failed to load symbols of plugin '{}'.", Renderer::ApiToModuleString(config.RendererAPI)));
+        Throw("Failed to load symbols of plugin '{}'.", Renderer::ApiToModuleString(config.RendererAPI));
     }
 
     std::exception_ptr exception;

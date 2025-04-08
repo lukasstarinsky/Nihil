@@ -39,9 +39,9 @@ OpenGLShader::OpenGLShader(const std::string& filePath, ShaderType shaderType)
         file.write(reinterpret_cast<char*>(spvBinary.data()), static_cast<std::streamsize>(spvBinary.size() * sizeof(u32)));
     }
 
-    GL_CHECK(mHandle = glCreateShader(ShaderTypeToGLenum(shaderType)));
-    GL_CHECK(glShaderBinary(1, &mHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, spvBinary.data(), static_cast<GLsizei>(sizeof(spvBinary[0]) * spvBinary.size())));
-    GL_CHECK(glSpecializeShader(mHandle, "main", 0, nullptr, nullptr));
+    mHandle = glCreateShader(ShaderTypeToGLenum(shaderType));
+    glShaderBinary(1, &mHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, spvBinary.data(), static_cast<GLsizei>(sizeof(spvBinary[0]) * spvBinary.size()));
+    glSpecializeShader(mHandle, "main", 0, nullptr, nullptr);
 
     i32 compiled;
     glGetShaderiv(mHandle, GL_COMPILE_STATUS, &compiled);
