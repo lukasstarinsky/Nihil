@@ -63,10 +63,8 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
     sRendererBackend->BeginFrame(r, g, b, a);
 
     // Temp
-    static f32 pos = 0.01f;
-//    pos += 0.01f;
-    auto translation = Mat4f::Translation({pos, pos, 0.0f});
-    sState.CameraUniformBuffer->SetData(translation.Data(), sizeof(Mat4f));
+    auto projection = Mat4f::Perspective(std::numbers::pi / 3.0f, 800.0f / 600.0f, 0.1f, 1000.0f);
+    sState.CameraUniformBuffer->SetData(projection.Data(), sizeof(Mat4f));
 }
 
 void Renderer::EndFrame()

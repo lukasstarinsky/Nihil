@@ -4,6 +4,8 @@ project(NihilCore LANGUAGES CXX)
 file(GLOB_RECURSE HEADER_FILES Source/*.hpp)
 file(GLOB_RECURSE SOURCE_FILES Source/*.cpp)
 
+add_subdirectory(Tests)
+
 find_package(unofficial-shaderc CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
