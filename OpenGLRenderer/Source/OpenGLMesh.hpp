@@ -7,7 +7,7 @@
 class OpenGLMesh : public Mesh
 {
 public:
-    OpenGLMesh();
+    OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> indices);
     ~OpenGLMesh() override;
 
     auto GetIndexCount() const -> i32 override;

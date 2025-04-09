@@ -5,6 +5,7 @@
 #include <format>
 #include <memory>
 #include <algorithm>
+#include <span>
 
 #include "Core/Defines.hpp"
 #include "Core/Logger.hpp"

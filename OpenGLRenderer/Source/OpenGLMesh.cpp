@@ -1,22 +1,9 @@
 #include "OpenGLMesh.hpp"
 
-// TODO: temp
-static constexpr Vertex vertexData[] = {
-    { .Position = { -0.5f, 0.5f, 0.0f }, .Color = { 1.0f, 0.0f, 0.0f } },
-    { .Position = { -0.5f, -0.5f, 0.0f }, .Color = { 1.0f, 0.0f, 0.0f } },
-
-    { .Position = { 0.5f, 0.5f, 0.0f }, .Color = { 0.0f, 1.0f, 0.0f } },
-    { .Position = { 0.5f, -0.5f, 0.0f}, .Color = { 0.0f, 0.0f, 1.0f } }
-};
-
-static constexpr u32 indexData[] = {
-    0, 1, 2, 2, 3, 1
-};
-
-OpenGLMesh::OpenGLMesh()
-    : mVertexBuffer{BufferType::Vertex, vertexData, sizeof(vertexData)}
-    , mIndexBuffer{BufferType::Index, indexData, sizeof(indexData)}
-    , mIndexCount{sizeof(indexData) / sizeof(u32)}
+OpenGLMesh::OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> indices)
+    : mVertexBuffer{BufferType::Vertex, vertices.data(), static_cast<i32>(vertices.size_bytes())}
+    , mIndexBuffer{BufferType::Index, indices.data(), static_cast<i32>(indices.size_bytes())}
+    , mIndexCount{static_cast<i32>(indices.size())}
     , mMaterial{Renderer::DefaultMaterial()}
 //    , mMaterial{std::static_pointer_cast<OpenGLMaterial>(Renderer::DefaultMaterial())}
 {

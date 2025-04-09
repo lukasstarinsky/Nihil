@@ -8,6 +8,8 @@ struct Vertex
     Vec3f Color {};
 };
 
+using Index = u32;
+
 class Mesh;
 using MeshPtr = std::shared_ptr<Mesh>;
 
@@ -19,5 +21,5 @@ public:
     virtual auto GetIndexCount() const -> i32 = 0;
     virtual void Bind() const = 0;
 
-    static auto Create() -> MeshPtr;
+    static auto Create(std::span<const Vertex> vertices, std::span<const Index> indices) -> MeshPtr;
 };

@@ -106,9 +106,9 @@ auto OpenGLBackend::CreateBuffer(BufferType bufferType, const void* data, i32 si
     return std::make_shared<OpenGLBuffer>(bufferType, data, size, uniformBinding);
 }
 
-auto OpenGLBackend::CreateMesh() const -> MeshPtr
+auto OpenGLBackend::CreateMesh(std::span<const Vertex> vertices, std::span<const Index> indices) const -> MeshPtr
 {
-    return std::make_shared<OpenGLMesh>();
+    return std::make_shared<OpenGLMesh>(vertices, indices);
 }
 
 void OpenGLBackend::Draw(const MeshPtr& mesh) const
