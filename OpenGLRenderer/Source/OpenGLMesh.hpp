@@ -13,6 +13,6 @@ public:
     void Bind() const override;
 private:
     GLuint mVertexArray {};
-    std::shared_ptr<OpenGLBuffer> mVertexBuffer {};
-    std::shared_ptr<OpenGLMaterial> mMaterial {};
+    OpenGLBuffer mVertexBuffer;
+    MaterialPtr mMaterial {};
 };

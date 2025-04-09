@@ -7,17 +7,13 @@ static constexpr Vertex vertexData[] = {
 };
 
 OpenGLMesh::OpenGLMesh()
-    : mVertexBuffer{std::make_shared<OpenGLBuffer>(BufferType::Vertex, vertexData, sizeof(vertexData))}
+    : mVertexBuffer{BufferType::Vertex, vertexData, sizeof(vertexData)}
+    , mMaterial{Renderer::DefaultMaterial()}
+//    , mMaterial{std::static_pointer_cast<OpenGLMaterial>(Renderer::DefaultMaterial())}
 {
-    // Temp, move where?
-    auto vert = std::make_shared<OpenGLShader>("Assets/Shaders/DefaultObjectShader.vert", ShaderType::Vertex);
-    auto frag = std::make_shared<OpenGLShader>("Assets/Shaders/DefaultObjectShader.frag", ShaderType::Fragment);
-    mMaterial = std::make_shared<OpenGLMaterial>(vert, frag);
-    //
-
     glCreateVertexArrays(1, &mVertexArray);
 
-    glVertexArrayVertexBuffer(mVertexArray, 0, mVertexBuffer->GetHandle(), 0, sizeof(Vertex));
+    glVertexArrayVertexBuffer(mVertexArray, 0, mVertexBuffer.GetHandle(), 0, sizeof(Vertex));
 
     glEnableVertexArrayAttrib(mVertexArray, 0);
     glEnableVertexArrayAttrib(mVertexArray, 1);

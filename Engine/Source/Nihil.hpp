@@ -19,4 +19,5 @@ try {                                                   \
     return EXIT_FAILURE;                                \
 } catch (...) {                                         \
     Logger::Fatal("Unknown exception occured.");        \
+    return EXIT_FAILURE:                                \
 } while(0)

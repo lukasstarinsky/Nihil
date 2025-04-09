@@ -1,9 +1,17 @@
 #include "Renderer.hpp"
 #include "Platform/DynamicLibrary.hpp"
 
+struct RendererState
+{
+    BufferPtr CameraUniformBuffer;
+    ShaderPtr DefaultVertexShader;
+    ShaderPtr DefaultFragmentShader;
+    MaterialPtr DefaultMaterial;
+};
+
 static DynamicLibrary sRendererModule;
 static RendererBackend* sRendererBackend;
-static BufferPtr sCameraUniformBuffer;
+static RendererState sState;
 
 void Renderer::Initialize(const ApplicationConfig& config)
 {
@@ -26,7 +34,10 @@ void Renderer::Initialize(const ApplicationConfig& config)
         std::rethrow_exception(exception);
     }
 
-    sCameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, sizeof(Mat4f), 0);
+    sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, sizeof(Mat4f), 0);
+    sState.DefaultVertexShader = Shader::Create("Assets/Shaders/DefaultObjectShader.vert", ShaderType::Vertex);
+    sState.DefaultFragmentShader = Shader::Create("Assets/Shaders/DefaultObjectShader.frag", ShaderType::Fragment);
+    sState.DefaultMaterial = Material::Create(sState.DefaultVertexShader, sState.DefaultFragmentShader);
 }
 
 void Renderer::Shutdown()
@@ -45,7 +56,7 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
     static f32 pos = 0.01f;
     pos += 0.01f;
     auto translation = Mat4f::Translation({pos, pos, 0.0f});
-    sCameraUniformBuffer->SetData(translation.Data(), sizeof(Mat4f));
+    sState.CameraUniformBuffer->SetData(translation.Data(), sizeof(Mat4f));
 }
 
 void Renderer::EndFrame()
@@ -58,6 +69,21 @@ void Renderer::Draw(const MeshPtr& mesh)
 {
     ASSERT(sRendererBackend);
     sRendererBackend->Draw(mesh);
+}
+
+auto Renderer::DefaultVertexShader() -> const ShaderPtr&
+{
+    return sState.DefaultVertexShader;
+}
+
+auto Renderer::DefaultFragmentShader() -> const ShaderPtr&
+{
+    return sState.DefaultFragmentShader;
+}
+
+auto Renderer::DefaultMaterial() -> const MaterialPtr&
+{
+    return sState.DefaultMaterial;
 }
 
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
