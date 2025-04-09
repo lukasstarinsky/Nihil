@@ -14,6 +14,12 @@ public:
     {
         return mElements.data();
     }
+
+    auto operator[](std::size_t index) const -> T
+    {
+        ASSERT(index >= 0 && index < mElements.size());
+        return mElements[index];
+    }
 public:
     static constexpr auto Identity() -> Mat4<T>
     {
@@ -35,6 +41,22 @@ public:
     }
 private:
     std::array<T, 16> mElements {};
+};
+
+template <typename T>
+class std::formatter<Mat4<T>>
+{
+public:
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return ctx.begin();
+    }
+
+    template <typename Context>
+    auto format(const Mat4<T>& m, Context& ctx) const
+    {
+        return std::format_to(ctx.out(), "{} {} {} {}\n{} {} {} {}\n{} {} {} {}\n{} {} {} {}", m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+    }
 };
 
 using Mat4i = Mat4<i32>;
