@@ -38,6 +38,8 @@ void Renderer::Initialize(const ApplicationConfig& config)
     sState.DefaultVertexShader = Shader::Create("Assets/Shaders/DefaultObjectShader.vert", ShaderType::Vertex);
     sState.DefaultFragmentShader = Shader::Create("Assets/Shaders/DefaultObjectShader.frag", ShaderType::Fragment);
     sState.DefaultMaterial = Material::Create(sState.DefaultVertexShader, sState.DefaultFragmentShader);
+
+    ADD_EVENT_LISTENER(Event::ApplicationResize, OnResizeEvent);
 }
 
 void Renderer::Shutdown()
@@ -45,6 +47,14 @@ void Renderer::Shutdown()
     ASSERT(sRendererBackend);
     auto DestroyPluginFn = sRendererModule.GetSymbol<Renderer::DestroyPluginFn>("DestroyPlugin");
     DestroyPluginFn(sRendererBackend);
+}
+
+auto Renderer::OnResizeEvent(const Event& e) -> bool
+{
+    ASSERT(sRendererBackend);
+    const auto& appEvent = e.ApplicationEvent;
+    sRendererBackend->OnResize(appEvent.Width, appEvent.Height);
+    return false;
 }
 
 void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)

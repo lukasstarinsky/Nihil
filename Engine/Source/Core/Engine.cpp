@@ -55,6 +55,7 @@ auto Engine::OnAppEvent(const Event& e) -> bool
         if (appEvent.Width == 0 || appEvent.Height == 0)
         {
             mApplication->State.IsSuspended = true;
+            return true;
         }
         else
         {

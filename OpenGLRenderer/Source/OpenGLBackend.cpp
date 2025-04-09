@@ -19,7 +19,7 @@ static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GL
     }
 }
 
-OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
+OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig)
 {
     const auto& platformState = Platform::GetState();
 
@@ -60,6 +60,7 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(OpenGLDebugCallback, nullptr);
+    glViewport(0, 0, appConfig.WindowWidth, appConfig.WindowHeight);
 }
 
 OpenGLBackend::~OpenGLBackend()
@@ -80,6 +81,11 @@ void OpenGLBackend::BeginFrame(f32 r, f32 g, f32 b, f32 a) const
 {
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void OpenGLBackend::OnResize(i32 width, i32 height) const
+{
+    glViewport(0, 0, width, height);
 }
 
 void OpenGLBackend::EndFrame() const

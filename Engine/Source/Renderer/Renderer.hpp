@@ -3,6 +3,7 @@
 #include <span>
 
 #include "Core/Application.hpp"
+#include "Core/Event.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
 #include "Buffer.hpp"
@@ -26,6 +27,7 @@ public:
     virtual auto GetTypeString() const -> const char* = 0;
 
     virtual void BeginFrame(f32 r, f32 g, f32 b, f32 a) const = 0;
+    virtual void OnResize(i32 width, i32 height) const = 0;
     virtual void EndFrame() const = 0;
 
     virtual auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr = 0;
@@ -42,6 +44,7 @@ namespace Renderer
     using DestroyPluginFn = void(*)(RendererBackend*);
 
     void Initialize(const ApplicationConfig& config);
+    auto OnResizeEvent(const Event& e) -> bool;
     void Shutdown();
 
     void BeginFrame(f32 r, f32 g, f32 b, f32 a);

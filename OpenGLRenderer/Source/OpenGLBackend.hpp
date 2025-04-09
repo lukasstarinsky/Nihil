@@ -6,13 +6,14 @@
 class OpenGLBackend : public RendererBackend
 {
 public:
-    explicit OpenGLBackend(const ApplicationConfig& config);
+    explicit OpenGLBackend(const ApplicationConfig& appConfig);
     ~OpenGLBackend() override;
 
     auto GetType() const -> RendererAPI override;
     auto GetTypeString() const -> const char* override;
 
     void BeginFrame(f32 r, f32 g, f32 b, f32 a) const override;
+    void OnResize(i32 width, i32 height) const override;
     void EndFrame() const override;
 
     auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr override;

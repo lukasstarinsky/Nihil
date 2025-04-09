@@ -6,8 +6,8 @@ enum class RendererAPI;
 
 struct ApplicationConfig
 {
-    u32 WindowWidth = 1024;
-    u32 WindowHeight = 768;
+    i32 WindowWidth = 1024;
+    i32 WindowHeight = 768;
     std::string Name = "Nihil Application";
     RendererAPI RendererAPI {};
 };
