@@ -22,6 +22,37 @@ public:
     {
 
     }
+
+    constexpr auto operator-(const Vec3<T>& other) const -> Vec3<T>
+    {
+        Vec3<T> out;
+        out.x = x - other.x;
+        out.y = y - other.y;
+        out.z = z - other.z;
+        return out;
+    }
+public:
+    static constexpr auto Normalize(Vec3<T> v) -> Vec3<T>
+    {
+        auto mag = std::hypot(v.x, v.y, v.z);
+        if (mag == 0.0f)
+            return v;
+
+        v.x /= mag;
+        v.y /= mag;
+        v.z /= mag;
+        return v;
+    }
+
+    static constexpr auto Cross(const Vec3<T>& a, const Vec3<T>& b) -> Vec3<T>
+    {
+        return {a.y * b.z - a.z*b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+    }
+
+    static constexpr auto Dot(const Vec3<T>& a, const Vec3<T>& b) -> T
+    {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
 };
 
 template <typename T>

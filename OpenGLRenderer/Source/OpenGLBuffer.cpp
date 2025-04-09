@@ -20,10 +20,10 @@ OpenGLBuffer::~OpenGLBuffer()
     glDeleteBuffers(1, &mHandle);
 }
 
-void OpenGLBuffer::SetData(const void* data, i32 size) const
+void OpenGLBuffer::SetData(const void* data, i32 size, i32 offset) const
 {
     ASSERT(mBufferType == BufferType::Uniform);
-    glNamedBufferSubData(mHandle, 0, size, data);
+    glNamedBufferSubData(mHandle, offset, size, data);
 }
 
 auto OpenGLBuffer::GetHandle() const -> GLuint

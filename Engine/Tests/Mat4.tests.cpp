@@ -13,3 +13,14 @@ TEST(Mat4, PerspectiveMatrix)
         ASSERT_NEAR(actual[i], expected[i], 0.001f);
     }
 }
+
+TEST(Mat4, LookAt)
+{
+    auto actual = Mat4f::LookAt({1.0f, 2.0f, 3.0f}, {4.0f, 5.0f, 6.0f}, {0.0f, 1.0f, 0.0f});
+    auto expected = Mat4f({-0.7071f, -0.4082f, -0.5774f, 0.0000f, 0.0000f, 0.8165f, -0.5774f, 0.0000f, 0.7071f, -0.4082f, -0.5774f, 0.0000f, -1.4142f, -0.0000f, 3.4641f, 1.0000f});
+
+    for (i32 i = 0; i < 16; ++i)
+    {
+        ASSERT_NEAR(actual[i], expected[i], 0.001f);
+    }
+}

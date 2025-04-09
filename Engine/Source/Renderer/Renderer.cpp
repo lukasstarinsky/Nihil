@@ -34,7 +34,7 @@ void Renderer::Initialize(const ApplicationConfig& config)
         std::rethrow_exception(exception);
     }
 
-    sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, sizeof(Mat4f), 0);
+    sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 3 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
     sState.DefaultVertexShader = Shader::Create("Assets/Shaders/DefaultObjectShader.vert", ShaderType::Vertex);
     sState.DefaultFragmentShader = Shader::Create("Assets/Shaders/DefaultObjectShader.frag", ShaderType::Fragment);
     sState.DefaultMaterial = Material::Create(sState.DefaultVertexShader, sState.DefaultFragmentShader);
@@ -64,7 +64,11 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
 
     // Temp
     auto projection = Mat4f::Perspective(std::numbers::pi / 3.0f, 800.0f / 600.0f, 0.1f, 1000.0f);
-    sState.CameraUniformBuffer->SetData(projection.Data(), sizeof(Mat4f));
+    auto view = Mat4f::LookAt({0.0f, 0.0f, -3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+    auto model = Mat4f::Identity();
+    sState.CameraUniformBuffer->SetData(projection.Data(), sizeof(Mat4f), 0);
+    sState.CameraUniformBuffer->SetData(view.Data(), sizeof(Mat4f), sizeof(Mat4f));
+    sState.CameraUniformBuffer->SetData(model.Data(), sizeof(Mat4f), sizeof(Mat4f) * 2);
 }
 
 void Renderer::EndFrame()
