@@ -11,5 +11,7 @@
 #include "Core/Utilities.hpp"
 #include "Core/Exception.hpp"
 
+#include "Math/Math.hpp"
+
 #include "OpenGLCommon.hpp"
 #include "OpenGLLoader.hpp"

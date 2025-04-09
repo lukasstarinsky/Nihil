@@ -1,0 +1,21 @@
+#pragma once
+
+enum class BufferType
+{
+    Vertex = 0,
+    Index,
+    Uniform
+};
+
+class Buffer;
+using BufferPtr = std::shared_ptr<Buffer>;
+
+class Buffer
+{
+public:
+    virtual ~Buffer() = default;
+
+    virtual void SetData(const void* data, i32 size) const = 0;
+
+    static auto Create(BufferType bufferType, const void* data, i32 size, i32 uniformBinding = 0) -> BufferPtr;
+};

@@ -68,3 +68,9 @@ auto Material::Create(const ShaderPtr& vertexShader, const ShaderPtr& fragmentSh
     ASSERT(sRendererBackend);
     return sRendererBackend->CreateMaterial(vertexShader, fragmentShader);
 }
+
+auto Buffer::Create(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) -> BufferPtr
+{
+    ASSERT(sRendererBackend);
+    return sRendererBackend->CreateBuffer(bufferType, data, size, uniformBinding);
+}

@@ -3,6 +3,7 @@
 #include "Core/Application.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
+#include "Buffer.hpp"
 
 enum class RendererAPI
 {
@@ -26,6 +27,7 @@ public:
 
     virtual auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr = 0;
     virtual auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr = 0;
+    virtual auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr = 0;
 };
 
 namespace Renderer
