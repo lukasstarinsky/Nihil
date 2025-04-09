@@ -15,10 +15,7 @@ OpenGLMaterial::OpenGLMaterial(const ShaderPtr& vertexShader, const ShaderPtr& f
 
 OpenGLMaterial::~OpenGLMaterial()
 {
-    if (mHandle)
-    {
-        glDeleteProgram(mHandle);
-    }
+    glDeleteProgram(mHandle);
 }
 
 void OpenGLMaterial::Bind() const

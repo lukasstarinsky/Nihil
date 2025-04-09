@@ -15,9 +15,9 @@ public:
         std::array<T, 2> elements {};
     };
 
-    Vec2() = default;
+    constexpr Vec2() = default;
 
-    Vec2(T x, T y)
+    constexpr Vec2(T x, T y)
         : x{x}, y{y}
     {
 

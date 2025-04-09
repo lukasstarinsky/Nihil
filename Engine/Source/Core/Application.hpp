@@ -18,6 +18,9 @@ struct ApplicationState
     bool IsSuspended;
 };
 
+///
+/// Note: Use OnInitialize to create resources, use constructor only to initialize ApplicationConfig
+///
 class NIHIL_API Application
 {
 public:

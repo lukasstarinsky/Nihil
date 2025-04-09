@@ -17,14 +17,21 @@ OpenGLBuffer::OpenGLBuffer(BufferType bufferType, const void* data, i32 size, i3
 
 OpenGLBuffer::~OpenGLBuffer()
 {
-    if (mHandle)
-    {
-        glDeleteBuffers(1, &mHandle);
-    }
+    glDeleteBuffers(1, &mHandle);
 }
 
 void OpenGLBuffer::SetData(const void* data, i32 size) const
 {
     ASSERT(mBufferType == BufferType::Uniform);
     glNamedBufferSubData(mHandle, 0, size, data);
+}
+
+auto OpenGLBuffer::GetHandle() const -> GLuint
+{
+    return mHandle;
+}
+
+auto OpenGLBuffer::GetType() const -> BufferType
+{
+    return mBufferType;
 }

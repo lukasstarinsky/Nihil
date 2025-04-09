@@ -15,7 +15,7 @@ static auto ShaderTypeToGLenum(ShaderType shaderType) -> GLenum
 }
 
 OpenGLShader::OpenGLShader(const std::string& filePath, ShaderType shaderType)
-    : mType{shaderType}
+    : mShaderType{shaderType}
 {
     std::vector<u32> spvBinary;
 
@@ -50,10 +50,7 @@ OpenGLShader::OpenGLShader(const std::string& filePath, ShaderType shaderType)
 
 OpenGLShader::~OpenGLShader()
 {
-    if (mHandle)
-    {
-        glDeleteShader(mHandle);
-    }
+    glDeleteShader(mHandle);
 }
 
 auto OpenGLShader::GetHandle() const -> GLuint
@@ -63,5 +60,5 @@ auto OpenGLShader::GetHandle() const -> GLuint
 
 auto OpenGLShader::GetType() const -> ShaderType
 {
-    return mType;
+    return mShaderType;
 }

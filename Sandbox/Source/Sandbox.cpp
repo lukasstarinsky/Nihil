@@ -10,7 +10,7 @@ Sandbox::Sandbox()
 
 void Sandbox::OnInitialize()
 {
-
+    mTestMesh = Mesh::Create();
 }
 
 void Sandbox::OnUpdate()
@@ -20,7 +20,7 @@ void Sandbox::OnUpdate()
 
 void Sandbox::OnRender()
 {
-
+    Renderer::Draw(mTestMesh);
 }
 
 void Sandbox::OnShutdown()

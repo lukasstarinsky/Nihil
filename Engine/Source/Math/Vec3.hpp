@@ -15,9 +15,9 @@ public:
         std::array<T, 3> elements {};
     };
 
-    Vec3() = default;
+    constexpr Vec3() = default;
 
-    Vec3(T x, T y, T z)
+    constexpr Vec3(T x, T y, T z)
         : x{x}, y{y}, z{z}
     {
 

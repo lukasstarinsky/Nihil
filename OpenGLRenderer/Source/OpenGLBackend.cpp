@@ -2,20 +2,8 @@
 #include "OpenGLShader.hpp"
 #include "OpenGLBuffer.hpp"
 #include "OpenGLMaterial.hpp"
+#include "OpenGLMesh.hpp"
 #include "Platform/Platform.hpp"
-
-std::shared_ptr<OpenGLShader> vert {};
-std::shared_ptr<OpenGLShader> frag {};
-std::shared_ptr<OpenGLMaterial> material {};
-std::shared_ptr<OpenGLBuffer> uniformBuffer {};
-GLuint vao {};
-GLuint vbo {};
-
-f32 vertexData[] = {
-    0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-    0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-};
 
 static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, GLenum severity, [[maybe_unused]] GLsizei length, const GLchar* msg, [[maybe_unused]] const void* user_param)
 {
@@ -26,7 +14,8 @@ static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GL
             Logger::Warn("OpenGL message: {}", msg);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            Throw("OpenGL Exception: {}", msg);
+            Logger::Error("OpenGL error: {}", msg);
+            break;
     }
 }
 
@@ -66,34 +55,11 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& config)
 
     wglMakeCurrent(platformState.DeviceContext, context);
 #endif
-    Logger::Info("Initialized OpenGL: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-
     OpenGLLoader::LoadGLFunctions();
+    Logger::Info("Initialized OpenGL: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(OpenGLDebugCallback, nullptr);
-
-    // TODO: temp, abstract
-    vert = std::make_shared<OpenGLShader>("Assets/Shaders/test.vert", ShaderType::Vertex);
-    frag = std::make_shared<OpenGLShader>("Assets/Shaders/test.frag", ShaderType::Fragment);
-    material = std::make_shared<OpenGLMaterial>(vert, frag);
-    uniformBuffer = std::make_shared<OpenGLBuffer>(BufferType::Uniform, nullptr, sizeof(Mat4f), 0);
-
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), reinterpret_cast<void*>(3 * sizeof(f32)));
-    glEnableVertexAttribArray(1);
-    glBindVertexArray(0);
-
-    auto translation = Mat4f::Translation({0.3f, 0.3f, 0.3f});
-    uniformBuffer->SetData(translation.Data(), sizeof(Mat4f));
 }
 
 OpenGLBackend::~OpenGLBackend()
@@ -114,10 +80,6 @@ void OpenGLBackend::BeginFrame(f32 r, f32 g, f32 b, f32 a) const
 {
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    material->Bind();
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void OpenGLBackend::EndFrame() const
@@ -142,6 +104,17 @@ auto OpenGLBackend::CreateMaterial(const ShaderPtr& vertexShader, const ShaderPt
 auto OpenGLBackend::CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr
 {
     return std::make_shared<OpenGLBuffer>(bufferType, data, size, uniformBinding);
+}
+
+auto OpenGLBackend::CreateMesh() const -> MeshPtr
+{
+    return std::make_shared<OpenGLMesh>();
+}
+
+void OpenGLBackend::Draw(const MeshPtr& mesh) const
+{
+    mesh->Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 extern "C"

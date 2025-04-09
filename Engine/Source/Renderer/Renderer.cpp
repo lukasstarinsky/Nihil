@@ -3,6 +3,7 @@
 
 static DynamicLibrary sRendererModule;
 static RendererBackend* sRendererBackend;
+static BufferPtr sCameraUniformBuffer;
 
 void Renderer::Initialize(const ApplicationConfig& config)
 {
@@ -24,6 +25,8 @@ void Renderer::Initialize(const ApplicationConfig& config)
     {
         std::rethrow_exception(exception);
     }
+
+    sCameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, sizeof(Mat4f), 0);
 }
 
 void Renderer::Shutdown()
@@ -37,12 +40,24 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
 {
     ASSERT(sRendererBackend);
     sRendererBackend->BeginFrame(r, g, b, a);
+
+    // Temp
+    static f32 pos = 0.01f;
+    pos += 0.01f;
+    auto translation = Mat4f::Translation({pos, pos, 0.0f});
+    sCameraUniformBuffer->SetData(translation.Data(), sizeof(Mat4f));
 }
 
 void Renderer::EndFrame()
 {
     ASSERT(sRendererBackend);
     sRendererBackend->EndFrame();
+}
+
+void Renderer::Draw(const MeshPtr& mesh)
+{
+    ASSERT(sRendererBackend);
+    sRendererBackend->Draw(mesh);
 }
 
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
@@ -73,4 +88,10 @@ auto Buffer::Create(BufferType bufferType, const void* data, i32 size, i32 unifo
 {
     ASSERT(sRendererBackend);
     return sRendererBackend->CreateBuffer(bufferType, data, size, uniformBinding);
+}
+
+auto Mesh::Create() -> MeshPtr
+{
+    ASSERT(sRendererBackend);
+    return sRendererBackend->CreateMesh();
 }

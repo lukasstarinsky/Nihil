@@ -42,10 +42,8 @@
 
 /* ======= Asserts ======= */
 #ifdef NDEBUG
-    #define ASSERT_MSG(check, message, ...)
     #define ASSERT(check)
 #else
-    #define ASSERT_MSG(check, message, ...) do { if(!(check)) { Logger::Fatal("Assertion failed [" __FILE__ ":" TO_STR(__LINE__)"]: " message, __VA_ARGS__); DEBUGBREAK(); } } while(0)
     #define ASSERT(check) do { if(!(check)) { Logger::Fatal("Assertion failed [" __FILE__ ":" TO_STR(__LINE__)"]"); DEBUGBREAK(); } } while(0)
 #endif
 

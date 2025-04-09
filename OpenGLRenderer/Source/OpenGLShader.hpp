@@ -12,5 +12,5 @@ public:
     auto GetType() const -> ShaderType;
 private:
     GLuint mHandle {};
-    ShaderType mType {};
+    ShaderType mShaderType {};
 };

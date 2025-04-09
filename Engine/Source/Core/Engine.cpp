@@ -5,7 +5,7 @@
 Engine::Engine(Application* application)
     : mApplication{application}
 {
-    ASSERT_MSG(mApplication, "Application cannot be nullptr.");
+    ASSERT(mApplication);
 
     Platform::Initialize(mApplication->Config);
     Renderer::Initialize(mApplication->Config);
