@@ -54,7 +54,7 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
 
     // Temp
     static f32 pos = 0.01f;
-    pos += 0.01f;
+//    pos += 0.01f;
     auto translation = Mat4f::Translation({pos, pos, 0.0f});
     sState.CameraUniformBuffer->SetData(translation.Data(), sizeof(Mat4f));
 }

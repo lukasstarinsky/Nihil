@@ -114,7 +114,7 @@ auto OpenGLBackend::CreateMesh() const -> MeshPtr
 void OpenGLBackend::Draw(const MeshPtr& mesh) const
 {
     mesh->Bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 extern "C"
