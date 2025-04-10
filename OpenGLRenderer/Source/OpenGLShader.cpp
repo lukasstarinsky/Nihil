@@ -1,7 +1,7 @@
 #include <fstream>
 #include <filesystem>
 #include "OpenGLShader.hpp"
-#include "Renderer/ShaderCompiler.hpp"
+#include "Graphics/ShaderCompiler.hpp"
 
 static auto ShaderTypeToGLenum(ShaderType shaderType) -> GLenum
 {

@@ -5,7 +5,7 @@
 #include <Core/Engine.hpp>
 #include <Core/Exception.hpp>
 #include <Core/Application.hpp>
-#include <Renderer/Renderer.hpp>
+#include <Graphics/Renderer.hpp>
 #include <Platform/Platform.hpp>
 
 #define CREATE_APPLICATION(Application)                 \

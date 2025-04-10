@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Application.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Graphics/Renderer.hpp"
 #include "VulkanCommon.hpp"
 #include "VulkanContext.hpp"
 #include "VulkanDevice.hpp"

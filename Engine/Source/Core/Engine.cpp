@@ -1,5 +1,5 @@
 #include "Platform/Platform.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Graphics/Renderer.hpp"
 #include "Engine.hpp"
 
 Engine::Engine(Application* application)
