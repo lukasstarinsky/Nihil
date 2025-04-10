@@ -27,7 +27,7 @@ void Engine::Run() const
     {
         if (!mApplication->State.IsSuspended)
         {
-            Renderer::BeginFrame(0.4f, 0.4f, 0.4f, 1.0f);
+            Renderer::BeginFrame(0.1f, 0.1f, 0.1f, 1.0f);
 
             mApplication->OnUpdate();
             mApplication->OnRender();

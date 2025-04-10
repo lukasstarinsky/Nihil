@@ -64,8 +64,10 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
 
     // Temp
     auto projection = Mat4f::Perspective(std::numbers::pi / 3.0f, 800.0f / 600.0f, 0.1f, 1000.0f);
-    auto view = Mat4f::LookAt({0.0f, 0.0f, -3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-    auto model = Mat4f::Identity();
+    auto view = Mat4f::LookAt({0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+    static f32 rot = 0.0f;
+    rot += 0.01f;
+    auto model = Mat4f::RotateX(rot);
     sState.CameraUniformBuffer->SetData(projection.Data(), sizeof(Mat4f), 0);
     sState.CameraUniformBuffer->SetData(view.Data(), sizeof(Mat4f), sizeof(Mat4f));
     sState.CameraUniformBuffer->SetData(model.Data(), sizeof(Mat4f), sizeof(Mat4f) * 2);

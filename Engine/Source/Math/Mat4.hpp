@@ -9,7 +9,13 @@ template <typename T>
 class Mat4
 {
 public:
-    constexpr Mat4() = default;
+    constexpr Mat4()
+    {
+        mElements[0] = 1;
+        mElements[5] = 1;
+        mElements[10] = 1;
+        mElements[15] = 1;
+    };
 
     constexpr Mat4(const std::array<T, 16>& elements)
         : mElements{elements}
@@ -36,20 +42,63 @@ public:
 public:
     static constexpr auto Identity() -> Mat4<T>
     {
-        Mat4<T> out;
-        out.mElements[0] = 1;
-        out.mElements[5] = 1;
-        out.mElements[10] = 1;
-        out.mElements[15] = 1;
+        return {};
+    }
+
+    static constexpr auto Scale(const Vec3<T>& scale) -> Mat4<T>
+    {
+        Mat4<T> out = Identity();
+        out[0] = scale.x;
+        out[5] = scale.y;
+        out[10] = scale.z;
         return out;
     }
 
-    static constexpr auto Translation(const Vec3<T>& translation) -> Mat4<T>
+    static constexpr auto RotateX(f32 theta) -> Mat4<T>
+    {
+        auto sin = std::sin(theta);
+        auto cos = std::cos(theta);
+
+        Mat4<T> out = Identity();
+        out[5] = cos;
+        out[6] = sin;
+        out[9] = -sin;
+        out[10] = cos;
+        return out;
+    }
+
+    static constexpr auto RotateY(f32 theta) -> Mat4<T>
+    {
+        auto sin = std::sin(theta);
+        auto cos = std::cos(theta);
+
+        Mat4<T> out = Identity();
+        out[0] = cos;
+        out[2] = -sin;
+        out[8] = sin;
+        out[10] = cos;
+        return out;
+    }
+
+    static constexpr auto RotateZ(f32 theta) -> Mat4<T>
+    {
+        auto sin = std::sin(theta);
+        auto cos = std::cos(theta);
+
+        Mat4<T> out = Identity();
+        out[0] = cos;
+        out[1] = sin;
+        out[4] = -sin;
+        out[5] = cos;
+        return out;
+    }
+
+    static constexpr auto Translate(const Vec3<T>& translation) -> Mat4<T>
     {
         Mat4<T> out = Identity();
-        out.mElements[12] = translation.x;
-        out.mElements[13] = translation.y;
-        out.mElements[14] = translation.z;
+        out[12] = translation.x;
+        out[13] = translation.y;
+        out[14] = translation.z;
         return out;
     }
 
@@ -62,13 +111,15 @@ public:
         const auto r = t * aspectRatio;
         const auto l = b * aspectRatio;
 
-        Mat4<f32> out;
-        out.mElements = {
-            (2.0f * nearPlane) / (r - l), 0.0f, 0.0f, 0.0f,
-            0.0f, (2.0f * nearPlane) / (t - b), 0.0f, 0.0f,
-            (r + l) / (r - l), (t + b) / (t - b), -(farPlane + nearPlane) / (farPlane - nearPlane), -1.0f,
-            0.0f, 0.0f, -(2.0f * farPlane * nearPlane) / (farPlane - nearPlane), 0.0f
-        };
+        Mat4<f32> out = Identity();
+        out[0] = (2.0f * nearPlane) / (r - l);
+        out[5] = (2.0f * nearPlane) / (t - b);
+        out[8] = (r + l) / (r - l);
+        out[9] = (t + b) / (t - b);
+        out[10] = -(farPlane + nearPlane) / (farPlane - nearPlane);
+        out[11] = -1.0f;
+        out[14] = -(2.0f * farPlane * nearPlane) / (farPlane - nearPlane);
+        out[15] = 0.0f;
         return out;
     }
 
