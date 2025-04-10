@@ -27,13 +27,18 @@ OpenGLMesh::~OpenGLMesh()
     glDeleteVertexArrays(1, &mVertexArray);
 }
 
+void OpenGLMesh::Bind() const
+{
+    mMaterial->Bind();
+    glBindVertexArray(mVertexArray);
+}
+
 auto OpenGLMesh::GetIndexCount() const -> i32
 {
     return mIndexCount;
 }
 
-void OpenGLMesh::Bind() const
+auto OpenGLMesh::GetMaterial() const -> const Material*
 {
-    mMaterial->Bind();
-    glBindVertexArray(mVertexArray);
+    return mMaterial.get();
 }

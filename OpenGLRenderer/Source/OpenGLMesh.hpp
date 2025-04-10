@@ -10,8 +10,10 @@ public:
     OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> indices);
     ~OpenGLMesh() override;
 
-    auto GetIndexCount() const -> i32 override;
     void Bind() const override;
+
+    auto GetIndexCount() const -> i32 override;
+    auto GetMaterial() const -> const Material* override;
 private:
     GLuint mVertexArray {};
     OpenGLBuffer mVertexBuffer;

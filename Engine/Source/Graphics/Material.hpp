@@ -12,5 +12,8 @@ public:
 
     virtual void Bind() const = 0;
 
+    // TODO: will this be here?
+    virtual void SetUniform(i32 location, const Mat4f& data) const = 0;
+
     static auto Create(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) -> MaterialPtr;
 };

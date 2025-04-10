@@ -9,8 +9,7 @@ public:
     explicit OpenGLBackend(const ApplicationConfig& appConfig);
     ~OpenGLBackend() override;
 
-    auto GetType() const -> RendererAPI override;
-    auto GetTypeString() const -> const char* override;
+    auto GetApi() const -> RendererAPI override;
 
     void BeginFrame(f32 r, f32 g, f32 b, f32 a) const override;
     void OnResize(i32 width, i32 height) const override;

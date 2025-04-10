@@ -1,6 +1,7 @@
 #include <shaderc/shaderc.hpp>
 
 #include "ShaderCompiler.hpp"
+#include "Renderer.hpp"
 
 static auto ShaderTypeToShaderc(ShaderType shaderType) -> shaderc_shader_kind
 {
@@ -19,6 +20,12 @@ auto ShaderCompiler::GlslToSpv(std::string_view filePath, ShaderType shaderType)
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+    if (Renderer::GetApi() == RendererAPI::OpenGL)
+    {
+        options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+        options.AddMacroDefinition("OPENGL");
+    }
 
     shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(sourceCode, ShaderTypeToShaderc(shaderType), "Shader", options);
     Ensure(module.GetCompilationStatus() == shaderc_compilation_status_success, "Failed to compiler shader to Spv. {}", module.GetErrorMessage());

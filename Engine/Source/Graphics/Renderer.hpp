@@ -23,8 +23,7 @@ class RendererBackend
 public:
     virtual ~RendererBackend() = default;
 
-    virtual auto GetType() const -> RendererAPI = 0;
-    virtual auto GetTypeString() const -> const char* = 0;
+    virtual auto GetApi() const -> RendererAPI = 0;
 
     virtual void BeginFrame(f32 r, f32 g, f32 b, f32 a) const = 0;
     virtual void OnResize(i32 width, i32 height) const = 0;
@@ -46,6 +45,8 @@ namespace Renderer
     void Initialize(const ApplicationConfig& config);
     auto OnResizeEvent(const Event& e) -> bool;
     void Shutdown();
+
+    auto GetApi() -> RendererAPI;
 
     void BeginFrame(f32 r, f32 g, f32 b, f32 a);
     void EndFrame();

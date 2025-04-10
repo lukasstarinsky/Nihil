@@ -5,13 +5,18 @@ layout(location = 1) in vec3 inColor;
 
 layout(location = 0) out vec3 outColor;
 
-layout(binding = 0) uniform Transformation
+layout(binding = 0) uniform CameraUniformBuffer
 {
-    mat4 translation;
-} uTransformation;
+    mat4 uProjection;
+    mat4 uView;
+};
+
+#ifdef OPENGL
+layout(location = 0) uniform mat4 uModel;
+#endif
 
 void main()
 {
-    gl_Position = uTransformation.translation * vec4(inPosition, 1.0);
+    gl_Position = uProjection * uView * uModel * vec4(inPosition, 1.0);
     outColor = inColor;
 }

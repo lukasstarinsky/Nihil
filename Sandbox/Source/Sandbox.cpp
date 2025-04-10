@@ -55,7 +55,10 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate()
 {
-
+    static f32 theta = 0.01f;
+    theta += 0.01f;
+    auto model = Mat4f::RotateX(theta);
+    mTestMesh->GetMaterial()->SetUniform(0, model);
 }
 
 void Sandbox::OnRender()

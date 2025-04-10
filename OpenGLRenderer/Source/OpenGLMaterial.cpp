@@ -22,3 +22,10 @@ void OpenGLMaterial::Bind() const
 {
     glUseProgram(mHandle);
 }
+
+void OpenGLMaterial::SetUniform(i32 location, const Mat4f& data) const
+{
+    Bind();
+    glUniformMatrix4fv(location, 1, GL_FALSE, data.Data());
+    glUseProgram(0);
+}

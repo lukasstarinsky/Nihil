@@ -18,8 +18,10 @@ class NIHIL_API Mesh
 public:
     virtual ~Mesh() = default;
 
-    virtual auto GetIndexCount() const -> i32 = 0;
     virtual void Bind() const = 0;
+
+    virtual auto GetIndexCount() const -> i32 = 0;
+    virtual auto GetMaterial() const -> const Material* = 0;
 
     static auto Create(std::span<const Vertex> vertices, std::span<const Index> indices) -> MeshPtr;
 };
