@@ -56,3 +56,16 @@ TEST(Mat4, RotateZ)
         ASSERT_NEAR(actual[i], expected[i], 0.001f);
     }
 }
+
+TEST(Mat4, Multiply)
+{
+    auto a = Mat4f({1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f});
+    auto b = Mat4f({1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f});
+    auto actual = a * b;
+    auto expected = Mat4f({10.0000f, 20.0000f, 30.0000f, 40.0000f, 10.0000f, 20.0000f, 30.0000f, 40.0000f, 10.0000f, 20.0000f, 30.0000f, 40.0000f, 10.0000f, 20.0000f, 30.0000f, 40.0000f});
+
+    for (i32 i = 0; i < 16; ++i)
+    {
+        ASSERT_NEAR(actual[i], expected[i], 0.001f);
+    }
+}

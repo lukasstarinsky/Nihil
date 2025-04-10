@@ -35,6 +35,23 @@ public:
         return mElements[index];
     }
 
+    constexpr auto operator*(const Mat4<T>& other) const -> Mat4<T>
+    {
+        Mat4<T> out;
+        for (i32 col = 0; col < 4; ++col)
+        {
+            for (i32 row = 0; row < 4; ++row)
+            {
+                out[col * 4 + row] = 0.0f;
+                for (i32 k = 0; k < 4; ++k)
+                {
+                    out[col * 4 + row] += mElements[k * 4 + row] * other[col * 4 + k];
+                }
+            }
+        }
+        return out;
+    }
+
     auto Data() const -> const T*
     {
         return mElements.data();
