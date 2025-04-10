@@ -16,6 +16,7 @@ struct ApplicationState
 {
     bool IsRunning = true;
     bool IsSuspended;
+    f64 LastFrameTime;
 };
 
 ///

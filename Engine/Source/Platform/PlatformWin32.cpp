@@ -36,6 +36,8 @@ void Platform::Initialize(const ApplicationConfig& config)
     Ensure(sState.WindowHandle, "Win32: CreateWindow() failed with error code: {}", GetLastError());
     sState.DeviceContext = GetDC(sState.WindowHandle);
 
+    QueryPerformanceFrequency(&sState.Frequency);
+
     ShowWindow(sState.WindowHandle, SW_SHOW);
 }
 
@@ -55,6 +57,13 @@ void Platform::PollEvents()
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+}
+
+auto Platform::GetTimeSeconds() -> f64
+{
+    LARGE_INTEGER time;
+    QueryPerformanceCounter(&time);
+    return static_cast<f64>(time.QuadPart) / static_cast<f64>(sState.Frequency.QuadPart);
 }
 
 auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESULT

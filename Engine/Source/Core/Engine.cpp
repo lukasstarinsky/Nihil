@@ -25,6 +25,10 @@ void Engine::Run() const
 {
     while (mApplication->State.IsRunning)
     {
+        f64 time = Platform::GetTimeSeconds();
+        f64 deltaTimeSeconds = time - mApplication->State.LastFrameTime;
+        mApplication->State.LastFrameTime = time;
+
         if (!mApplication->State.IsSuspended)
         {
             Renderer::BeginFrame(0.1f, 0.1f, 0.1f, 1.0f);
