@@ -14,8 +14,7 @@ static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GL
             Logger::Warn("OpenGL message: {}", msg);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            Logger::Error("OpenGL error: {}", msg);
-            break;
+            Throw("OpenGL error: {}", msg);
     }
 }
 
@@ -58,8 +57,11 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig)
     OpenGLLoader::LoadGLFunctions();
     Logger::Info("Initialized OpenGL: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
+#ifndef NDEBUG
     glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(OpenGLDebugCallback, nullptr);
+#endif
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glViewport(0, 0, appConfig.WindowWidth, appConfig.WindowHeight);
