@@ -61,13 +61,13 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::RotateX(0.0f));
+    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::Scale({100.0f, 1.0f, 100.0f}) * Mat4f::Translate({0.0f, -4.0f, 0.0f}));
 
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
-        moveVector.z = Input::IsKeyDown(Key::W) ? -1.0f : Input::IsKeyDown(Key::S) ? 1.0f : 0.0f;
-        moveVector.x = Input::IsKeyDown(Key::A) ? -1.0f : Input::IsKeyDown(Key::D) ? 1.0f : 0.0f;
+        moveVector += Input::IsKeyDown(Key::W) ? mCamera.Direction() : Input::IsKeyDown(Key::S) ? -mCamera.Direction() : Vec3f{};
+        moveVector += Input::IsKeyDown(Key::A) ? -mCamera.Right() : Input::IsKeyDown(Key::D) ? mCamera.Right() : Vec3f{};
         moveVector.Normalize();
         mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
     }
@@ -88,7 +88,7 @@ auto Sandbox::OnMouseMoveEvent(const Event& e) -> bool
 {
     auto delta = e.MouseEvent.Delta;
     delta *= MOUSE_SENSITIVITY;
-    mCamera.Rotate(delta.y, delta.x);
+    mCamera.Rotate(-delta.y, delta.x);
 
     return false;
 }

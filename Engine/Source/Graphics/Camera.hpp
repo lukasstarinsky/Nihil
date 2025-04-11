@@ -17,10 +17,11 @@ public:
     auto GetProjectionMatrix() const -> const Mat4f&;
     auto GetViewMatrix() const -> const Mat4f&;
 
+    auto Direction() const -> const Vec3f&;
+    auto Right() const -> const Vec3f&;
+
     void Translate(const Vec3f& translation);
     void Rotate(f32 pitch, f32 yaw);
-private:
-    auto GetRight() const -> Vec3f;
 private:
     Mat4f mProjectionMatrix {};
     Mat4f mViewMatrix {};
@@ -28,6 +29,7 @@ private:
     Vec3f mPosition {};
     Vec3f mLookAt {};
     Vec3f mUp {};
+    Vec3f mRight {};
 
     f32 mPitch {};
     f32 mYaw {};
