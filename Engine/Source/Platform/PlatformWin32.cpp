@@ -9,13 +9,22 @@ void Platform::Initialize(const ApplicationConfig& config)
 {
     Logger::Trace("Initializing Win32 Platform...");
     sState.Instance = GetModuleHandle(nullptr);
+    Ensure(QueryPerformanceFrequency(&sState.Frequency), "Win32: QueryPerformanceFrequency() failed with error code: {}", GetLastError());
 
-    WNDCLASSEX wndClass {};
-    wndClass.cbSize = sizeof(WNDCLASSEX);
-    wndClass.lpfnWndProc = ProcessMessage;
-    wndClass.hInstance = sState.Instance;
-    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wndClass.lpszClassName = "nihil_window";
+    WNDCLASSEX wndClass {
+        .cbSize = sizeof(WNDCLASSEX),
+        .style = 0,
+        .lpfnWndProc = ProcessMessage,
+        .cbClsExtra = 0,
+        .cbWndExtra = 0,
+        .hInstance = sState.Instance,
+        .hIcon = nullptr,
+        .hCursor = LoadCursor(nullptr, IDC_ARROW),
+        .hbrBackground = nullptr,
+        .lpszMenuName = nullptr,
+        .lpszClassName = "nihil_window",
+        .hIconSm = nullptr
+    };
     Ensure(RegisterClassEx(&wndClass), "Win32: RegisterClassEx() failed with error code: {}", GetLastError());
 
     DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
@@ -36,7 +45,13 @@ void Platform::Initialize(const ApplicationConfig& config)
     Ensure(sState.WindowHandle, "Win32: CreateWindow() failed with error code: {}", GetLastError());
     sState.DeviceContext = GetDC(sState.WindowHandle);
 
-    QueryPerformanceFrequency(&sState.Frequency);
+    RAWINPUTDEVICE rawInputDevice {
+        .usUsagePage = HID_USAGE_PAGE_GENERIC,
+        .usUsage = HID_USAGE_GENERIC_MOUSE,
+        .dwFlags = 0,
+        .hwndTarget = nullptr
+    };
+    Ensure(RegisterRawInputDevices(&rawInputDevice, 1, sizeof(RAWINPUTDEVICE)), "Win32: RegisterRawInputDevices() failed with error code: {}", GetLastError());
 
     ShowWindow(sState.WindowHandle, SW_SHOW);
 }
@@ -79,6 +94,23 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
         {
             PostQuitMessage(0);
             return 0;
+        }
+        case WM_INPUT:
+        {
+            u32 size;
+            if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) == -1u)
+                break;
+
+            std::vector<char> buffer(size);
+            if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, buffer.data(), &size, sizeof(RAWINPUTHEADER)) != size)
+                break;
+
+            auto* rawInput = reinterpret_cast<RAWINPUT*>(buffer.data());
+            if (rawInput->header.dwType == RIM_TYPEMOUSE && (rawInput->data.mouse.lLastX != 0 || rawInput->data.mouse.lLastY != 0))
+            {
+                Input::PushMouseRawDelta({rawInput->data.mouse.lLastX, rawInput->data.mouse.lLastY});
+            }
+            break;
         }
         case WM_SIZE:
         {

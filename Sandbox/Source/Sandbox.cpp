@@ -57,10 +57,7 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    static f32 theta = 0.01f;
-    theta += 0.01f;
-    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::RotateX(theta));
-
+//    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::RotateX(theta));
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
@@ -68,6 +65,11 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
         moveVector.x = Input::IsKeyDown(Key::A) ? -1.0f : Input::IsKeyDown(Key::D) ? 1.0f : 0.0f;
         moveVector.Normalize();
         mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
+    }
+
+    while (auto mouseDelta = Input::PopMouseDelta())
+    {
+        Logger::Info("{}", mouseDelta.value());
     }
 }
 
