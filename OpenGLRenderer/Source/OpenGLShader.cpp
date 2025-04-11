@@ -19,24 +19,15 @@ OpenGLShader::OpenGLShader(const std::string& filePath, ShaderType shaderType)
 {
     std::vector<u32> spvBinary;
 
-    std::filesystem::path spvFilePath = filePath + ".spv";
+    std::string spvFilePath = filePath + ".spv";
     if (std::filesystem::exists(spvFilePath))
     {
-        std::ifstream file(spvFilePath, std::ios::binary | std::ios::ate);
-        Ensure(file.is_open(), "Failed to open file: {}", spvFilePath.string());
-
-        std::size_t size = file.tellg();
-        file.seekg(0, std::ios::beg);
-        spvBinary.resize(size / sizeof(u32));
-        file.read(reinterpret_cast<char*>(spvBinary.data()), static_cast<std::streamsize>(size));
+        spvBinary = File::ReadBinary<u32>(spvFilePath);
     }
     else
     {
         spvBinary = ShaderCompiler::GlslToSpv(filePath + ".glsl", shaderType);
-
-        std::ofstream file(spvFilePath, std::ios::binary);
-        Ensure(file.is_open(), "Failed to open file: {}", spvFilePath.string());
-        file.write(reinterpret_cast<char*>(spvBinary.data()), static_cast<std::streamsize>(spvBinary.size() * sizeof(u32)));
+        File::WriteBinary(spvFilePath, spvBinary.data(), spvBinary.size() * sizeof(u32));
     }
 
     mHandle = glCreateShader(ShaderTypeToGLenum(shaderType));

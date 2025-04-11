@@ -16,7 +16,7 @@ static auto ShaderTypeToShaderc(ShaderType shaderType) -> shaderc_shader_kind
 
 auto ShaderCompiler::GlslToSpv(std::string_view filePath, ShaderType shaderType) -> std::vector<u32>
 {
-    auto sourceCode = File::ReadAll(filePath);
+    auto sourceCode = File::Read(filePath);
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
