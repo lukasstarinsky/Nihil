@@ -3,29 +3,38 @@
 #include <array>
 #include "Core/Defines.hpp"
 
-template <typename T>
-class Vec2
+class Vec2f
 {
 public:
     union
     {
-        struct { T x, y; };
-        struct { T r, g; };
-        struct { T u, v; };
-        std::array<T, 2> elements {};
+        struct { f32 x, y; };
+        struct { f32 r, g; };
+        struct { f32 u, v; };
     };
 
-    constexpr Vec2() = default;
+    constexpr Vec2f()
+        : x{0.0f}, y{0.0f}
+    {
 
-    constexpr Vec2(T x, T y)
+    }
+
+    constexpr Vec2f(f32 x, f32 y)
         : x{x}, y{y}
     {
 
     }
+
+    constexpr auto operator*=(f32 scalar) -> Vec2f&
+    {
+        x *= scalar;
+        y *= scalar;
+        return *this;
+    }
 };
 
-template <typename T>
-class std::formatter<Vec2<T>>
+template <>
+class std::formatter<Vec2f>
 {
 public:
     constexpr auto parse(std::format_parse_context& ctx)
@@ -34,14 +43,8 @@ public:
     }
 
     template <typename Context>
-    auto format(const Vec2<T>& v, Context& ctx) const
+    auto format(const Vec2f& v, Context& ctx) const
     {
-        if constexpr (std::same_as<T, f32>)
-            return std::format_to(ctx.out(), "Vector2[X:{:.2f}, Y:{:.2f}]", v.x, v.y);
-        else
-            return std::format_to(ctx.out(), "Vector2[X:{}, Y:{}]", v.x, v.y);
+        return std::format_to(ctx.out(), "Vector2[X:{:.2f}, Y:{:.2f}]", v.x, v.y);
     }
 };
-
-using Vec2i = Vec2<i32>;
-using Vec2f = Vec2<f32>;

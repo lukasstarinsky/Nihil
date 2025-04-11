@@ -1,5 +1,7 @@
 #include "Sandbox.hpp"
 
+#define MOUSE_SENSITIVITY 0.008f
+
 static constexpr Vertex vertexData[] = {
     // Front face
     { .Position = {-0.5f, -0.5f,  0.5f}, .Color = {1.0f, 0.0f, 0.0f} },
@@ -53,11 +55,14 @@ Sandbox::Sandbox()
 void Sandbox::OnInitialize()
 {
     mTestMesh = Mesh::Create(vertexData, indexData);
+
+    ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
 }
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-//    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::RotateX(theta));
+    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::RotateX(0.0f));
+
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
@@ -65,11 +70,6 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
         moveVector.x = Input::IsKeyDown(Key::A) ? -1.0f : Input::IsKeyDown(Key::D) ? 1.0f : 0.0f;
         moveVector.Normalize();
         mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
-    }
-
-    while (auto mouseDelta = Input::PopMouseDelta())
-    {
-        Logger::Info("{}", mouseDelta.value());
     }
 }
 
@@ -82,4 +82,13 @@ void Sandbox::OnRender()
 void Sandbox::OnShutdown()
 {
 
+}
+
+auto Sandbox::OnMouseMoveEvent(const Event& e) -> bool
+{
+    auto delta = e.MouseEvent.Delta;
+    delta *= MOUSE_SENSITIVITY;
+    mCamera.Rotate(delta.y, delta.x);
+
+    return false;
 }

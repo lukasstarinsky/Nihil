@@ -37,6 +37,15 @@ public:
         z /= mag;
     }
 
+    constexpr auto operator+(const Vec3f& other) const -> Vec3f
+    {
+        Vec3f out;
+        out.x = x + other.x;
+        out.y = y + other.y;
+        out.z = z + other.z;
+        return out;
+    }
+
     constexpr auto operator-(const Vec3f& other) const -> Vec3f
     {
         Vec3f out;

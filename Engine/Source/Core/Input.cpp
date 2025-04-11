@@ -9,9 +9,6 @@ struct InputState
 
     bool LastKeys[static_cast<u16>(Key::Total)];
     bool LastButtons[static_cast<u16>(Button::Total)];
-
-    Vec2i MousePos;
-    std::queue<Vec2i> RawDeltaBuffer;
 };
 
 static InputState sState;
@@ -49,24 +46,6 @@ void Input::ProcessButton(Button button, bool isPressed)
     }
 }
 
-void Input::ProcessMouseMove(const Vec2i& position)
-{
-    sState.MousePos = position;
-
-    MouseEvent e { .Position = position };
-    EventDispatcher::Dispatch({ .Type = Event::MouseMove, .MouseEvent = e });
-}
-
-void Input::PushMouseRawDelta(const Vec2i& delta)
-{
-    sState.RawDeltaBuffer.push(delta);
-
-    if (sState.RawDeltaBuffer.size() > 16)
-    {
-        sState.RawDeltaBuffer.pop();
-    }
-}
-
 auto Input::IsKeyDown(Key key) -> bool
 {
     return sState.Keys[static_cast<i32>(key)];
@@ -75,14 +54,4 @@ auto Input::IsKeyDown(Key key) -> bool
 auto Input::IsButtonDown(Button button) -> bool
 {
     return sState.Buttons[static_cast<i32>(button)];
-}
-
-auto Input::PopMouseDelta() -> std::optional<Vec2i>
-{
-    if (sState.RawDeltaBuffer.empty())
-        return std::nullopt;
-
-    Vec2i out = sState.RawDeltaBuffer.front();
-    sState.RawDeltaBuffer.pop();
-    return out;
 }

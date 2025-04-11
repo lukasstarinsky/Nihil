@@ -102,10 +102,7 @@ namespace Input
     void ProcessKey(Key key, bool isPressed);
     void ProcessKey(Key key, bool isPressed, bool wasPressed);
     void ProcessButton(Button button, bool isPressed);
-    void ProcessMouseMove(const Vec2i& position);
-    void PushMouseRawDelta(const Vec2i& delta);
 
-    NIHIL_API auto IsKeyDown(Key key) -> bool;
-    NIHIL_API auto IsButtonDown(Button button) -> bool;
-    NIHIL_API auto PopMouseDelta() -> std::optional<Vec2i>;
+    auto NIHIL_API IsKeyDown(Key key) -> bool;
+    auto NIHIL_API IsButtonDown(Button button) -> bool;
 }

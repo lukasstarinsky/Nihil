@@ -108,7 +108,8 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
             auto* rawInput = reinterpret_cast<RAWINPUT*>(buffer.data());
             if (rawInput->header.dwType == RIM_TYPEMOUSE && (rawInput->data.mouse.lLastX != 0 || rawInput->data.mouse.lLastY != 0))
             {
-                Input::PushMouseRawDelta({rawInput->data.mouse.lLastX, rawInput->data.mouse.lLastY});
+                MouseEvent e { .Button = Button::Middle, .Delta = { static_cast<f32>(rawInput->data.mouse.lLastX), static_cast<f32>(rawInput->data.mouse.lLastY) } };
+                EventDispatcher::Dispatch({ .Type = Event::MouseMove, .MouseEvent = e });
             }
             break;
         }

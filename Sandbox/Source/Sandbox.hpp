@@ -11,6 +11,8 @@ public:
     void OnUpdate(f32 deltaTimeSeconds) override;
     void OnRender() override;
     void OnShutdown() override;
+
+    auto OnMouseMoveEvent(const Event& e) -> bool;
 private:
     MeshPtr mTestMesh {};
     Camera mCamera;

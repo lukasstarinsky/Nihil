@@ -13,7 +13,7 @@ struct ApplicationEvent
 struct MouseEvent
 {
     Button Button = Button::Middle;
-    Vec2i Position {};
+    Vec2f Delta {};
 };
 
 struct KeyEvent

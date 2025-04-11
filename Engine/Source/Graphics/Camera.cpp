@@ -24,9 +24,26 @@ auto Camera::GetViewMatrix() const -> const Mat4f&
     return mViewMatrix;
 }
 
+void Camera::Rotate(f32 pitch, f32 yaw)
+{
+    mPitch += pitch;
+    mYaw += yaw;
+    mLookAt = Vec3f::Normalize({
+        std::cos(mYaw) * std::cos(mPitch),
+        std::sin(mPitch),
+        std::sin(mYaw) * std::cos(mPitch)
+    });
+    mViewMatrix = Mat4f::LookAt(mPosition, mPosition + mLookAt, mUp);
+}
+
 void Camera::Translate(const Vec3f& translation)
 {
     mPosition += translation;
     mLookAt += translation;
     mViewMatrix = Mat4f::LookAt(mPosition, mLookAt, mUp);
+}
+
+auto Camera::GetRight() const -> Vec3f
+{
+    return Vec3f::Normalize(Vec3f::Cross(mLookAt, mUp));
 }
