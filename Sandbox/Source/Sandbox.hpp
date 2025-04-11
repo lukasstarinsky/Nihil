@@ -8,9 +8,10 @@ public:
     Sandbox();
 
     void OnInitialize() override;
-    void OnUpdate() override;
+    void OnUpdate(f32 deltaTimeSeconds) override;
     void OnRender() override;
     void OnShutdown() override;
 private:
     MeshPtr mTestMesh {};
+    Camera mCamera;
 };

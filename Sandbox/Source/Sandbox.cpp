@@ -14,7 +14,7 @@ static constexpr Vertex vertexData[] = {
     { .Position = {-0.5f,  0.5f, -0.5f}, .Color = {0.5f, 0.0f, 1.0f} },
 };
 
-static constexpr u32 indexData[] = {
+static constexpr Index indexData[] = {
     // Front face
     0, 1, 2,
     2, 3, 0,
@@ -41,6 +41,8 @@ static constexpr u32 indexData[] = {
 };
 
 Sandbox::Sandbox()
+    // Projection, Position, LookAt, Up, Fov, AspectRatio
+    : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 800.0f / 600.0f}
 {
     Config.WindowWidth = 1280;
     Config.WindowHeight = 960;
@@ -53,16 +55,32 @@ void Sandbox::OnInitialize()
     mTestMesh = Mesh::Create(vertexData, indexData);
 }
 
-void Sandbox::OnUpdate()
+void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
     static f32 theta = 0.01f;
     theta += 0.01f;
-    auto model = Mat4f::RotateX(theta);
-    mTestMesh->GetMaterial()->SetUniform(0, model);
+    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::RotateX(theta));
+
+    if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
+    {
+        Vec3f moveVector;
+        if (Input::IsKeyDown(Key::W))
+            moveVector.z = -1.0f;
+        else if (Input::IsKeyDown(Key::S))
+            moveVector.z = 1.0f;
+
+        if (Input::IsKeyDown(Key::A))
+            moveVector.x = -1.0f;
+        else if (Input::IsKeyDown(Key::D))
+            moveVector.x = 1.0f;
+
+        mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
+    }
 }
 
 void Sandbox::OnRender()
 {
+    Renderer::BeginScene(mCamera);
     Renderer::Draw(mTestMesh);
 }
 

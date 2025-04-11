@@ -8,6 +8,7 @@
 #include "Material.hpp"
 #include "Buffer.hpp"
 #include "Mesh.hpp"
+#include "Camera.hpp"
 
 enum class RendererAPI
 {
@@ -51,6 +52,7 @@ namespace Renderer
     void BeginFrame(f32 r, f32 g, f32 b, f32 a);
     void EndFrame();
 
+    void NIHIL_API BeginScene(const Camera& camera);
     void NIHIL_API Draw(const MeshPtr& mesh);
 
     auto NIHIL_API DefaultVertexShader() -> const ShaderPtr&;

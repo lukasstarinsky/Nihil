@@ -1,62 +1,92 @@
 #pragma once
 
 #include <array>
+
 #include "Core/Defines.hpp"
 
-template <typename T>
-class Vec3
+class Vec3f
 {
 public:
     union
     {
-        struct { T x, y, z; };
-        struct { T r, g, b; };
-        struct { T u, v, w; };
-        std::array<T, 3> elements {};
+        struct { f32 x, y, z; };
+        struct { f32 r, g, b; };
+        struct { f32 u, v, w; };
     };
 
-    constexpr Vec3() = default;
+    constexpr Vec3f()
+        : x{0.0f}, y{0.0f}, z{0.0f}
+    {
 
-    constexpr Vec3(T x, T y, T z)
+    }
+
+    constexpr Vec3f(f32 x, f32 y, f32 z)
         : x{x}, y{y}, z{z}
     {
 
     }
 
-    constexpr auto operator-(const Vec3<T>& other) const -> Vec3<T>
+    constexpr void Normalize()
     {
-        Vec3<T> out;
+        auto mag = std::hypot(x, y, z);
+        if (mag == 0.0f)
+            return;
+
+        x /= mag;
+        y /= mag;
+        z /= mag;
+    }
+
+    constexpr auto operator-(const Vec3f& other) const -> Vec3f
+    {
+        Vec3f out;
         out.x = x - other.x;
         out.y = y - other.y;
         out.z = z - other.z;
         return out;
     }
-public:
-    static constexpr auto Normalize(Vec3<T> v) -> Vec3<T>
-    {
-        auto mag = std::hypot(v.x, v.y, v.z);
-        if (mag == 0.0f)
-            return v;
 
-        v.x /= mag;
-        v.y /= mag;
-        v.z /= mag;
-        return v;
+    constexpr auto operator-() const -> Vec3f
+    {
+        return {-x, -y, -z};
     }
 
-    static constexpr auto Cross(const Vec3<T>& a, const Vec3<T>& b) -> Vec3<T>
+    constexpr auto operator*(f32 scalar) const -> Vec3f
+    {
+        Vec3f out;
+        out.x = x * scalar;
+        out.y = y * scalar;
+        out.z = z * scalar;
+        return out;
+    }
+
+    constexpr auto operator+=(const Vec3f& other) -> Vec3f&
+    {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        return *this;
+    }
+public:
+    static constexpr auto Normalize(Vec3f vec) -> Vec3f
+    {
+        vec.Normalize();
+        return vec;
+    }
+
+    static constexpr auto Cross(const Vec3f& a, const Vec3f& b) -> Vec3f
     {
         return {a.y * b.z - a.z*b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
     }
 
-    static constexpr auto Dot(const Vec3<T>& a, const Vec3<T>& b) -> T
+    static constexpr auto Dot(const Vec3f& a, const Vec3f& b) -> f32
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;
     }
 };
 
-template <typename T>
-class std::formatter<Vec3<T>>
+template <>
+class std::formatter<Vec3f>
 {
 public:
     constexpr auto parse(std::format_parse_context& ctx)
@@ -65,14 +95,8 @@ public:
     }
 
     template <typename Context>
-    auto format(const Vec3<T>& v, Context& ctx) const
+    auto format(const Vec3f& v, Context& ctx) const
     {
-        if constexpr (std::same_as<T, f32>)
-            return std::format_to(ctx.out(), "Vector3[X:{:.2f}, Y:{:.2f}, Z:{:.2f}]", v.x, v.y, v.z);
-        else
-            return std::format_to(ctx.out(), "Vector3[X:{}, Y:{}, Z: {}]", v.x, v.y, v.z);
+        return std::format_to(ctx.out(), "Vector3[X:{:.2f}, Y:{:.2f}, Z:{:.2f}]", v.x, v.y, v.z);
     }
 };
-
-using Vec3i = Vec3<i32>;
-using Vec3f = Vec3<f32>;

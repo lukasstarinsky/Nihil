@@ -33,7 +33,7 @@ void Engine::Run() const
         {
             Renderer::BeginFrame(0.1f, 0.1f, 0.1f, 1.0f);
 
-            mApplication->OnUpdate();
+            mApplication->OnUpdate(static_cast<f32>(deltaTimeSeconds));
             mApplication->OnRender();
 
             Renderer::EndFrame();

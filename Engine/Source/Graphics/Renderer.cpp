@@ -67,18 +67,18 @@ void Renderer::BeginFrame(f32 r, f32 g, f32 b, f32 a)
 {
     ASSERT(sRendererBackend);
     sRendererBackend->BeginFrame(r, g, b, a);
-
-    // Temp
-    auto projection = Mat4f::Perspective(std::numbers::pi / 3.0f, 800.0f / 600.0f, 0.1f, 1000.0f);
-    auto view = Mat4f::LookAt({0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-    sState.CameraUniformBuffer->SetData(projection.Data(), sizeof(Mat4f), 0);
-    sState.CameraUniformBuffer->SetData(view.Data(), sizeof(Mat4f), sizeof(Mat4f));
 }
 
 void Renderer::EndFrame()
 {
     ASSERT(sRendererBackend);
     sRendererBackend->EndFrame();
+}
+
+void Renderer::BeginScene(const Camera& camera)
+{
+    sState.CameraUniformBuffer->SetData(camera.GetProjectionMatrix().Data(), sizeof(Mat4f), 0);
+    sState.CameraUniformBuffer->SetData(camera.GetViewMatrix().Data(), sizeof(Mat4f), sizeof(Mat4f));
 }
 
 void Renderer::Draw(const MeshPtr& mesh)
