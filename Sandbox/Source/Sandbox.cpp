@@ -64,16 +64,9 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
-        if (Input::IsKeyDown(Key::W))
-            moveVector.z = -1.0f;
-        else if (Input::IsKeyDown(Key::S))
-            moveVector.z = 1.0f;
-
-        if (Input::IsKeyDown(Key::A))
-            moveVector.x = -1.0f;
-        else if (Input::IsKeyDown(Key::D))
-            moveVector.x = 1.0f;
-
+        moveVector.z = Input::IsKeyDown(Key::W) ? -1.0f : Input::IsKeyDown(Key::S) ? 1.0f : 0.0f;
+        moveVector.x = Input::IsKeyDown(Key::A) ? -1.0f : Input::IsKeyDown(Key::D) ? 1.0f : 0.0f;
+        moveVector.Normalize();
         mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
     }
 }

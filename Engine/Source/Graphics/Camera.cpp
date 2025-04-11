@@ -27,5 +27,6 @@ auto Camera::GetViewMatrix() const -> const Mat4f&
 void Camera::Translate(const Vec3f& translation)
 {
     mPosition += translation;
+    mLookAt += translation;
     mViewMatrix = Mat4f::LookAt(mPosition, mLookAt, mUp);
 }

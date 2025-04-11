@@ -61,6 +61,7 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig)
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(OpenGLDebugCallback, nullptr);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glViewport(0, 0, appConfig.WindowWidth, appConfig.WindowHeight);
 }
 
