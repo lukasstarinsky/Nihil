@@ -9,6 +9,7 @@ public:
 
     void OnInitialize() override;
     void OnUpdate(f32 deltaTimeSeconds) override;
+    void OnResize() override;
     void OnRender() override;
     void OnShutdown() override;
 

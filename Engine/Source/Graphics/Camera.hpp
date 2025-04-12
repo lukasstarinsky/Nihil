@@ -16,8 +16,9 @@ public:
 
     auto GetProjectionMatrix() const -> const Mat4f&;
     auto GetViewMatrix() const -> const Mat4f&;
+    void SetAspectRatio(f32 aspectRatio);
 
-    auto Direction() const -> const Vec3f&;
+    auto Front() const -> const Vec3f&;
     auto Right() const -> const Vec3f&;
 
     void Translate(const Vec3f& translation);
@@ -33,4 +34,5 @@ private:
 
     f32 mPitch {};
     f32 mYaw {};
+    f32 mFovDegrees {};
 };

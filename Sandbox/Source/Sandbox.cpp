@@ -75,11 +75,16 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
-        moveVector += Input::IsKeyDown(Key::W) ? mCamera.Direction() : Input::IsKeyDown(Key::S) ? -mCamera.Direction() : Vec3f{};
+        moveVector += Input::IsKeyDown(Key::W) ? mCamera.Front() : Input::IsKeyDown(Key::S) ? -mCamera.Front() : Vec3f{};
         moveVector += Input::IsKeyDown(Key::A) ? -mCamera.Right() : Input::IsKeyDown(Key::D) ? mCamera.Right() : Vec3f{};
         moveVector.Normalize();
         mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
     }
+}
+
+void Sandbox::OnResize()
+{
+    mCamera.SetAspectRatio(static_cast<f32>(Config.WindowWidth) / static_cast<f32>(Config.WindowHeight));
 }
 
 void Sandbox::OnRender()
