@@ -61,15 +61,16 @@ Sandbox::Sandbox()
 
 void Sandbox::OnInitialize()
 {
-    mTestMesh = Mesh::Create(vertexData, indexData);
-    mTestTex = Texture::Create("Assets/Textures/container2.png");
+    mMesh = Mesh::Create(vertexData, indexData);
+    mTexture = Texture::Create("Assets/Textures/container2.png");
+    mMaterial = Renderer::DefaultMaterial();
 
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
 }
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::Identity());
+    mMaterial->SetUniform(0, Mat4f::Identity());
 
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
@@ -84,9 +85,9 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 void Sandbox::OnRender()
 {
     Renderer::BeginScene(mCamera);
-
-    mTestTex->Bind(0);
-    Renderer::Draw(mTestMesh);
+    mTexture->Bind(0);
+    mMaterial->Bind();
+    Renderer::Draw(mMesh);
 }
 
 void Sandbox::OnShutdown()

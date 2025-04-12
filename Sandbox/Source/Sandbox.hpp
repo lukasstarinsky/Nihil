@@ -14,7 +14,8 @@ public:
 
     auto OnMouseMoveEvent(const Event& e) -> bool;
 private:
-    MeshPtr mTestMesh {};
-    TexturePtr mTestTex {};
+    MeshPtr mMesh {};
+    MaterialPtr mMaterial {};
+    TexturePtr mTexture {};
     Camera mCamera;
 };

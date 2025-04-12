@@ -4,8 +4,6 @@ OpenGLMesh::OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> 
     : mVertexBuffer{BufferType::Vertex, vertices.data(), static_cast<i32>(vertices.size_bytes())}
     , mIndexBuffer{BufferType::Index, indices.data(), static_cast<i32>(indices.size_bytes())}
     , mIndexCount{static_cast<i32>(indices.size())}
-    , mMaterial{Renderer::DefaultMaterial()}
-//    , mMaterial{std::static_pointer_cast<OpenGLMaterial>(Renderer::DefaultMaterial())}
 {
     glCreateVertexArrays(1, &mVertexArray);
 
@@ -29,16 +27,10 @@ OpenGLMesh::~OpenGLMesh()
 
 void OpenGLMesh::Bind() const
 {
-    mMaterial->Bind();
     glBindVertexArray(mVertexArray);
 }
 
 auto OpenGLMesh::GetIndexCount() const -> i32
 {
     return mIndexCount;
-}
-
-auto OpenGLMesh::GetMaterial() const -> const Material*
-{
-    return mMaterial.get();
 }

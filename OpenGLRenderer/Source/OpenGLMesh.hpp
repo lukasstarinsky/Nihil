@@ -13,11 +13,9 @@ public:
     void Bind() const override;
 
     auto GetIndexCount() const -> i32 override;
-    auto GetMaterial() const -> const Material* override;
 private:
     GLuint mVertexArray {};
     OpenGLBuffer mVertexBuffer;
     OpenGLBuffer mIndexBuffer;
     i32 mIndexCount {};
-    MaterialPtr mMaterial {};
 };
