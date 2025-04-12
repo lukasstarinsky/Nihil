@@ -19,6 +19,7 @@ public:
     auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr override;
     auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr override;
     auto CreateMesh(std::span<const Vertex> vertices, std::span<const Index> indices) const -> MeshPtr override;
+    auto CreateTexture(std::string_view filePath) const -> TexturePtr override;
 
     void Draw(const MeshPtr& mesh) const override;
 };

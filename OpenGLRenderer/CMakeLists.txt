@@ -14,5 +14,5 @@ add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE NIHIL_EXPORT)
 target_include_directories(${PROJECT_NAME} PRIVATE Source ThirdParty)
-target_link_libraries(${PROJECT_NAME} PRIVATE NihilCore OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} PRIVATE NihilCore OpenGL::GL stb)
 target_precompile_headers(${PROJECT_NAME} PRIVATE Source/pch.hpp)

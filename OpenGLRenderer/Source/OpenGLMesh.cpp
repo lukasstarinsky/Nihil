@@ -16,7 +16,7 @@ OpenGLMesh::OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> 
     glEnableVertexArrayAttrib(mVertexArray, 1);
 
     glVertexArrayAttribFormat(mVertexArray, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, Position));
-    glVertexArrayAttribFormat(mVertexArray, 1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, Color));
+    glVertexArrayAttribFormat(mVertexArray, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, TexCoord));
 
     glVertexArrayAttribBinding(mVertexArray, 0, 0);
     glVertexArrayAttribBinding(mVertexArray, 1, 0);

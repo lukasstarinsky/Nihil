@@ -17,6 +17,8 @@ static auto ShaderTypeToGLenum(ShaderType shaderType) -> GLenum
 OpenGLShader::OpenGLShader(const std::string& filePath, ShaderType shaderType)
     : mShaderType{shaderType}
 {
+    // TODO: pass the raw file data, dont load here
+
     std::vector<u32> spvBinary;
 
     std::string spvFilePath = filePath + ".spv";

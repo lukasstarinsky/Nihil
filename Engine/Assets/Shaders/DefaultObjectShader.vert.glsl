@@ -1,9 +1,9 @@
 #version 460 core
 
 layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inColor;
+layout(location = 1) in vec2 inTexCoord;
 
-layout(location = 0) out vec3 outColor;
+layout(location = 0) out vec2 outTexCoord;
 
 layout(binding = 0) uniform CameraUniformBuffer
 {
@@ -18,5 +18,5 @@ layout(location = 0) uniform mat4 uModel;
 void main()
 {
     gl_Position = uProjection * uView * uModel * vec4(inPosition, 1.0);
-    outColor = inColor;
+    outTexCoord = inTexCoord;
 }

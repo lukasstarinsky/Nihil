@@ -9,6 +9,7 @@
 #include "Buffer.hpp"
 #include "Mesh.hpp"
 #include "Camera.hpp"
+#include "Texture.hpp"
 
 enum class RendererAPI
 {
@@ -34,6 +35,7 @@ public:
     virtual auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr = 0;
     virtual auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr = 0;
     virtual auto CreateMesh(std::span<const Vertex> vertices, std::span<const Index> indices) const -> MeshPtr = 0;
+    virtual auto CreateTexture(std::string_view filePath) const -> TexturePtr = 0;
 
     virtual void Draw(const MeshPtr& mesh) const = 0;
 };

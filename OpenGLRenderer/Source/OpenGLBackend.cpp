@@ -1,9 +1,11 @@
 #include "OpenGLBackend.hpp"
+
+#include "Platform/Platform.hpp"
 #include "OpenGLShader.hpp"
 #include "OpenGLBuffer.hpp"
 #include "OpenGLMaterial.hpp"
 #include "OpenGLMesh.hpp"
-#include "Platform/Platform.hpp"
+#include "OpenGLTexture.hpp"
 
 static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, GLenum severity, [[maybe_unused]] GLsizei length, const GLchar* msg, [[maybe_unused]] const void* user_param)
 {
@@ -114,6 +116,11 @@ auto OpenGLBackend::CreateBuffer(BufferType bufferType, const void* data, i32 si
 auto OpenGLBackend::CreateMesh(std::span<const Vertex> vertices, std::span<const Index> indices) const -> MeshPtr
 {
     return std::make_shared<OpenGLMesh>(vertices, indices);
+}
+
+auto OpenGLBackend::CreateTexture(std::string_view filePath) const -> TexturePtr
+{
+    return std::make_shared<OpenGLTexture>(filePath);
 }
 
 void OpenGLBackend::Draw(const MeshPtr& mesh) const

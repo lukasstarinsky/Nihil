@@ -137,3 +137,9 @@ auto Mesh::Create(std::span<const Vertex> vertices, std::span<const Index> indic
     ASSERT(sRendererBackend);
     return sRendererBackend->CreateMesh(vertices, indices);
 }
+
+auto Texture::Create(std::string_view filePath) -> TexturePtr
+{
+    ASSERT(sRendererBackend);
+    return sRendererBackend->CreateTexture(filePath);
+}

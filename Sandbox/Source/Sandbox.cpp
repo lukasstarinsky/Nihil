@@ -4,42 +4,49 @@
 
 static constexpr Vertex vertexData[] = {
     // Front face
-    { .Position = {-0.5f, -0.5f,  0.5f}, .Color = {1.0f, 0.0f, 0.0f} },
-    { .Position = { 0.5f, -0.5f,  0.5f}, .Color = {0.0f, 1.0f, 0.0f} },
-    { .Position = { 0.5f,  0.5f,  0.5f}, .Color = {0.0f, 0.0f, 1.0f} },
-    { .Position = {-0.5f,  0.5f,  0.5f}, .Color = {1.0f, 1.0f, 0.0f} },
+    { .Position = {-0.5f, -0.5f,  0.5f}, .TexCoord = {0.0f, 0.0f} },
+    { .Position = { 0.5f, -0.5f,  0.5f}, .TexCoord = {1.0f, 0.0f} },
+    { .Position = { 0.5f,  0.5f,  0.5f}, .TexCoord = {1.0f, 1.0f} },
+    { .Position = {-0.5f,  0.5f,  0.5f}, .TexCoord = {0.0f, 1.0f} },
 
     // Back face
-    { .Position = {-0.5f, -0.5f, -0.5f}, .Color = {1.0f, 0.0f, 1.0f} },
-    { .Position = { 0.5f, -0.5f, -0.5f}, .Color = {0.0f, 1.0f, 1.0f} },
-    { .Position = { 0.5f,  0.5f, -0.5f}, .Color = {1.0f, 0.5f, 0.0f} },
-    { .Position = {-0.5f,  0.5f, -0.5f}, .Color = {0.5f, 0.0f, 1.0f} },
+    { .Position = { 0.5f, -0.5f, -0.5f}, .TexCoord = {0.0f, 0.0f} },
+    { .Position = {-0.5f, -0.5f, -0.5f}, .TexCoord = {1.0f, 0.0f} },
+    { .Position = {-0.5f,  0.5f, -0.5f}, .TexCoord = {1.0f, 1.0f} },
+    { .Position = { 0.5f,  0.5f, -0.5f}, .TexCoord = {0.0f, 1.0f} },
+
+    // Left face
+    { .Position = {-0.5f, -0.5f, -0.5f}, .TexCoord = {0.0f, 0.0f} },
+    { .Position = {-0.5f, -0.5f,  0.5f}, .TexCoord = {1.0f, 0.0f} },
+    { .Position = {-0.5f,  0.5f,  0.5f}, .TexCoord = {1.0f, 1.0f} },
+    { .Position = {-0.5f,  0.5f, -0.5f}, .TexCoord = {0.0f, 1.0f} },
+
+    // Right face
+    { .Position = { 0.5f, -0.5f,  0.5f}, .TexCoord = {0.0f, 0.0f} },
+    { .Position = { 0.5f, -0.5f, -0.5f}, .TexCoord = {1.0f, 0.0f} },
+    { .Position = { 0.5f,  0.5f, -0.5f}, .TexCoord = {1.0f, 1.0f} },
+    { .Position = { 0.5f,  0.5f,  0.5f}, .TexCoord = {0.0f, 1.0f} },
+
+    // Top face
+    { .Position = {-0.5f,  0.5f,  0.5f}, .TexCoord = {0.0f, 0.0f} },
+    { .Position = { 0.5f,  0.5f,  0.5f}, .TexCoord = {1.0f, 0.0f} },
+    { .Position = { 0.5f,  0.5f, -0.5f}, .TexCoord = {1.0f, 1.0f} },
+    { .Position = {-0.5f,  0.5f, -0.5f}, .TexCoord = {0.0f, 1.0f} },
+
+    // Bottom face
+    { .Position = {-0.5f, -0.5f, -0.5f}, .TexCoord = {0.0f, 0.0f} },
+    { .Position = { 0.5f, -0.5f, -0.5f}, .TexCoord = {1.0f, 0.0f} },
+    { .Position = { 0.5f, -0.5f,  0.5f}, .TexCoord = {1.0f, 1.0f} },
+    { .Position = {-0.5f, -0.5f,  0.5f}, .TexCoord = {0.0f, 1.0f} },
 };
 
 static constexpr Index indexData[] = {
-    // Front face
-    0, 1, 2,
-    2, 3, 0,
-
-    // Right face
-    1, 5, 6,
-    6, 2, 1,
-
-    // Back face
-    5, 4, 7,
-    7, 6, 5,
-
-    // Left face
-    4, 0, 3,
-    3, 7, 4,
-
-    // Top face
-    3, 2, 6,
-    6, 7, 3,
-
-    // Bottom face
-    4, 5, 1,
-    1, 0, 4
+    0, 1, 2, 2, 3, 0,       // Front
+    4, 5, 6, 6, 7, 4,       // Back
+    8, 9,10,10,11, 8,       // Left
+    12,13,14,14,15,12,      // Right
+    16,17,18,18,19,16,      // Top
+    20,21,22,22,23,20,      // Bottom
 };
 
 Sandbox::Sandbox()
@@ -55,13 +62,14 @@ Sandbox::Sandbox()
 void Sandbox::OnInitialize()
 {
     mTestMesh = Mesh::Create(vertexData, indexData);
+    mTestTex = Texture::Create("Assets/Textures/container2.png");
 
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
 }
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::Scale({100.0f, 1.0f, 100.0f}) * Mat4f::Translate({0.0f, -4.0f, 0.0f}));
+    mTestMesh->GetMaterial()->SetUniform(0, Mat4f::Identity());
 
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
@@ -76,6 +84,8 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 void Sandbox::OnRender()
 {
     Renderer::BeginScene(mCamera);
+
+    mTestTex->Bind(0);
     Renderer::Draw(mTestMesh);
 }
 
