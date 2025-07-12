@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "shaderc",
-    "gtest"
+    "gtest",
+    "assimp"
   ]
 }
