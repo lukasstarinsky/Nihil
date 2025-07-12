@@ -9,8 +9,8 @@
 .idea/
 
 # CMake
-build/
-bin/
+Build/
+Bin/
 cmake-build-*/
 CMakeUserPresets.json
 

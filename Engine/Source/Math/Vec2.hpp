@@ -25,6 +25,13 @@ public:
 
     }
 
+    constexpr auto operator*(f32 scalar) const -> Vec2f
+    {
+        Vec2f out = *this;
+        out *= scalar;
+        return out;
+    }
+
     constexpr auto operator*=(f32 scalar) -> Vec2f&
     {
         x *= scalar;

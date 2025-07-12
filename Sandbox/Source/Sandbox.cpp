@@ -65,13 +65,13 @@ void Sandbox::OnInitialize()
     mTexture = Texture::Create("Assets/Textures/container2.png");
     mMaterial = Renderer::DefaultMaterial();
 
+    auto model = ModelImporter::Import("Assets/Models/cottage_obj.obj");
+
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
 }
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    mMaterial->SetUniform(0, Mat4f::Identity());
-
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
@@ -102,8 +102,7 @@ void Sandbox::OnShutdown()
 
 auto Sandbox::OnMouseMoveEvent(const Event& e) -> bool
 {
-    auto delta = e.MouseEvent.Delta;
-    delta *= MOUSE_SENSITIVITY;
+    auto delta = e.MouseEvent.Delta * MOUSE_SENSITIVITY;
     mCamera.Rotate(-delta.y, delta.x);
 
     return false;

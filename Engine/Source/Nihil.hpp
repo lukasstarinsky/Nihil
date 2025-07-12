@@ -6,6 +6,7 @@
 #include <Core/Exception.hpp>
 #include <Core/Application.hpp>
 #include <Graphics/Renderer.hpp>
+#include <Graphics/ModelImporter.hpp>
 #include <Platform/Platform.hpp>
 
 #define CREATE_APPLICATION(Application)                 \

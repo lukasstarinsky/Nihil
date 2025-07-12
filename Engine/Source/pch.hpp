@@ -6,6 +6,7 @@
 #include <memory>
 #include <algorithm>
 #include <span>
+#include <filesystem>
 
 #include "Core/Defines.hpp"
 #include "Core/Logger.hpp"

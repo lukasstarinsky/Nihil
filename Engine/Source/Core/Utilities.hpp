@@ -14,7 +14,7 @@ namespace Time
 namespace File
 {
     auto NIHIL_API Read(std::string_view filePath) -> std::string;
-    auto NIHIL_API ReadLines(std::string_view filePath) -> std::vector<std::string>;
+    auto NIHIL_API ReadLines(const std::filesystem::path& filePath) -> std::vector<std::string>;
 
     template <typename T>
     auto NIHIL_API ReadBinary(std::string_view filePath) -> std::vector<T>

@@ -23,12 +23,18 @@ auto File::Read(std::string_view filePath) -> std::string
     return {std::istreambuf_iterator<char>(file), {}};
 }
 
-auto File::ReadLines(std::string_view filePath) -> std::vector<std::string>
+auto File::ReadLines(const std::filesystem::path& filePath) -> std::vector<std::string>
 {
-    std::ifstream file(filePath.data());
-    Ensure(file.is_open(), "Failed to open file: {}", filePath.data());
+    std::ifstream file(filePath);
+    Ensure(file.is_open(), "Failed to open file: {}", filePath.string());
 
-    return {std::istream_iterator<std::string>(file), {}};
+    std::vector<std::string> out;
+    std::string line;
+    while (std::getline(file, line))
+    {
+        out.push_back(line);
+    }
+    return out;
 }
 
 void File::WriteBinary(std::string_view filePath, const void* data, std::size_t size)
