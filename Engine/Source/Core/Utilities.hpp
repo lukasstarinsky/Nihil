@@ -2,6 +2,7 @@
 
 #include <string>
 #include <fstream>
+#include <filesystem>
 
 #include "Defines.hpp"
 #include "Exception.hpp"
@@ -13,20 +14,20 @@ namespace Time
 
 namespace File
 {
-    auto NIHIL_API Read(std::string_view filePath) -> std::string;
+    auto NIHIL_API Read(const std::filesystem::path& filePath) -> std::string;
     auto NIHIL_API ReadLines(const std::filesystem::path& filePath) -> std::vector<std::string>;
 
     template <typename T = std::byte>
-    auto NIHIL_API ReadBinary(std::string_view filePath) -> std::vector<T>
+    auto NIHIL_API ReadBinary(const std::filesystem::path& filePath) -> std::vector<T>
     {
-        std::ifstream file(filePath.data(), std::ios::binary | std::ios::ate);
-        Ensure(file.is_open(), "Failed to open file: {}", filePath.data());
+        std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+        Ensure(file.is_open(), "Failed to open file: {}", filePath.string());
 
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);
 
         std::vector<T> buffer(size / sizeof(T));
-        Ensure(!!file.read(reinterpret_cast<char*>(buffer.data()), size), "Failed to read binary from file: {}", filePath.data());
+        Ensure(!!file.read(reinterpret_cast<char*>(buffer.data()), size), "Failed to read binary from file: {}", filePath.string());
 
         return buffer;
     }

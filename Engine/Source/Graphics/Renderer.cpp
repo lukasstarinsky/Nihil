@@ -34,9 +34,12 @@ void Renderer::Initialize(const ApplicationConfig& config)
         std::rethrow_exception(exception);
     }
 
+    // TODO: Move to scene
     sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 2 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
-    sState.DefaultVertexShader = Shader::Create("Assets/Shaders/DefaultObjectShader.vert", ShaderType::Vertex);
-    sState.DefaultFragmentShader = Shader::Create("Assets/Shaders/DefaultObjectShader.frag", ShaderType::Fragment);
+
+    // TODO: Move where?
+    sState.DefaultVertexShader = Shader::Create(config.AssetManager->LoadShader("DefaultObjectShader.vert", ShaderStage::Vertex));
+    sState.DefaultFragmentShader = Shader::Create(config.AssetManager->LoadShader("DefaultObjectShader.frag", ShaderStage::Fragment));
     sState.DefaultMaterial = Material::Create(sState.DefaultVertexShader, sState.DefaultFragmentShader);
 
     ADD_EVENT_LISTENER(Event::ApplicationResize, OnResizeEvent);
@@ -114,10 +117,10 @@ auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
     }
 }
 
-auto Shader::Create(const std::string& filePath, ShaderType shaderType) -> ShaderPtr
+auto Shader::Create(const ShaderSpecification& shaderSpec) -> ShaderPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateShader(filePath, shaderType);
+    return sRendererBackend->CreateShader(shaderSpec);
 }
 
 auto Material::Create(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) -> MaterialPtr
@@ -138,8 +141,8 @@ auto Mesh::Create(std::span<const Vertex> vertices, std::span<const Index> indic
     return sRendererBackend->CreateMesh(vertices, indices);
 }
 
-auto Texture::Create(std::string_view filePath) -> TexturePtr
+auto Texture::Create(const TextureSpecification& textureSpec) -> TexturePtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateTexture(filePath);
+    return sRendererBackend->CreateTexture(textureSpec);
 }

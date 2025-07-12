@@ -5,6 +5,6 @@
 
 namespace ShaderCompiler
 {
-    auto NIHIL_API GlslToSpv(std::string_view filePath, ShaderType shaderType) -> std::vector<u32>;
+    auto NIHIL_API GlslToSpv(const std::string& glslSourceCode, ShaderStage shaderStage) -> std::vector<u32>;
 //    auto SPIRVToHLSL(const std::vector<u32> spirv) -> std::string;
 }

@@ -98,9 +98,9 @@ void OpenGLBackend::EndFrame() const
 #endif
 }
 
-auto OpenGLBackend::CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr
+auto OpenGLBackend::CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr
 {
-    return std::make_shared<OpenGLShader>(filePath, shaderType);
+    return std::make_shared<OpenGLShader>(shaderSpec);
 }
 
 auto OpenGLBackend::CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr
@@ -118,9 +118,9 @@ auto OpenGLBackend::CreateMesh(std::span<const Vertex> vertices, std::span<const
     return std::make_shared<OpenGLMesh>(vertices, indices);
 }
 
-auto OpenGLBackend::CreateTexture(std::string_view filePath) const -> TexturePtr
+auto OpenGLBackend::CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr
 {
-    return std::make_shared<OpenGLTexture>(filePath);
+    return std::make_shared<OpenGLTexture>(textureSpec);
 }
 
 void OpenGLBackend::Draw(const MeshPtr& mesh) const

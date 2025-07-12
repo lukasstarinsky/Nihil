@@ -15,11 +15,11 @@ public:
     void OnResize(i32 width, i32 height) const override;
     void EndFrame() const override;
 
-    auto CreateShader(const std::string& filePath, ShaderType shaderType) const -> ShaderPtr override;
+    auto CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr override;
     auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr override;
     auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr override;
     auto CreateMesh(std::span<const Vertex> vertices, std::span<const Index> indices) const -> MeshPtr override;
-    auto CreateTexture(std::string_view filePath) const -> TexturePtr override;
+    auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr override;
 
     void Draw(const MeshPtr& mesh) const override;
 };

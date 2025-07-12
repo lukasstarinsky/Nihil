@@ -1,14 +1,7 @@
 #include "OpenGLTexture.hpp"
 
-#include <stb/stb_image.h>
-
-OpenGLTexture::OpenGLTexture(std::string_view filePath)
+OpenGLTexture::OpenGLTexture(const TextureSpecification& textureSpec)
 {
-    // TODO: pass the raw file data, dont load here
-    i32 width, height, numChannels;
-    auto data = stbi_load(filePath.data(), &width, &height, &numChannels, 0);
-    Ensure(data, "Failed to load image file: {}", filePath);
-
     glCreateTextures(GL_TEXTURE_2D, 1, &mHandle);
 
     glTextureParameteri(mHandle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -16,9 +9,8 @@ OpenGLTexture::OpenGLTexture(std::string_view filePath)
     glTextureParameteri(mHandle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTextureParameteri(mHandle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTextureStorage2D(mHandle, 1, GL_RGBA8, width, height);
-    glTextureSubImage2D(mHandle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    stbi_image_free(data);
+    glTextureStorage2D(mHandle, 1, GL_RGBA8, textureSpec.Width, textureSpec.Height);
+    glTextureSubImage2D(mHandle, 0, 0, 0, textureSpec.Width, textureSpec.Height, GL_RGBA, GL_UNSIGNED_BYTE, textureSpec.Data.data());
 }
 
 OpenGLTexture::~OpenGLTexture()

@@ -4,8 +4,8 @@ OpenGLMaterial::OpenGLMaterial(const ShaderPtr& vertexShader, const ShaderPtr& f
     : mVertexShader{std::static_pointer_cast<OpenGLShader>(vertexShader)}
     , mFragmentShader{std::static_pointer_cast<OpenGLShader>(fragmentShader)}
 {
-    ASSERT(mVertexShader->GetType() == ShaderType::Vertex);
-    ASSERT(mFragmentShader->GetType() == ShaderType::Fragment);
+    ASSERT(mVertexShader->GetStage() == ShaderStage::Vertex);
+    ASSERT(mFragmentShader->GetStage() == ShaderStage::Fragment);
 
     mHandle = glCreateProgram();
     glAttachShader(mHandle, mVertexShader->GetHandle());

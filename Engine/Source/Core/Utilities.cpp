@@ -15,10 +15,10 @@ auto Time::GetFormattedTime(bool includeDate) -> std::string
         return std::format("{:%T}", now);
 }
 
-auto File::Read(std::string_view filePath) -> std::string
+auto File::Read(const std::filesystem::path& filePath) -> std::string
 {
-    std::ifstream file(filePath.data());
-    Ensure(file.is_open(), "Failed to open file: {}", filePath.data());
+    std::ifstream file(filePath);
+    Ensure(file.is_open(), "Failed to open file: {}", filePath.string());
 
     return {std::istreambuf_iterator<char>(file), {}};
 }

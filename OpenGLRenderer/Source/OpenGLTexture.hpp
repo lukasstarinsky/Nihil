@@ -5,7 +5,7 @@
 class OpenGLTexture : public Texture
 {
 public:
-    OpenGLTexture(std::string_view filePath);
+    OpenGLTexture(const TextureSpecification& textureSpec);
     ~OpenGLTexture() override;
 
     void Bind(i32 slot) const override;

@@ -1,9 +1,15 @@
 #pragma once
 
-enum class ShaderType
+enum class ShaderStage
 {
     Vertex = 0,
     Fragment
+};
+
+struct ShaderSpecification
+{
+    ShaderStage Stage;
+    std::vector<std::byte> Data;
 };
 
 class Shader;
@@ -13,6 +19,6 @@ class Shader
 {
 public:
     virtual ~Shader() = default;
-
-    static auto Create(const std::string& filePath, ShaderType shaderType) -> ShaderPtr;
+public:
+    static auto Create(const ShaderSpecification& shaderSpec) -> ShaderPtr;
 };

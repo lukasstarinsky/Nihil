@@ -5,12 +5,12 @@
 class OpenGLShader : public Shader
 {
 public:
-    OpenGLShader(const std::string& filePath, ShaderType shaderType);
+    OpenGLShader(const ShaderSpecification& shaderSpec);
     ~OpenGLShader() override;
 
     auto GetHandle() const -> GLuint;
-    auto GetType() const -> ShaderType;
+    auto GetStage() const -> ShaderStage;
 private:
     GLuint mHandle {};
-    ShaderType mShaderType {};
+    ShaderStage mShaderStage {};
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Defines.hpp"
+#include "AssetManager.hpp"
 
 enum class RendererAPI;
 
@@ -10,6 +11,7 @@ struct ApplicationConfig
     i32 WindowHeight = 768;
     std::string Name = "Nihil Application";
     RendererAPI RendererAPI {};
+    std::unique_ptr<AssetManager> AssetManager {};
 };
 
 struct ApplicationState

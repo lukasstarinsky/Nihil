@@ -3,20 +3,19 @@
 #include "ShaderCompiler.hpp"
 #include "Renderer.hpp"
 
-static auto ShaderTypeToShaderc(ShaderType shaderType) -> shaderc_shader_kind
+static auto ShaderStageToShaderc(ShaderStage shaderType) -> shaderc_shader_kind
 {
     switch (shaderType)
     {
-        case ShaderType::Vertex: return shaderc_glsl_vertex_shader;
-        case ShaderType::Fragment: return shaderc_glsl_fragment_shader;
+        case ShaderStage::Vertex: return shaderc_glsl_vertex_shader;
+        case ShaderStage::Fragment: return shaderc_glsl_fragment_shader;
     }
 
     return shaderc_glsl_vertex_shader;
 }
 
-auto ShaderCompiler::GlslToSpv(std::string_view filePath, ShaderType shaderType) -> std::vector<u32>
+auto ShaderCompiler::GlslToSpv(const std::string& glslSourceCode, ShaderStage shaderStage) -> std::vector<u32>
 {
-    auto sourceCode = File::Read(filePath);
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
@@ -27,7 +26,7 @@ auto ShaderCompiler::GlslToSpv(std::string_view filePath, ShaderType shaderType)
         options.AddMacroDefinition("OPENGL");
     }
 
-    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(sourceCode, ShaderTypeToShaderc(shaderType), "Shader", options);
+    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(glslSourceCode, ShaderStageToShaderc(shaderStage), "Shader", options);
     Ensure(module.GetCompilationStatus() == shaderc_compilation_status_success, "Failed to compiler shader to Spv. {}", module.GetErrorMessage());
 
     return {module.begin(), module.end()};

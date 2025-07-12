@@ -57,21 +57,22 @@ Sandbox::Sandbox()
     Config.WindowHeight = 960;
     Config.Name = "Nihil Sandbox";
     Config.RendererAPI = RendererAPI::OpenGL;
+    Config.AssetManager = std::make_unique<RawAssetManager>("Assets/");
 }
 
 void Sandbox::OnInitialize()
 {
     mMesh = Mesh::Create(vertexData, indexData);
-    mTexture = Texture::Create("Assets/Textures/container2.png");
+    mTexture = Texture::Create(Config.AssetManager->LoadTexture("container2.png"));
     mMaterial = Renderer::DefaultMaterial();
-
-    auto model = ModelImporter::Import("Assets/Models/cottage_obj.obj");
 
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
 }
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
+    mMaterial->SetUniform(0, Mat4f::Identity());
+
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
