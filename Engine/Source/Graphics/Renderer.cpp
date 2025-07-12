@@ -4,9 +4,6 @@
 struct RendererState
 {
     BufferPtr CameraUniformBuffer;
-    ShaderPtr DefaultVertexShader;
-    ShaderPtr DefaultFragmentShader;
-    MaterialPtr DefaultMaterial;
 };
 
 static DynamicLibrary sRendererModule;
@@ -36,11 +33,6 @@ void Renderer::Initialize(const ApplicationConfig& config)
 
     // TODO: Move to scene
     sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 2 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
-
-    // TODO: Move where?
-    sState.DefaultVertexShader = Shader::Create(config.AssetManager->LoadShader("DefaultObjectShader.vert", ShaderStage::Vertex));
-    sState.DefaultFragmentShader = Shader::Create(config.AssetManager->LoadShader("DefaultObjectShader.frag", ShaderStage::Fragment));
-    sState.DefaultMaterial = Material::Create(sState.DefaultVertexShader, sState.DefaultFragmentShader);
 
     ADD_EVENT_LISTENER(Event::ApplicationResize, OnResizeEvent);
 }
@@ -88,21 +80,6 @@ void Renderer::Draw(const MeshPtr& mesh)
 {
     ASSERT(sRendererBackend);
     sRendererBackend->Draw(mesh);
-}
-
-auto Renderer::DefaultVertexShader() -> const ShaderPtr&
-{
-    return sState.DefaultVertexShader;
-}
-
-auto Renderer::DefaultFragmentShader() -> const ShaderPtr&
-{
-    return sState.DefaultFragmentShader;
-}
-
-auto Renderer::DefaultMaterial() -> const MaterialPtr&
-{
-    return sState.DefaultMaterial;
 }
 
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*

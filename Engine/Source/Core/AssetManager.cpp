@@ -4,10 +4,27 @@
 #include "Graphics/Renderer.hpp"
 #include "Graphics/ShaderCompiler.hpp"
 
+auto AssetManager::GetDefaultVertexShader() const -> ShaderPtr
+{
+    return mDefaultVertexShader;
+}
+
+auto AssetManager::GetDefaultFragmentShader() const -> ShaderPtr
+{
+    return mDefaultFragmentShader;
+}
+
+auto AssetManager::GetDefaultMaterial() const -> MaterialPtr
+{
+    return mDefaultMaterial;
+}
+
 RawAssetManager::RawAssetManager(const std::filesystem::path& root)
     : mRoot{root}
 {
-
+    mDefaultVertexShader = Shader::Create(RawAssetManager::LoadShader("DefaultObjectShader.vert", ShaderStage::Vertex));
+    mDefaultFragmentShader = Shader::Create(RawAssetManager::LoadShader("DefaultObjectShader.frag", ShaderStage::Fragment));
+    mDefaultMaterial = Material::Create(mDefaultVertexShader, mDefaultFragmentShader);
 }
 
 auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecification

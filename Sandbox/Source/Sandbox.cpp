@@ -57,14 +57,14 @@ Sandbox::Sandbox()
     Config.WindowHeight = 960;
     Config.Name = "Nihil Sandbox";
     Config.RendererAPI = RendererAPI::OpenGL;
-    Config.AssetManager = std::make_unique<RawAssetManager>("Assets/");
 }
 
 void Sandbox::OnInitialize()
 {
+    mAssetManager = std::make_unique<RawAssetManager>("Assets/");
     mMesh = Mesh::Create(vertexData, indexData);
-    mTexture = Texture::Create(Config.AssetManager->LoadTexture("container2.png"));
-    mMaterial = Renderer::DefaultMaterial();
+    mTexture = Texture::Create(mAssetManager->LoadTexture("container2.png"));
+    mMaterial = mAssetManager->GetDefaultMaterial();
 
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
 }

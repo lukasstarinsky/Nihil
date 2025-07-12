@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Math/Math.hpp"
 #include "Shader.hpp"
 
 class Material;

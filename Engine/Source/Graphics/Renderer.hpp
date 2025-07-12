@@ -57,9 +57,5 @@ namespace Renderer
     void NIHIL_API BeginScene(const Camera& camera);
     void NIHIL_API Draw(const MeshPtr& mesh);
 
-    auto NIHIL_API DefaultVertexShader() -> const ShaderPtr&;
-    auto NIHIL_API DefaultFragmentShader() -> const ShaderPtr&;
-    auto NIHIL_API DefaultMaterial() -> const MaterialPtr&;
-
     auto ApiToModuleString(RendererAPI api) -> const char*;
 }

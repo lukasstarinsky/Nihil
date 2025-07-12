@@ -11,7 +11,6 @@ struct ApplicationConfig
     i32 WindowHeight = 768;
     std::string Name = "Nihil Application";
     RendererAPI RendererAPI {};
-    std::unique_ptr<AssetManager> AssetManager {};
 };
 
 struct ApplicationState
@@ -38,4 +37,6 @@ public:
 public:
     ApplicationConfig Config {};
     ApplicationState State {};
+protected:
+    std::unique_ptr<AssetManager> mAssetManager {};
 };
