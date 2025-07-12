@@ -46,8 +46,7 @@ void Camera::Rotate(f32 pitch, f32 yaw)
     mPitch += pitch;
     mYaw += yaw;
 
-    // TODO: uncomment and fix
-//    mPitch = std::clamp(mPitch, -std::numbers::pi_v<f32> / 2.0f, std::numbers::pi_v<f32> / 2.0f);
+    mPitch = std::clamp(mPitch, -std::numbers::pi_v<f32> / 2.0f + 0.001f, std::numbers::pi_v<f32> / 2.0f - 0.001f);
     mYaw = std::fmod(mYaw, 2.0f * std::numbers::pi_v<f32>);
 
     mLookAt = Vec3f::Normalize({
