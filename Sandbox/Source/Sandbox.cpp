@@ -2,53 +2,6 @@
 
 #define MOUSE_SENSITIVITY 0.008f
 
-static constexpr Vertex vertexData[] = {
-    // Front face
-    { .Position = {-0.5f, -0.5f,  0.5f}, .TexCoord = {0.0f, 0.0f} },
-    { .Position = { 0.5f, -0.5f,  0.5f}, .TexCoord = {1.0f, 0.0f} },
-    { .Position = { 0.5f,  0.5f,  0.5f}, .TexCoord = {1.0f, 1.0f} },
-    { .Position = {-0.5f,  0.5f,  0.5f}, .TexCoord = {0.0f, 1.0f} },
-
-    // Back face
-    { .Position = { 0.5f, -0.5f, -0.5f}, .TexCoord = {0.0f, 0.0f} },
-    { .Position = {-0.5f, -0.5f, -0.5f}, .TexCoord = {1.0f, 0.0f} },
-    { .Position = {-0.5f,  0.5f, -0.5f}, .TexCoord = {1.0f, 1.0f} },
-    { .Position = { 0.5f,  0.5f, -0.5f}, .TexCoord = {0.0f, 1.0f} },
-
-    // Left face
-    { .Position = {-0.5f, -0.5f, -0.5f}, .TexCoord = {0.0f, 0.0f} },
-    { .Position = {-0.5f, -0.5f,  0.5f}, .TexCoord = {1.0f, 0.0f} },
-    { .Position = {-0.5f,  0.5f,  0.5f}, .TexCoord = {1.0f, 1.0f} },
-    { .Position = {-0.5f,  0.5f, -0.5f}, .TexCoord = {0.0f, 1.0f} },
-
-    // Right face
-    { .Position = { 0.5f, -0.5f,  0.5f}, .TexCoord = {0.0f, 0.0f} },
-    { .Position = { 0.5f, -0.5f, -0.5f}, .TexCoord = {1.0f, 0.0f} },
-    { .Position = { 0.5f,  0.5f, -0.5f}, .TexCoord = {1.0f, 1.0f} },
-    { .Position = { 0.5f,  0.5f,  0.5f}, .TexCoord = {0.0f, 1.0f} },
-
-    // Top face
-    { .Position = {-0.5f,  0.5f,  0.5f}, .TexCoord = {0.0f, 0.0f} },
-    { .Position = { 0.5f,  0.5f,  0.5f}, .TexCoord = {1.0f, 0.0f} },
-    { .Position = { 0.5f,  0.5f, -0.5f}, .TexCoord = {1.0f, 1.0f} },
-    { .Position = {-0.5f,  0.5f, -0.5f}, .TexCoord = {0.0f, 1.0f} },
-
-    // Bottom face
-    { .Position = {-0.5f, -0.5f, -0.5f}, .TexCoord = {0.0f, 0.0f} },
-    { .Position = { 0.5f, -0.5f, -0.5f}, .TexCoord = {1.0f, 0.0f} },
-    { .Position = { 0.5f, -0.5f,  0.5f}, .TexCoord = {1.0f, 1.0f} },
-    { .Position = {-0.5f, -0.5f,  0.5f}, .TexCoord = {0.0f, 1.0f} },
-};
-
-static constexpr Index indexData[] = {
-    0, 1, 2, 2, 3, 0,       // Front
-    4, 5, 6, 6, 7, 4,       // Back
-    8, 9,10,10,11, 8,       // Left
-    12,13,14,14,15,12,      // Right
-    16,17,18,18,19,16,      // Top
-    20,21,22,22,23,20,      // Bottom
-};
-
 Sandbox::Sandbox()
     // Projection, Position, LookAt, Up, Fov, AspectRatio
     : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 800.0f / 600.0f}
@@ -62,7 +15,7 @@ Sandbox::Sandbox()
 void Sandbox::OnInitialize()
 {
     mAssetManager = std::make_unique<RawAssetManager>("Assets/");
-    mMesh = Mesh::Create(vertexData, indexData);
+    mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj.obj", "ground_Plane.004"));
     mTexture = Texture::Create(mAssetManager->LoadTexture("container2.png"));
     mMaterial = mAssetManager->GetDefaultMaterial();
 

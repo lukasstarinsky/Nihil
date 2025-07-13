@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <span>
 #include <string>
 #include <format>
 #include <memory>

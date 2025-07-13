@@ -34,7 +34,7 @@ public:
     virtual auto CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr = 0;
     virtual auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr = 0;
     virtual auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr = 0;
-    virtual auto CreateMesh(std::span<const Vertex> vertices, std::span<const Index> indices) const -> MeshPtr = 0;
+    virtual auto CreateMesh(const MeshSpecification& meshSpec) const -> MeshPtr = 0;
     virtual auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr = 0;
 
     virtual void Draw(const MeshPtr& mesh) const = 0;

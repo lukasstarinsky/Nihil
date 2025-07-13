@@ -1,9 +1,9 @@
 #include "OpenGLMesh.hpp"
 
-OpenGLMesh::OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> indices)
-    : mVertexBuffer{BufferType::Vertex, vertices.data(), static_cast<i32>(vertices.size_bytes())}
-    , mIndexBuffer{BufferType::Index, indices.data(), static_cast<i32>(indices.size_bytes())}
-    , mIndexCount{static_cast<i32>(indices.size())}
+OpenGLMesh::OpenGLMesh(const MeshSpecification& meshSpec)
+    : mVertexBuffer{BufferType::Vertex, meshSpec.Vertices.data(), static_cast<i32>(meshSpec.Vertices.size() * sizeof(Vertex))}
+    , mIndexBuffer{BufferType::Index, meshSpec.Indices.data(), static_cast<i32>(meshSpec.Indices.size() * sizeof(Index))}
+    , mIndexCount{static_cast<i32>(meshSpec.Indices.size())}
 {
     glCreateVertexArrays(1, &mVertexArray);
 

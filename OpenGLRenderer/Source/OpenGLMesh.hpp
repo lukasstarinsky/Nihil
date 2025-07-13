@@ -7,7 +7,7 @@
 class OpenGLMesh : public Mesh
 {
 public:
-    OpenGLMesh(std::span<const Vertex> vertices, std::span<const Index> indices);
+    OpenGLMesh(const MeshSpecification& meshSpec);
     ~OpenGLMesh() override;
 
     void Bind() const override;

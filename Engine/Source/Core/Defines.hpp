@@ -44,7 +44,7 @@
 #ifdef NDEBUG
     #define ASSERT(check)
 #else
-    #define ASSERT(check) do { if(!(check)) { Logger::Fatal("Assertion failed [" __FILE__ ":" TO_STR(__LINE__)"]"); DEBUGBREAK(); } } while(0)
+    #define ASSERT(check, ...) do { if(!(check)) { Logger::Fatal("Assertion failed [" __FILE__ ":" TO_STR(__LINE__) "] " __VA_ARGS__); DEBUGBREAK(); } } while(0)
 #endif
 
 /* ======= Type Defs ======= */

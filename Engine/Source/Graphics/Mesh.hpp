@@ -8,6 +8,13 @@ struct Vertex
 
 using Index = u32;
 
+struct MeshSpecification
+{
+    std::string Name;
+    std::vector<Vertex> Vertices;
+    std::vector<Index> Indices;
+};
+
 class Mesh;
 using MeshPtr = std::shared_ptr<Mesh>;
 
@@ -19,5 +26,5 @@ public:
     virtual void Bind() const = 0;
     virtual auto GetIndexCount() const -> i32 = 0;
 
-    static auto Create(std::span<const Vertex> vertices, std::span<const Index> indices) -> MeshPtr;
+    static auto Create(const MeshSpecification& meshSpec) -> MeshPtr;
 };

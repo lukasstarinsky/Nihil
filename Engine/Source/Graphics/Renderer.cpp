@@ -112,10 +112,10 @@ auto Buffer::Create(BufferType bufferType, const void* data, i32 size, i32 unifo
     return sRendererBackend->CreateBuffer(bufferType, data, size, uniformBinding);
 }
 
-auto Mesh::Create(std::span<const Vertex> vertices, std::span<const Index> indices) -> MeshPtr
+auto Mesh::Create(const MeshSpecification& meshSpec) -> MeshPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateMesh(vertices, indices);
+    return sRendererBackend->CreateMesh(meshSpec);
 }
 
 auto Texture::Create(const TextureSpecification& textureSpec) -> TexturePtr
