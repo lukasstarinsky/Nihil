@@ -10,6 +10,7 @@ public:
     ~OpenGLBackend() override;
 
     auto GetApi() const -> RendererAPI override;
+    auto GetApiString() const -> const char* override;
 
     void BeginFrame(f32 r, f32 g, f32 b, f32 a) const override;
     void OnResize(i32 width, i32 height) const override;

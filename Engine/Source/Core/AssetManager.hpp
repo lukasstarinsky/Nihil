@@ -33,7 +33,6 @@ class NIHIL_API RawAssetManager : public AssetManager
 public:
     explicit RawAssetManager(const std::filesystem::path& root);
 
-    // TODO: Determine file extensions and load accordingly
     auto LoadTexture(std::string_view name) const -> TextureSpecification override;
     auto LoadShader(std::string_view name, ShaderStage shaderStage) const -> ShaderSpecification override;
     auto LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification override;

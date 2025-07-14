@@ -50,6 +50,12 @@ auto Renderer::GetApi() -> RendererAPI
     return sRendererBackend->GetApi();
 }
 
+auto Renderer::GetApiString() -> const char*
+{
+    ASSERT(sRendererBackend);
+    return sRendererBackend->GetApiString();
+}
+
 auto Renderer::OnResizeEvent(const Event& e) -> bool
 {
     ASSERT(sRendererBackend);

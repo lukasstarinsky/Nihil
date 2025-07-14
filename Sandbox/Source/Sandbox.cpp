@@ -15,8 +15,8 @@ Sandbox::Sandbox()
 void Sandbox::OnInitialize()
 {
     mAssetManager = std::make_unique<RawAssetManager>("Assets/");
-    mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj.obj", "ground_Plane.004"));
-    mTexture = Texture::Create(mAssetManager->LoadTexture("container2.png"));
+    mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj", "Cube_Cube.002"));
+    mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
     mMaterial = mAssetManager->GetDefaultMaterial();
 
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);

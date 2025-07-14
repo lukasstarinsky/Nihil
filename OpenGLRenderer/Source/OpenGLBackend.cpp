@@ -78,6 +78,11 @@ auto OpenGLBackend::GetApi() const -> RendererAPI
     return RendererAPI::OpenGL;
 }
 
+auto OpenGLBackend::GetApiString() const -> const char*
+{
+    return "OpenGL";
+}
+
 void OpenGLBackend::BeginFrame(f32 r, f32 g, f32 b, f32 a) const
 {
     glClearColor(r, g, b, a);

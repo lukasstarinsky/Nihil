@@ -35,12 +35,26 @@ RawAssetManager::RawAssetManager(const std::filesystem::path& root)
 
 auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecification
 {
-    auto filePath = mRoot / "Textures" / name;
-    auto fileData = File::ReadBinary(filePath);
+    auto validTextureExtensions = {".png", ".jpg", ".jpeg"};
+    std::filesystem::path filePath {};
 
+    for (const char* validExt : validTextureExtensions)
+    {
+        auto fullPath = mRoot / "Textures" / name;
+        fullPath += validExt;
+
+        if (std::filesystem::exists(fullPath))
+        {
+            filePath = fullPath;
+            break;
+        }
+    }
+    Ensure(!filePath.empty(), "Texture '{}' not found.", name);
+
+    auto fileData = File::ReadBinary(filePath);
     i32 width, height, numChannels;
     auto data = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(fileData.data()), static_cast<int>(fileData.size()), &width, &height, &numChannels, 4);
-    Ensure(data, "Failed to load image: {}", filePath.string());
+    Ensure(data, "Failed to load texture '{}'", name);
 
     auto size = width * height * numChannels;
 
@@ -58,19 +72,27 @@ auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecifi
 auto RawAssetManager::LoadShader(std::string_view name, ShaderStage shaderStage) const -> ShaderSpecification
 {
     auto filePath = mRoot / "Shaders" / name;
-    if (Renderer::GetApi() == RendererAPI::OpenGL || Renderer::GetApi() == RendererAPI::Vulkan)
+
+    switch(Renderer::GetApi())
     {
-        filePath += ".glsl";
+        case RendererAPI::OpenGL:
+        case RendererAPI::Vulkan:
+        {
+            filePath += ".glsl";
+            auto sourceCode = File::Read(filePath);
+            auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage);
 
-        auto sourceCode = File::Read(filePath);
-        auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage);
-
-        ShaderSpecification shaderSpec {
-            .Stage = shaderStage,
-            .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
-        };
-        std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
-        return shaderSpec;
+            ShaderSpecification shaderSpec {
+                .Stage = shaderStage,
+                .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
+            };
+            std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
+            return shaderSpec;
+        }
+        case RendererAPI::Direct3D11:
+        case RendererAPI::Direct3D12:
+        case RendererAPI::Metal:
+            Throw("Renderer API {} not yet supported.", Renderer::GetApiString());
     }
 
     return {};
@@ -78,15 +100,28 @@ auto RawAssetManager::LoadShader(std::string_view name, ShaderStage shaderStage)
 
 auto RawAssetManager::LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification
 {
-    const auto filePath = mRoot / "Models" / file;
-    const auto fileData = File::ReadBinary(filePath);
+    auto validMeshExtensions = {".obj", ".fbx"};
+    std::filesystem::path filePath {};
 
+    for (const char* validExt : validMeshExtensions)
+    {
+        auto fullPath = mRoot / "Models" / file;
+        fullPath += validExt;
+
+        if (std::filesystem::exists(fullPath))
+        {
+            filePath = fullPath;
+            break;
+        }
+    }
+    Ensure(!filePath.empty(), "Mesh file '{}' not found.", file);
+
+    auto fileData = File::ReadBinary(filePath);
     Assimp::Importer importer;
     const auto* scene = importer.ReadFileFromMemory(fileData.data(), static_cast<u32>(fileData.size()), aiProcess_Triangulate);
     Ensure(scene && scene->HasMeshes(), "Failed to load mesh from file: {}", filePath.string());
 
     std::span<aiMesh*> loadedMeshes(scene->mMeshes, scene->mMeshes + scene->mNumMeshes);
-
     for (const auto* mesh: loadedMeshes)
     {
         // TODO: Load every mesh in the file, not just the first one with the matching name
@@ -94,7 +129,6 @@ auto RawAssetManager::LoadMesh(std::string_view file, std::string_view name) con
         if (mesh->mName.C_Str() != name)
             continue;
 
-        Logger::Info("Loading mesh: {} from file: {}", name, filePath.string());
         MeshSpecification meshSpec {};
         meshSpec.Name = name;
 
@@ -123,7 +157,7 @@ auto RawAssetManager::LoadMesh(std::string_view file, std::string_view name) con
         return meshSpec;
     }
 
-    Throw("Mesh with name '{}' not found in file: {}", name, filePath.string());
+    Throw("Mesh '{}' not found in file '{}'", name, filePath.string());
     return {};
 }
 
