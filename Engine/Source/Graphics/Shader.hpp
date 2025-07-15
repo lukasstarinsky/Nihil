@@ -8,6 +8,7 @@ enum class ShaderStage
 
 struct ShaderSpecification
 {
+    std::string Name;
     ShaderStage Stage;
     std::vector<std::byte> Data;
 };

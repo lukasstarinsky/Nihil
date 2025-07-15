@@ -2,6 +2,7 @@
 
 struct TextureSpecification
 {
+    std::string Name;
     i32 Width, Height;
     std::vector<std::byte> Data;
 };
