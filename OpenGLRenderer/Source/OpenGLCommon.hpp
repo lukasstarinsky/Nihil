@@ -2,7 +2,7 @@
 
 #ifdef NIHIL_PLATFORM_WINDOWS
 #define GET_PROC_ADDRESS wglGetProcAddress
-#include "Platform/PlatformWin32.hpp"
+#include "Platform/Win32/PlatformWin32.hpp"
 #include <GL/gl.h>
 #include <wglext.h>
 #elifdef NIHIL_PLATFORM_LINUX

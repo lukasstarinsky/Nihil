@@ -19,6 +19,7 @@ void Sandbox::OnInitialize()
     mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
     mMaterial = mAssetManager->GetDefaultMaterial();
 
+    MappedFile meshFile("Assets/Models/cottae_obj.obj");
     ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
     ADD_EVENT_LISTENER_THIS(Event::KeyPress, OnKeyPress);
 }

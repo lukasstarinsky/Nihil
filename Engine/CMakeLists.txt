@@ -4,6 +4,13 @@ project(NihilCore LANGUAGES CXX)
 file(GLOB_RECURSE HEADER_FILES Source/*.hpp)
 file(GLOB_RECURSE SOURCE_FILES Source/*.cpp)
 
+if(NOT WIN32)
+    file(GLOB_RECURSE WIN32_HEADER_FILES Source/Platform/Win32/*.hpp)
+    file(GLOB_RECURSE WIN32_SOURCE_FILES Source/Platform/Win32/*.cpp)
+    list(REMOVE_ITEM HEADER_FILES ${WIN32_HEADER_FILES})
+    list(REMOVE_ITEM SOURCE_FILES ${WIN32_SOURCE_FILES})
+endif()
+
 add_subdirectory(Tests)
 
 add_subdirectory(ThirdParty/stb)

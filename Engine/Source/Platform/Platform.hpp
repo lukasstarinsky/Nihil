@@ -2,16 +2,18 @@
 
 #include "Core/Application.hpp"
 #include "DynamicLibrary.hpp"
-#include "Console.hpp"
+#include "MappedFile.hpp"
 
 struct PlatformState;
+enum class LogLevel;
 
 namespace Platform
 {
     void Initialize(const ApplicationConfig& config);
     void Shutdown();
     void PollEvents();
-    auto GetTimeSeconds() -> f64;
+    void Print(std::string_view message, LogLevel severity);
 
-    NIHIL_API auto GetState() -> const PlatformState&;
+    auto GetTimeSeconds() -> f64;
+    auto GetState() -> const PlatformState&;
 }

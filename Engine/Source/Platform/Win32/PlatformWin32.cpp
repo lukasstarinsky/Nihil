@@ -206,7 +206,7 @@ auto DynamicLibrary::LoadSymbol(const char* name) -> bool
     return true;
 }
 
-void Console::Print(std::string_view message, LogLevel severity)
+void Platform::Print(std::string_view message, LogLevel severity)
 {
     auto consoleHandle = GetStdHandle((severity == LogLevel::Error || severity == LogLevel::Fatal) ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO consoleSbi {};
