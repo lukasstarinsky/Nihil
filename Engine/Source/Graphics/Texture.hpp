@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 struct TextureSpecification
 {
     std::string Name;

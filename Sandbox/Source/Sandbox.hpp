@@ -14,6 +14,7 @@ public:
     void OnShutdown() override;
 
     auto OnMouseMoveEvent(const Event& e) -> bool;
+    auto OnKeyPress(const Event& e) -> bool;
 private:
     MeshPtr mMesh {};
     MaterialPtr mMaterial {};

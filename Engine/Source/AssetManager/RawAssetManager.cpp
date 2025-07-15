@@ -1,6 +1,5 @@
-#include "AssetManager.hpp"
+#include "RawAssetManager.hpp"
 
-#include <regex>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -8,22 +7,6 @@
 #include "Graphics/Renderer.hpp"
 #include "Graphics/ShaderCompiler.hpp"
 
-auto AssetManager::GetDefaultVertexShader() const -> ShaderPtr
-{
-    return mDefaultVertexShader;
-}
-
-auto AssetManager::GetDefaultFragmentShader() const -> ShaderPtr
-{
-    return mDefaultFragmentShader;
-}
-
-auto AssetManager::GetDefaultMaterial() const -> MaterialPtr
-{
-    return mDefaultMaterial;
-}
-
-#pragma region RawAssetManager
 RawAssetManager::RawAssetManager(const std::filesystem::path& root)
     : mRoot{root}
 {
@@ -60,10 +43,10 @@ auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecifi
     auto size = width * height * numChannels;
 
     TextureSpecification textureSpec {
-        .Name = name.data(),
-        .Width = width,
-        .Height = height,
-        .Data = std::vector<std::byte>(size)
+            .Name = name.data(),
+            .Width = width,
+            .Height = height,
+            .Data = std::vector<std::byte>(size)
     };
     std::memcpy(textureSpec.Data.data(), data, size);
 
@@ -255,9 +238,9 @@ void RawAssetManager::PackAll() const
             {
                 auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage, i == 0 ? RendererAPI::OpenGL : RendererAPI::Vulkan);
                 ShaderSpecification shaderSpec {
-                    .Name = strippedExt + (i == 0 ? ".glspv" : ".vkspv"),
-                    .Stage = shaderStage,
-                    .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
+                        .Name = strippedExt + (i == 0 ? ".glspv" : ".vkspv"),
+                        .Stage = shaderStage,
+                        .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
                 };
                 std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
                 Logger::Info("Packing shader '{}'", shaderSpec.Name);
@@ -293,29 +276,3 @@ void RawAssetManager::PackAll() const
         }
     }
 }
-#pragma endregion
-
-#pragma region PackagedAssetManager
-auto PackedAssetManager::LoadTexture(std::string_view name) const -> TextureSpecification
-{
-    Ensure(false, "PackedAssetManager::LoadTexture is not implemented yet.");
-    return {};
-}
-
-auto PackedAssetManager::LoadShader(std::string_view name) const -> ShaderSpecification
-{
-    Ensure(false, "PackedAssetManager::LoadShader is not implemented yet.");
-    return {};
-}
-
-auto PackedAssetManager::LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification
-{
-    Ensure(false, "PackedAssetManager::LoadMesh is not implemented yet.");
-    return {};
-}
-
-void PackedAssetManager::PackAll() const
-{
-    // Do nothing in already packed manager
-}
-#pragma endregion

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Defines.hpp"
-#include "AssetManager.hpp"
+#include "AssetManager/AssetManager.hpp"
 
 enum class RendererAPI;
 
