@@ -12,3 +12,12 @@
 #include <glext.h>
 
 #include "Graphics/RendererBackend.hpp"
+
+template <typename... Args>
+inline void Ensure(bool predicate, std::format_string<Args...> msg, Args&&... args)
+{
+    if (!predicate)
+    {
+        throw std::runtime_error("OpenGL error: " + std::format(msg, std::forward<Args>(args)...));
+    }
+}

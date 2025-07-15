@@ -5,13 +5,9 @@
 #include <format>
 #include <memory>
 #include <algorithm>
+#include <cassert>
 
 #include "Core/Defines.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Utilities.hpp"
-#include "Core/Exception.hpp"
-
-#include "Math/Math.hpp"
 
 #include "OpenGLCommon.hpp"
 #include "OpenGLLoader.hpp"

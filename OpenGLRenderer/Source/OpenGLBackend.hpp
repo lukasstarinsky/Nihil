@@ -6,7 +6,7 @@
 class OpenGLBackend : public RendererBackend
 {
 public:
-    explicit OpenGLBackend(const ApplicationConfig& appConfig);
+    explicit OpenGLBackend(const ApplicationConfig& appConfig, const PlatformState& platformState);
     ~OpenGLBackend() override;
 
     auto GetApi() const -> RendererAPI override;
@@ -23,4 +23,6 @@ public:
     auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr override;
 
     void Draw(const MeshPtr& mesh) const override;
+private:
+    const PlatformState& mPlatformState;
 };

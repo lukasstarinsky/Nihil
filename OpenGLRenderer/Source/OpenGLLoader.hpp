@@ -53,7 +53,7 @@ FOR_OPENGL_WGL_FUNCTIONS(RESOLVE_GL_FUNCTION_DECLARATION)
 
 namespace OpenGLLoader
 {
-    void LoadWGLFunctions();
+    void LoadWGLFunctions(const PlatformState& platformState);
 }
 #endif
 

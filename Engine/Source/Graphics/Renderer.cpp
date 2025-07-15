@@ -12,19 +12,22 @@ static RendererState sState;
 
 void Renderer::Initialize(const ApplicationConfig& config)
 {
-    if (!DynamicLibrary::Load(Renderer::ApiToModuleString(config.RendererAPI), &sRendererModule))
+    auto moduleName = Renderer::ApiToModuleString(config.RendererAPI);
+
+    Logger::Trace("Initializing {}...", moduleName);
+    if (!DynamicLibrary::Load(moduleName, &sRendererModule))
     {
-        Throw("Failed to load plugin '{}'", Renderer::ApiToModuleString(config.RendererAPI));
+        Throw("Failed to load plugin '{}'", moduleName);
     }
 
     if (!sRendererModule.LoadSymbol("CreatePlugin") || !sRendererModule.LoadSymbol("DestroyPlugin"))
     {
-        Throw("Failed to load symbols of plugin '{}'.", Renderer::ApiToModuleString(config.RendererAPI));
+        Throw("Failed to load symbols of plugin '{}'.", moduleName);
     }
 
     std::exception_ptr exception;
     auto CreatePluginFn = sRendererModule.GetSymbol<Renderer::CreatePluginFn>("CreatePlugin");
-    sRendererBackend = CreatePluginFn(config, exception);
+    sRendererBackend = CreatePluginFn(config, Platform::GetState(), exception);
 
     if (exception)
     {
@@ -40,6 +43,8 @@ void Renderer::Initialize(const ApplicationConfig& config)
 void Renderer::Shutdown()
 {
     ASSERT(sRendererBackend);
+
+    Logger::Trace("Shutting down renderer...");
     auto DestroyPluginFn = sRendererModule.GetSymbol<Renderer::DestroyPluginFn>("DestroyPlugin");
     DestroyPluginFn(sRendererBackend);
 }

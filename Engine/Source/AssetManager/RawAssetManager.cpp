@@ -5,7 +5,7 @@
 #include <assimp/postprocess.h>
 #include <stb/stb_image.h>
 #include "Graphics/Renderer.hpp"
-#include "Graphics/ShaderCompiler.hpp"
+#include "ShaderCompiler.hpp"
 
 RawAssetManager::RawAssetManager(const std::filesystem::path& root)
     : mRoot{root}
@@ -43,10 +43,10 @@ auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecifi
     auto size = width * height * numChannels;
 
     TextureSpecification textureSpec {
-            .Name = name.data(),
-            .Width = width,
-            .Height = height,
-            .Data = std::vector<std::byte>(size)
+        .Name = name.data(),
+        .Width = width,
+        .Height = height,
+        .Data = std::vector<std::byte>(size)
     };
     std::memcpy(textureSpec.Data.data(), data, size);
 
@@ -238,9 +238,9 @@ void RawAssetManager::PackAll() const
             {
                 auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage, i == 0 ? RendererAPI::OpenGL : RendererAPI::Vulkan);
                 ShaderSpecification shaderSpec {
-                        .Name = strippedExt + (i == 0 ? ".glspv" : ".vkspv"),
-                        .Stage = shaderStage,
-                        .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
+                    .Name = strippedExt + (i == 0 ? ".glspv" : ".vkspv"),
+                    .Stage = shaderStage,
+                    .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
                 };
                 std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
                 Logger::Info("Packing shader '{}'", shaderSpec.Name);

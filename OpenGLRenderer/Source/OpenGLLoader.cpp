@@ -4,10 +4,8 @@
 #define RESOLVE_GL_FUNCTION_DEFINITION(type, name) name = std::bit_cast<type>(GET_PROC_ADDRESS(#name));
 
 #ifdef NIHIL_PLATFORM_WINDOWS
-void OpenGLLoader::LoadWGLFunctions()
+void OpenGLLoader::LoadWGLFunctions(const PlatformState& platformState)
 {
-    const auto& platformState = Platform::GetState();
-
     PIXELFORMATDESCRIPTOR pfd {};
     pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
     pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;

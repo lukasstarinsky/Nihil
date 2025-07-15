@@ -2,12 +2,13 @@
 
 #include "Core/Application.hpp"
 #include "Core/Event.hpp"
+#include "Platform/Platform.hpp"
 #include "RendererBackend.hpp"
 #include "Camera.hpp"
 
 namespace Renderer
 {
-    using CreatePluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig, std::exception_ptr& exceptionPtr);
+    using CreatePluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig, const PlatformState& platformState, std::exception_ptr& exceptionPtr);
     using DestroyPluginFn = void(*)(RendererBackend*);
 
     void Initialize(const ApplicationConfig& config);

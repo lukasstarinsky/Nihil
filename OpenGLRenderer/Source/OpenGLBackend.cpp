@@ -1,6 +1,6 @@
 #include "OpenGLBackend.hpp"
 
-#include "Platform/Platform.hpp"
+#include <print>
 #include "OpenGLShader.hpp"
 #include "OpenGLBuffer.hpp"
 #include "OpenGLMaterial.hpp"
@@ -13,19 +13,18 @@ static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GL
     {
         case GL_DEBUG_SEVERITY_LOW:
         case GL_DEBUG_SEVERITY_MEDIUM:
-            Logger::Warn("OpenGL message: {}", msg);
+            std::println(stderr, "OpenGL message: {}", msg);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            Throw("OpenGL error: {}", msg);
+            Ensure(false, "OpenGL error: {}", msg);
     }
 }
 
-OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig)
+OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig, const PlatformState& platformState)
+    : mPlatformState{platformState}
 {
-    const auto& platformState = Platform::GetState();
-
 #ifdef NIHIL_PLATFORM_WINDOWS
-    OpenGLLoader::LoadWGLFunctions();
+    OpenGLLoader::LoadWGLFunctions(mPlatformState);
 
     i32 pixelFormatAttribs[] = {
         WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
@@ -41,8 +40,8 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig)
 
     i32 pixelFormat = 0;
     u32 numFormats = 0;
-    wglChoosePixelFormatARB(platformState.DeviceContext, pixelFormatAttribs, nullptr, 1, &pixelFormat, &numFormats);
-    Ensure(numFormats != 0, "OpenGL WGL: Failed to choose a pixel format");
+    wglChoosePixelFormatARB(mPlatformState.DeviceContext, pixelFormatAttribs, nullptr, 1, &pixelFormat, &numFormats);
+    Ensure(numFormats != 0, "WGL: Failed to choose a pixel format");
 
     i32 attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -51,13 +50,12 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig)
         NULL
     };
 
-    auto context = wglCreateContextAttribsARB(platformState.DeviceContext, nullptr, attribs);
-    Ensure(context, "OpenGL WGL: Failed to create context");
+    auto context = wglCreateContextAttribsARB(mPlatformState.DeviceContext, nullptr, attribs);
+    Ensure(context, "WGL: Failed to create context");
 
-    wglMakeCurrent(platformState.DeviceContext, context);
+    wglMakeCurrent(mPlatformState.DeviceContext, context);
 #endif
     OpenGLLoader::LoadGLFunctions();
-    Logger::Info("Initialized OpenGL: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
 #ifndef NDEBUG
     glEnable(GL_DEBUG_OUTPUT);
@@ -96,10 +94,8 @@ void OpenGLBackend::OnResize(i32 width, i32 height) const
 
 void OpenGLBackend::EndFrame() const
 {
-    const auto& platformState = Platform::GetState();
-
 #ifdef NIHIL_PLATFORM_WINDOWS
-    ::SwapBuffers(platformState.DeviceContext);
+    ::SwapBuffers(mPlatformState.DeviceContext);
 #endif
 }
 
@@ -136,12 +132,11 @@ void OpenGLBackend::Draw(const MeshPtr& mesh) const
 
 extern "C"
 {
-    NIHIL_API auto CreatePlugin(const ApplicationConfig& appConfig, std::exception_ptr& exceptionPtr) -> RendererBackend*
+    NIHIL_API auto CreatePlugin(const ApplicationConfig& appConfig, const PlatformState& platformState, std::exception_ptr& exceptionPtr) -> RendererBackend*
     {
-        Logger::Trace("Initializing OpenGL renderer...");
         try
         {
-            return new OpenGLBackend(appConfig);
+            return new OpenGLBackend(appConfig, platformState);
         }
         catch (...)
         {
@@ -152,7 +147,6 @@ extern "C"
 
     NIHIL_API void DestroyPlugin(OpenGLBackend* plugin)
     {
-        Logger::Trace("Shutting down OpenGL renderer...");
         delete plugin;
     }
 }

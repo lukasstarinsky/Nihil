@@ -1,7 +1,6 @@
-#include <shaderc/shaderc.hpp>
-
 #include "ShaderCompiler.hpp"
-#include "Renderer.hpp"
+
+#include <shaderc/shaderc.hpp>
 
 static auto ShaderStageToShaderc(ShaderStage shaderType) -> shaderc_shader_kind
 {
