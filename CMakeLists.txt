@@ -7,5 +7,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(Engine)
 add_subdirectory(Sandbox)
 
-add_subdirectory(VulkanRenderer)
+#add_subdirectory(VulkanRenderer)
 add_subdirectory(OpenGLRenderer)
