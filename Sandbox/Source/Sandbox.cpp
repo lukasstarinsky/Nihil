@@ -3,7 +3,6 @@
 #define MOUSE_SENSITIVITY 0.008f
 
 Sandbox::Sandbox()
-    // Projection, Position, LookAt, Up, Fov, AspectRatio
     : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 800.0f / 600.0f}
 {
     Config.WindowWidth = 1280;
@@ -19,9 +18,8 @@ void Sandbox::OnInitialize()
     mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
     mMaterial = mAssetManager->GetDefaultMaterial();
 
-    MappedFile meshFile("Assets/Models/cottae_obj.obj");
-    ADD_EVENT_LISTENER_THIS(Event::MouseMove, OnMouseMoveEvent);
-    ADD_EVENT_LISTENER_THIS(Event::KeyPress, OnKeyPress);
+    EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
+    EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));
 }
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
@@ -56,19 +54,21 @@ void Sandbox::OnShutdown()
 
 }
 
-auto Sandbox::OnMouseMoveEvent(const Event& e) -> bool
+auto Sandbox::OnMouseEvent(const MouseEvent& e) -> bool
 {
-    auto delta = e.MouseEvent.Delta * MOUSE_SENSITIVITY;
-    mCamera.Rotate(-delta.y, delta.x);
-
+    if (e.Type == EventType::MouseMove)
+    {
+        auto delta = e.Delta * MOUSE_SENSITIVITY;
+        mCamera.Rotate(-delta.y, delta.x);
+    }
     return false;
 }
 
-auto Sandbox::OnKeyPress(const Event& e) -> bool
+auto Sandbox::OnKeyEvent(const KeyEvent& e) -> bool
 {
-    if (e.KeyEvent.Key == Key::F2)
+    if (e.Type == EventType::KeyPress && e.Key == Key::F2)
     {
-        mAssetManager->PackAll();
+        mAssetManager->PackAll("./Assets/01.npack");
     }
     return true;
 }

@@ -195,13 +195,9 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
     return meshSpecs;
 }
 
-void RawAssetManager::PackAll() const
+void RawAssetManager::PackAll(const std::filesystem::path& outFilePath) const
 {
-    const auto textureRoot = mRoot / "Textures";
-    const auto shaderRoot = mRoot / "Shaders";
-    const auto meshRoot = mRoot / "Models";
-
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(textureRoot))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
         if (entry.is_directory())
             continue;
@@ -213,7 +209,7 @@ void RawAssetManager::PackAll() const
         Logger::Info("Packing texture '{}'", textureSpec.Name);
     }
 
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(shaderRoot))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Shaders"))
     {
         if (entry.is_directory())
             continue;
@@ -261,7 +257,7 @@ void RawAssetManager::PackAll() const
         // TODO: Pack
     }
 
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(meshRoot))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
     {
         if (entry.is_directory())
             continue;

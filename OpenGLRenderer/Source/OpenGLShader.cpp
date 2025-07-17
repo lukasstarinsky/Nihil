@@ -1,9 +1,5 @@
 #include "OpenGLShader.hpp"
 
-#include <fstream>
-#include <filesystem>
-#include "Graphics/ShaderCompiler.hpp"
-
 static auto ShaderTypeToGLenum(ShaderStage shaderType) -> GLenum
 {
     switch (shaderType)

@@ -16,7 +16,7 @@ struct ShaderSpecification
 class Shader;
 using ShaderPtr = std::shared_ptr<Shader>;
 
-class Shader
+class NIHIL_API Shader
 {
 public:
     virtual ~Shader() = default;

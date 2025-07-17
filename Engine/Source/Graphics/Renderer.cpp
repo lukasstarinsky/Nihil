@@ -37,7 +37,7 @@ void Renderer::Initialize(const ApplicationConfig& config)
     // TODO: Move to scene
     sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 2 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
 
-    ADD_EVENT_LISTENER(Event::ApplicationResize, OnResizeEvent);
+    EventDispatcher::AddListener<ApplicationEvent>(OnAppEvent);
 }
 
 void Renderer::Shutdown()
@@ -61,11 +61,13 @@ auto Renderer::GetApiString() -> const char*
     return sRendererBackend->GetApiString();
 }
 
-auto Renderer::OnResizeEvent(const Event& e) -> bool
+auto Renderer::OnAppEvent(const ApplicationEvent& e) -> bool
 {
     ASSERT(sRendererBackend);
-    const auto& appEvent = e.ApplicationEvent;
-    sRendererBackend->OnResize(appEvent.Width, appEvent.Height);
+    if (e.Type == EventType::ApplicationResize)
+    {
+        sRendererBackend->OnResize(e.Width, e.Height);
+    }
     return false;
 }
 

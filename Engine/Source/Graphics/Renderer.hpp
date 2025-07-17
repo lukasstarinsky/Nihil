@@ -12,7 +12,7 @@ namespace Renderer
     using DestroyPluginFn = void(*)(RendererBackend*);
 
     void Initialize(const ApplicationConfig& config);
-    auto OnResizeEvent(const Event& e) -> bool;
+    auto OnAppEvent(const ApplicationEvent& e) -> bool;
     void Shutdown();
 
     auto GetApi() -> RendererAPI;

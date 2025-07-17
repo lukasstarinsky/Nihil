@@ -18,7 +18,7 @@ auto PackedAssetManager::LoadMesh(std::string_view file, std::string_view name) 
     return {};
 }
 
-void PackedAssetManager::PackAll() const
+void PackedAssetManager::PackAll([[maybe_unused]] const std::filesystem::path& outFilePath) const
 {
     // Do nothing in already packed manager
 }

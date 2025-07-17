@@ -11,7 +11,7 @@ Engine::Engine(Application* application)
     Renderer::Initialize(mApplication->Config);
     mApplication->OnInitialize();
 
-    ADD_EVENT_LISTENER_THIS(Event::ApplicationQuit | Event::ApplicationResize, OnAppEvent);
+    EventDispatcher::AddListener<ApplicationEvent>(std::bind_front(&Engine::OnAppEvent, this));
 }
 
 Engine::~Engine()
@@ -42,21 +42,19 @@ void Engine::Run() const
     }
 }
 
-auto Engine::OnAppEvent(const Event& e) -> bool
+auto Engine::OnAppEvent(const ApplicationEvent& e) -> bool
 {
-    if (e.Type == Event::ApplicationQuit)
+    if (e.Type == EventType::ApplicationQuit)
     {
         mApplication->State.IsRunning = false;
         return true;
     }
-    else if (e.Type == Event::ApplicationResize)
+    else if (e.Type == EventType::ApplicationResize)
     {
-        const auto& appEvent = e.ApplicationEvent;
+        mApplication->Config.WindowWidth = e.Width;
+        mApplication->Config.WindowHeight = e.Height;
 
-        mApplication->Config.WindowWidth = appEvent.Width;
-        mApplication->Config.WindowHeight = appEvent.Height;
-
-        if (appEvent.Width == 0 || appEvent.Height == 0)
+        if (e.Width == 0 || e.Height == 0)
         {
             mApplication->State.IsSuspended = true;
             return true;

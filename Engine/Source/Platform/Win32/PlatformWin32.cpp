@@ -87,7 +87,7 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
     {
         case WM_CLOSE:
         {
-            EventDispatcher::Dispatch({ .Type = Event::ApplicationQuit, .ApplicationEvent = { } });
+            EventDispatcher::Dispatch(ApplicationEvent { .Type = EventType::ApplicationQuit });
             break;
         }
         case WM_DESTROY:
@@ -108,8 +108,10 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
             auto* rawInput = reinterpret_cast<RAWINPUT*>(buffer.data());
             if (rawInput->header.dwType == RIM_TYPEMOUSE && (rawInput->data.mouse.lLastX != 0 || rawInput->data.mouse.lLastY != 0))
             {
-                MouseEvent e { .Button = Button::Middle, .Delta = { static_cast<f32>(rawInput->data.mouse.lLastX), static_cast<f32>(rawInput->data.mouse.lLastY) } };
-                EventDispatcher::Dispatch({ .Type = Event::MouseMove, .MouseEvent = e });
+                EventDispatcher::Dispatch(MouseEvent {
+                    .Delta = { static_cast<f32>(rawInput->data.mouse.lLastX), static_cast<f32>(rawInput->data.mouse.lLastY) },
+                    .Type = EventType::MouseMove
+                });
             }
             break;
         }
@@ -118,8 +120,11 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
             RECT rect {};
             GetClientRect(sState.WindowHandle, &rect);
 
-            ApplicationEvent e { .Width = rect.right - rect.left, .Height = rect.bottom - rect.top };
-            EventDispatcher::Dispatch({ .Type = Event::ApplicationResize, .ApplicationEvent = e });
+            EventDispatcher::Dispatch(ApplicationEvent {
+                .Width = rect.right - rect.left,
+                .Height = rect.bottom - rect.top,
+                .Type = EventType::ApplicationResize
+            });
             break;
         }
         case WM_KEYDOWN:

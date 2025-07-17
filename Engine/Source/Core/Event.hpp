@@ -1,58 +1,72 @@
 #pragma once
 
 #include <functional>
+#include <variant>
 #include "Defines.hpp"
 #include "Input.hpp"
+
+enum class EventType
+{
+    ApplicationQuit,
+    ApplicationResize,
+
+    MousePress,
+    MouseRelease,
+    MouseScroll,
+    MouseMove,
+
+    KeyPress,
+    KeyRelease
+};
 
 struct ApplicationEvent
 {
     i32 Width {};
     i32 Height {};
+    EventType Type = EventType::ApplicationQuit;
 };
 
 struct MouseEvent
 {
-    Button Button = Button::Middle;
+    Button Button {};
     Vec2f Delta {};
+    EventType Type = EventType::MousePress;
 };
 
 struct KeyEvent
 {
-    Key Key;
+    Key Key {};
+    EventType Type = EventType::KeyPress;
 };
 
-struct Event
+using Event = std::variant<ApplicationEvent, MouseEvent, KeyEvent>;
+
+class NIHIL_API EventDispatcher
 {
-    enum EventType
+public:
+    template<typename T>
+    using EventCallback = std::function<bool(const T&)>;
+
+    template<typename T>
+    static void AddListener(const EventCallback<T>& callback)
     {
-        ApplicationQuit     = 1 << 0,
-        ApplicationResize   = 1 << 1,
+        auto wrapper = [callback](const Event& e) -> bool
+        {
+            if (const auto* eventPtr = std::get_if<T>(&e))
+                return callback(*eventPtr);
+            return false;
+        };
+        sEventListeners.push_back(wrapper);
+    }
 
-        KeyPress            = 1 << 2,
-        KeyRelease          = 1 << 3,
-
-        MousePress          = 1 << 4,
-        MouseRelease        = 1 << 5,
-        MouseScroll         = 1 << 6,
-        MouseMove           = 1 << 7
-    };
-
-    EventType Type;
-    union
+    static void Dispatch(const Event& e)
     {
-        struct ApplicationEvent ApplicationEvent;
-        struct MouseEvent MouseEvent;
-        struct KeyEvent KeyEvent;
-    };
+        for (const auto& callback: sEventListeners)
+        {
+            if (callback(e))
+                return;
+        }
+    }
+private:
+    static std::vector<std::function<bool(const Event&)>> sEventListeners;
 };
-
-namespace EventDispatcher
-{
-    using EventCallback = std::function<bool(const Event&)>;
-
-    NIHIL_API void AddListener(u64 flag, const EventCallback& callback);
-    NIHIL_API void Dispatch(const Event& e);
-}
-
-#define ADD_EVENT_LISTENER_THIS(flag, fn) EventDispatcher::AddListener(flag, [this](const Event& e) -> bool { return fn(e); })
-#define ADD_EVENT_LISTENER(flag, fn)      EventDispatcher::AddListener(flag, fn)

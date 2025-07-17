@@ -11,7 +11,7 @@ public:
 
     void Run() const;
 private:
-    auto OnAppEvent(const Event& e) -> bool;
+    auto OnAppEvent(const ApplicationEvent& e) -> bool;
 private:
     Application* mApplication {};
 };

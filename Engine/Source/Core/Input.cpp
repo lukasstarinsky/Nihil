@@ -27,8 +27,7 @@ void Input::ProcessKey(Key key, bool isPressed, bool wasPressed)
 
     if (sState.LastKeys[index] != isPressed)
     {
-        KeyEvent e { .Key = key };
-        EventDispatcher::Dispatch({ .Type = isPressed ? Event::KeyPress : Event::KeyRelease , .KeyEvent = e });
+        EventDispatcher::Dispatch(KeyEvent { .Key = key, .Type = isPressed ? EventType::KeyPress : EventType::KeyRelease });
     }
 }
 
@@ -41,8 +40,7 @@ void Input::ProcessButton(Button button, bool isPressed)
 
     if (sState.LastButtons[index] != isPressed)
     {
-        MouseEvent e { .Button = button };
-        EventDispatcher::Dispatch({ .Type = isPressed ? Event::MousePress : Event::MouseRelease, .MouseEvent = e });
+        EventDispatcher::Dispatch(MouseEvent { .Button = button, .Delta = {}, .Type = isPressed ? EventType::MousePress : EventType::MouseRelease });
     }
 }
 

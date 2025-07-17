@@ -13,8 +13,8 @@ public:
     void OnRender() override;
     void OnShutdown() override;
 
-    auto OnMouseMoveEvent(const Event& e) -> bool;
-    auto OnKeyPress(const Event& e) -> bool;
+    auto OnMouseEvent(const MouseEvent& e) -> bool;
+    auto OnKeyEvent(const KeyEvent& e) -> bool;
 private:
     MeshPtr mMesh {};
     MaterialPtr mMaterial {};
