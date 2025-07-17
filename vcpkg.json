@@ -2,6 +2,7 @@
   "dependencies": [
     "shaderc",
     "gtest",
-    "assimp"
+    "assimp",
+    "zstd"
   ]
 }

@@ -197,10 +197,14 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
     return meshSpecs;
 }
 
-void RawAssetManager::PackAll(const std::filesystem::path& outFilePath) const
+void RawAssetManager::PackAll(
+    [[maybe_unused]] const std::filesystem::path& outFilePath,
+    [[maybe_unused]] i32 compressionLevel,
+    [[maybe_unused]] u32 compressionThreshold
+) const
 {
     // TODO: Pack all into single file or multiple files
-    PakWriter pakWriter(outFilePath);
+    PakWriter pakWriter(outFilePath, compressionLevel, compressionThreshold);
 
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {

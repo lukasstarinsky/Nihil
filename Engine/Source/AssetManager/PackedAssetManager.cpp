@@ -51,7 +51,11 @@ auto PackedAssetManager::LoadMesh(std::string_view file, std::string_view name) 
     return mPakReader.Read<MeshSpecification>(fullName);
 }
 
-void PackedAssetManager::PackAll([[maybe_unused]] const std::filesystem::path& outFilePath) const
+void PackedAssetManager::PackAll(
+    [[maybe_unused]] const std::filesystem::path& outFilePath,
+    [[maybe_unused]] i32 compressionLevel,
+    [[maybe_unused]] u32 compressionThreshold
+) const
 {
     // Do nothing in already packed manager
 }

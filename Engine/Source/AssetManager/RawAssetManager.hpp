@@ -13,7 +13,7 @@ public:
     auto LoadShader(std::string_view name) const -> ShaderSpecification override;
     auto LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification override;
 
-    void PackAll(const std::filesystem::path& outFilePath) const override;
+    void PackAll(const std::filesystem::path& outFilePath, i32 compressionLevel, u32 compressionThreshold) const override;
 private:
     auto LoadAllMeshes(std::string_view file) const -> std::vector<MeshSpecification>;
 private:

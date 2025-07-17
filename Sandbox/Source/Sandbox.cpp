@@ -68,7 +68,7 @@ auto Sandbox::OnKeyEvent(const KeyEvent& e) -> bool
 {
     if (e.Type == EventType::KeyPress && e.Key == Key::F2)
     {
-        mAssetManager->PackAll("./Assets/01.npack");
+        mAssetManager->PackAll("./Assets/01.npack", 1, MEGABYTE(2));
     }
     return true;
 }

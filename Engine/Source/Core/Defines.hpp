@@ -5,6 +5,11 @@
 #define TO_STR_(x) #x
 #define TO_STR(x) TO_STR_(x)
 
+#define KILOBYTE(x) ((x) * 1024)
+#define MEGABYTE(x) KILOBYTE(1024 * x)
+#define GIGABYTE(x) MEGABYTE(1024 * x)
+#define TERABYTE(x) GIGABYTE(1024 * x)
+
 /* ======= Platform Detection ======= */
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     #ifdef _WIN64
@@ -42,7 +47,7 @@
 
 /* ======= Asserts ======= */
 #ifdef NDEBUG
-    #define ASSERT(check)
+    #define ASSERT(check, ...)
 #else
     #define ASSERT(check, ...) do { if(!(check)) { Logger::Fatal("Assertion failed [" __FILE__ ":" TO_STR(__LINE__) "] " __VA_ARGS__); DEBUGBREAK(); } } while(0)
 #endif

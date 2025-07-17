@@ -15,7 +15,7 @@ public:
     virtual auto LoadShader(std::string_view name) const -> ShaderSpecification = 0;
     virtual auto LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification = 0;
 
-    virtual void PackAll(const std::filesystem::path& outFilePath) const = 0;
+    virtual void PackAll(const std::filesystem::path& outFilePath, i32 compressionLevel = 1, u32 compressionThreshold = MEGABYTE(8)) const = 0;
 
     auto GetDefaultVertexShader() const -> ShaderPtr { return mDefaultVertexShader; };
     auto GetDefaultFragmentShader() const -> ShaderPtr { return mDefaultFragmentShader; };

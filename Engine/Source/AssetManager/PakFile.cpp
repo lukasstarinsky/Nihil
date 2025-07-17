@@ -17,9 +17,11 @@ PakReader::PakReader(const std::filesystem::path& path)
     }
 }
 
-PakWriter::PakWriter(const std::filesystem::path& path)
+PakWriter::PakWriter(const std::filesystem::path& path, i32 compressionLevel, u32 compressionThreshold)
     : mHeader{}
     , mFile(path, std::ios::binary)
+    , mCompressionLevel{compressionLevel}
+    , mCompressionThreshold{compressionThreshold}
 {
     Ensure(mFile.is_open(), "Failed to open NPak file {} for writing.", path.string());
 
