@@ -8,6 +8,7 @@
 #include "Graphics/Texture.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Mesh.hpp"
+#include "Core/Utilities.hpp"
 
 #pragma pack(push, 1)
 struct PakHeader
@@ -30,7 +31,6 @@ struct PakEntry
     Type Type;
     u64 Offset;
     u64 Size;
-    u32 OriginalSize;
 };
 #pragma pack(pop)
 
@@ -63,15 +63,22 @@ public:
 
         PakEntry entry {};
         entry.NameHash = std::hash<std::string_view>{}(spec.Name);
+        entry.Offset = mFile.tellp();
         if constexpr (std::is_same_v<T, TextureSpecification>)
         {
             entry.Type = PakEntry::Type::Texture;
-            Write(entry, spec.Data);
+            entry.Size = spec.Data.size() + sizeof(spec.Width) + sizeof(spec.Height);
+
+            mFile.write(reinterpret_cast<const char*>(&spec.Width), sizeof(spec.Width));
+            mFile.write(reinterpret_cast<const char*>(&spec.Height), sizeof(spec.Height));
+            mFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(spec.Data.size()));
         }
         else if constexpr (std::is_same_v<T, ShaderSpecification>)
         {
             entry.Type = PakEntry::Type::Shader;
-            Write(entry, spec.Data);
+            entry.Size = spec.Data.size();
+
+            mFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(sizeof(spec.Data.size())));
         }
         else if constexpr (std::is_same_v<T, MeshSpecification>)
         {
@@ -79,10 +86,7 @@ public:
             auto indexCount = static_cast<u32>(spec.Indices.size());
 
             entry.Type = PakEntry::Type::Mesh;
-            entry.Offset = mFile.tellp();
             entry.Size = vertexCount * sizeof(Vertex) + indexCount * sizeof(Index);
-            entry.OriginalSize = entry.Size;
-            mEntries.push_back(entry);
 
             mFile.write(reinterpret_cast<const char*>(&vertexCount), sizeof(vertexCount));
             mFile.write(reinterpret_cast<const char*>(spec.Vertices.data()), static_cast<i32>(vertexCount * sizeof(Vertex)));
@@ -90,9 +94,8 @@ public:
             mFile.write(reinterpret_cast<const char*>(&indexCount), sizeof(indexCount));
             mFile.write(reinterpret_cast<const char*>(spec.Indices.data()), static_cast<i32>(indexCount * sizeof(Index)));
         }
+        mEntries.push_back(entry);
     }
-private:
-    void Write(PakEntry& entry, const std::vector<std::byte>& data);
 private:
     PakHeader mHeader;
     std::vector<PakEntry> mEntries;

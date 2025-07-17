@@ -6,7 +6,7 @@ PakReader::PakReader(const std::filesystem::path& path)
 {
     PakHeader header {};
     std::memcpy(&header, mFile.GetData(), sizeof(PakHeader));
-    Ensure(std::memcmp(header.Magic, "NPAK", 4) == 0, "Invalid NPak file magic.");
+    Ensure(std::memcmp(header.Magic, "NPAK", 4) == 0, "Invalid NPAK magic in file '{}'", path.string());
 
     std::vector<PakEntry> entries;
     entries.resize(header.AssetCount);
@@ -58,16 +58,6 @@ PakWriter::~PakWriter()
     {
         Save();
     }
-}
-
-void PakWriter::Write(PakEntry& entry, const std::vector<std::byte>& data)
-{
-    entry.Offset = mFile.tellp();
-    entry.Size = data.size();
-    entry.OriginalSize = entry.Size;
-    mEntries.push_back(entry);
-
-    mFile.write(reinterpret_cast<const char*>(data.data()), static_cast<std::streamsize>(data.size()));
 }
 
 void PakWriter::Save()
