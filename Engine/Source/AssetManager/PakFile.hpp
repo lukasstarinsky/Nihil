@@ -39,10 +39,52 @@ class PakReader
 public:
     explicit PakReader(const std::filesystem::path& path);
 
-    auto operator[](std::string_view name) -> PakEntry&;
-    auto operator[](std::string_view name) const -> const PakEntry&;
+    template <typename T> requires IsAnyOf<T, TextureSpecification, ShaderSpecification, MeshSpecification>
+    auto Read(std::string_view name) const -> T
+    {
+        u64 hash = std::hash<std::string_view>{}(name);
+        Ensure(mEntryMap.contains(hash), "Asset {} not found in NPak file.", name);
+        auto& entry = mEntryMap.at(hash);
 
-    auto GetData(const PakEntry& entry) const -> std::vector<std::byte>;
+        std::vector<std::byte> data;
+        data.resize(entry.Size);
+        std::memcpy(data.data(), mFile.GetData() + entry.Offset, entry.Size);
+
+        T spec {};
+        spec.Name = name;
+        if constexpr (std::same_as<T, TextureSpecification>)
+        {
+            Ensure(entry.Type == PakEntry::Type::Texture, "Asset {} is not a texture.", name);
+
+            std::memcpy(&spec.Width, data.data(), sizeof(spec.Width));
+            std::memcpy(&spec.Height, data.data() + sizeof(spec.Width), sizeof(spec.Height));
+
+            spec.Data.resize(entry.Size - sizeof(spec.Width) - sizeof(spec.Height));
+            std::memcpy(spec.Data.data(), data.data() + sizeof(spec.Width) + sizeof(spec.Height), spec.Data.size());
+        }
+        else if constexpr (std::same_as<T, ShaderSpecification>)
+        {
+            Ensure(entry.Type == PakEntry::Type::Shader, "Asset {} is not a shader.", name);
+
+            spec.Data.resize(entry.Size);
+            std::memcpy(spec.Data.data(), data.data(), entry.Size);
+        }
+        else if constexpr (std::same_as<T, MeshSpecification>)
+        {
+            Ensure(entry.Type == PakEntry::Type::Mesh, "Asset {} is not a mesh.", name);
+
+            u32 vertexCount = 0;
+            u32 indexCount = 0;
+            std::memcpy(&vertexCount, data.data(), sizeof(vertexCount));
+            std::memcpy(&indexCount, data.data() + vertexCount * sizeof(Vertex) + sizeof(vertexCount), sizeof(vertexCount));
+
+            spec.Vertices.resize(vertexCount);
+            spec.Indices.resize(indexCount);
+            std::memcpy(spec.Vertices.data(), data.data() + sizeof(vertexCount), vertexCount * sizeof(Vertex));
+            std::memcpy(spec.Indices.data(), data.data() + sizeof(vertexCount) + vertexCount * sizeof(Vertex) + sizeof(indexCount), indexCount * sizeof(Index));
+        }
+        return spec;
+    }
 private:
     std::unordered_map<u64, PakEntry> mEntryMap;
     MappedFile mFile;
@@ -78,7 +120,7 @@ public:
             entry.Type = PakEntry::Type::Shader;
             entry.Size = spec.Data.size();
 
-            mFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(sizeof(spec.Data.size())));
+            mFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(entry.Size));
         }
         else if constexpr (std::is_same_v<T, MeshSpecification>)
         {

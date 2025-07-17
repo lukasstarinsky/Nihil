@@ -15,7 +15,7 @@ OpenGLShader::OpenGLShader(const ShaderSpecification& shaderSpec)
     : mShaderStage{shaderSpec.Stage}
 {
     mHandle = glCreateShader(ShaderTypeToGLenum(mShaderStage));
-    glShaderBinary(1, &mHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderSpec.Data.data(), static_cast<GLsizei>(sizeof(shaderSpec.Data[0]) * shaderSpec.Data.size()));
+    glShaderBinary(1, &mHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderSpec.Data.data(), static_cast<GLsizei>(shaderSpec.Data.size()));
     glSpecializeShader(mHandle, "main", 0, nullptr, nullptr);
 
     i32 compiled;

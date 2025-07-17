@@ -1,6 +1,5 @@
 #include "PakFile.hpp"
 
-#pragma region PakReader
 PakReader::PakReader(const std::filesystem::path& path)
     : mFile(path)
 {
@@ -18,30 +17,6 @@ PakReader::PakReader(const std::filesystem::path& path)
     }
 }
 
-auto PakReader::operator[](std::string_view name) const -> const PakEntry&
-{
-    u64 hash = std::hash<std::string_view>{}(name);
-    Ensure(mEntryMap.contains(hash), "Asset {} not found in NPak file.", name);
-    return mEntryMap.at(hash);
-}
-
-auto PakReader::operator[](std::string_view name) -> PakEntry&
-{
-    u64 hash = std::hash<std::string_view>{}(name);
-    Ensure(mEntryMap.contains(hash), "Asset {} not found in NPak file.", name);
-    return mEntryMap[hash];
-}
-
-auto PakReader::GetData(const PakEntry& entry) const -> std::vector<std::byte>
-{
-    std::vector<std::byte> data;
-    data.resize(entry.Size);
-    std::memcpy(data.data(), mFile.GetData() + entry.Offset, entry.Size);
-    return data;
-}
-#pragma endregion
-
-#pragma region PakWriter
 PakWriter::PakWriter(const std::filesystem::path& path)
     : mHeader{}
     , mFile(path, std::ios::binary)
@@ -74,4 +49,3 @@ void PakWriter::Save()
     mFile.write(reinterpret_cast<const char*>(&mHeader), sizeof(PakHeader));
     mFile.close();
 }
-#pragma endregion

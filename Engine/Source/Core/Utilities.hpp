@@ -18,7 +18,7 @@ namespace File
     auto NIHIL_API ReadLines(const std::filesystem::path& filePath) -> std::vector<std::string>;
 
     template <typename T = std::byte>
-    auto NIHIL_API ReadBinary(const std::filesystem::path& filePath) -> std::vector<T>
+    auto ReadBinary(const std::filesystem::path& filePath) -> std::vector<T>
     {
         std::ifstream file(filePath, std::ios::binary | std::ios::ate);
         Ensure(file.is_open(), "Failed to open file: {}", filePath.string());
