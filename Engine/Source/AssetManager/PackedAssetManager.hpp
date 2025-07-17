@@ -2,6 +2,7 @@
 
 #include "AssetManager.hpp"
 
+// TODO: Should use compression and uncompress at runtime? Or compress only for shipping?
 class NIHIL_API PackedAssetManager : public AssetManager
 {
 public:

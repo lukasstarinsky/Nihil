@@ -28,13 +28,13 @@ MappedFile::MappedFile(const std::filesystem::path& filePath)
     );
     Ensure(mMappingHandle, "Win32: CreateFileMapping() failed with error code: {}", GetLastError());
 
-    mData = MapViewOfFile(
+    mData = reinterpret_cast<std::byte*>(MapViewOfFile(
         mMappingHandle,
         FILE_MAP_READ,
         0,
         0,
         0
-    );
+    ));
     Ensure(mData, "Win32: MapViewOfFile() failed with error code: {}", GetLastError());
 }
 
@@ -43,4 +43,14 @@ MappedFile::~MappedFile()
     UnmapViewOfFile(mData);
     CloseHandle(mMappingHandle);
     CloseHandle(mFileHandle);
+}
+
+auto MappedFile::GetData() const -> std::byte*
+{
+    return mData;
+}
+
+auto MappedFile::GetSize() const -> std::size_t
+{
+    return mSize;
 }

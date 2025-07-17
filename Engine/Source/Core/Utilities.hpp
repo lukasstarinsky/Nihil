@@ -34,3 +34,6 @@ namespace File
 
     void NIHIL_API WriteBinary(std::string_view filePath, const void* data, std::size_t size);
 }
+
+template <typename T, typename... U>
+concept IsAnyOf = (std::same_as<T, U> || ...);

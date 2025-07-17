@@ -4,8 +4,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <stb/stb_image.h>
+
 #include "Graphics/Renderer.hpp"
 #include "ShaderCompiler.hpp"
+#include "PakFile.hpp"
 
 RawAssetManager::RawAssetManager(const std::filesystem::path& root)
     : mRoot{root}
@@ -22,7 +24,7 @@ auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecifi
     std::filesystem::path filePath {};
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
-        if (entry.is_directory())
+        if (!entry.is_regular_file())
             continue;
 
         // File name without extension
@@ -87,7 +89,7 @@ auto RawAssetManager::LoadShader(std::string_view name) const -> ShaderSpecifica
     std::filesystem::path filePath;
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Shaders"))
     {
-        if (entry.is_directory())
+        if (!entry.is_regular_file())
             continue;
 
         auto assetName = entry.path().filename().replace_extension().string();
@@ -109,7 +111,7 @@ auto RawAssetManager::LoadShader(std::string_view name) const -> ShaderSpecifica
             auto sourceCode = File::Read(filePath);
             auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderSpec.Stage);
             shaderSpec.Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]));
-            shaderSpec.Name = std::string(name) + (api == RendererAPI::OpenGL ? ".glspv" : ".vkspv");
+            shaderSpec.Name = std::format("{}{}", name, api == RendererAPI::OpenGL ? ".glspv" : ".vkspv");
             std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
             break;
         }
@@ -135,7 +137,7 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
     std::filesystem::path filePath {};
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
     {
-        if (entry.is_directory())
+        if (!entry.is_regular_file())
             continue;
 
         // File name without extension
@@ -197,25 +199,29 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
 
 void RawAssetManager::PackAll(const std::filesystem::path& outFilePath) const
 {
+    // TODO: Pack all into single file or multiple files
+    PakWriter pakWriter(outFilePath);
+
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
-        if (entry.is_directory())
+        if (!entry.is_regular_file())
             continue;
 
         auto assetName = entry.path().filename().replace_extension().string();
         auto textureSpec = RawAssetManager::LoadTexture(assetName);
 
-        // TODO: Pack
         Logger::Info("Packing texture '{}'", textureSpec.Name);
+        pakWriter.Write(textureSpec);
     }
 
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Shaders"))
     {
-        if (entry.is_directory())
+        if (!entry.is_regular_file())
             continue;
 
         auto& path = entry.path();
         auto strippedExt = path.filename().replace_extension().string();
+        auto extension = path.extension().string();
 
         ShaderStage shaderStage {};
         if (strippedExt.ends_with(".vs"))
@@ -228,33 +234,31 @@ void RawAssetManager::PackAll(const std::filesystem::path& outFilePath) const
         }
 
         auto sourceCode = File::Read(path);
-        if (path.extension() == ".glsl")
+        if (extension == ".glsl")
         {
             for (i32 i = 0; i < 2; ++i)
             {
                 auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage, i == 0 ? RendererAPI::OpenGL : RendererAPI::Vulkan);
                 ShaderSpecification shaderSpec {
-                    .Name = strippedExt + (i == 0 ? ".glspv" : ".vkspv"),
+                    .Name = std::format("{}{}", strippedExt, i == 0 ? ".glspv" : ".vkspv"),
                     .Stage = shaderStage,
                     .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
                 };
                 std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
-                Logger::Info("Packing shader '{}'", shaderSpec.Name);
 
-                // Temporary break, vulkan is not supported yet
+                Logger::Info("Packing shader '{}' for {}", shaderSpec.Name, i == 0 ? "OpenGL" : "Vulkan");
+                pakWriter.Write(shaderSpec);
                 break;
             }
         }
-        else if (path.extension() == ".hlsl")
+        else if (extension == ".hlsl")
         {
             Logger::Info("Packing shader '{}' for Direct3D", strippedExt);
         }
-        else if (path.extension() == ".msl")
+        else if (extension == ".msl")
         {
             Logger::Info("Packing shader '{}' for Metal", strippedExt);
         }
-
-        // TODO: Pack
     }
 
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
@@ -267,8 +271,9 @@ void RawAssetManager::PackAll(const std::filesystem::path& outFilePath) const
 
         for (const auto& meshSpec: meshSpecs)
         {
-            // TODO: Pack
             Logger::Info("Packing mesh '{}'", meshSpec.Name);
+            pakWriter.Write(meshSpec);
         }
     }
+    pakWriter.Save();
 }
