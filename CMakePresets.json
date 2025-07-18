@@ -16,8 +16,8 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
 				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
-				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Debug",
-				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Debug"
+				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/Binaries/Debug",
+				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/Binaries/Debug"
 			}
 		},
 		{
@@ -28,8 +28,8 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
-				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Release",
-				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/Bin/Release"
+				"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/Binaries/Release",
+				"CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/Binaries/Release"
 			}
 		},
 		{

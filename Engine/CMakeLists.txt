@@ -19,9 +19,16 @@ find_package(unofficial-shaderc CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(zstd CONFIG REQUIRED)
 
+add_custom_command(
+    OUTPUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Assets" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets"
+    COMMENT "Copying assets to output directory"
+)
+add_custom_target(copy_assets ALL DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets")
+
 add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE NIHIL_EXPORT)
 target_include_directories(${PROJECT_NAME} PUBLIC Source)
 target_precompile_headers(${PROJECT_NAME} PRIVATE Source/pch.hpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::shaderc::shaderc stb assimp::assimp zstd::libzstd_shared)
-add_dependencies(${PROJECT_NAME} OpenGLRenderer)
+add_dependencies(${PROJECT_NAME} OpenGLRenderer copy_assets)

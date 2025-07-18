@@ -10,7 +10,7 @@
 
 # CMake
 Build/
-Bin/
+Binaries/
 cmake-build-*/
 CMakeUserPresets.json
 
