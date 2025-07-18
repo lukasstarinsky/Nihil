@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ranges>
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
@@ -61,7 +62,6 @@ public:
             auto metadataSize = sizeof(spec.Width) + sizeof(spec.Height);
             auto dataBlobStart = data.data() + metadataSize;
             auto dataBlobSize = data.size() - metadataSize;
-
             std::memcpy(&spec.Width, data.data(), sizeof(spec.Width));
             std::memcpy(&spec.Height, data.data() + sizeof(spec.Width), sizeof(spec.Height));
 
@@ -87,15 +87,34 @@ public:
         {
             Ensure(entry.Type == PakEntry::Type::Mesh, "Asset {} is not a mesh.", name);
 
-            u32 vertexCount = 0;
-            u32 indexCount = 0;
-            std::memcpy(&vertexCount, data.data(), sizeof(vertexCount));
-            std::memcpy(&indexCount, data.data() + sizeof(vertexCount), sizeof(indexCount));
+            auto metadataSize = sizeof(u32) + sizeof(u32);
+            u32 vertexBlobSize;
+            u32 indexBlobSize;
+            std::memcpy(&vertexBlobSize, data.data(), sizeof(vertexBlobSize));
+            std::memcpy(&indexBlobSize, data.data() + sizeof(vertexBlobSize), sizeof(indexBlobSize));
+            if (entry.CompressionLevel > 0)
+            {
+                Logger::Info("Decompressing mesh '{}' ({} bytes) with level {}", name, entry.Size, entry.CompressionLevel);
+                auto vertexBlob = ZSTD::Decompress({ data.data() + metadataSize, vertexBlobSize });
+                auto indexBlob = ZSTD::Decompress({ data.data() + metadataSize + vertexBlobSize, indexBlobSize });
+                auto vertexCount = vertexBlob.size() / sizeof(Vertex);
+                auto indexCount = indexBlob.size() / sizeof(Index);
 
-            spec.Vertices.resize(vertexCount);
-            spec.Indices.resize(indexCount);
-            std::memcpy(spec.Vertices.data(), data.data() + sizeof(vertexCount) + sizeof(indexCount), vertexCount * sizeof(Vertex));
-            std::memcpy(spec.Indices.data(), data.data() + sizeof(vertexCount) + sizeof(indexCount) + vertexCount * sizeof(Vertex), indexCount * sizeof(Index));
+                spec.Vertices.resize(vertexCount);
+                spec.Indices.resize(indexCount);
+                std::memcpy(spec.Vertices.data(), vertexBlob.data(), vertexBlob.size());
+                std::memcpy(spec.Indices.data(), indexBlob.data(), indexBlob.size());
+            }
+            else
+            {
+                auto vertexCount = vertexBlobSize / sizeof(Vertex);
+                auto indexCount = indexBlobSize / sizeof(Index);
+
+                spec.Vertices.resize(vertexCount);
+                spec.Indices.resize(indexCount);
+                std::memcpy(spec.Vertices.data(), data.data() + metadataSize, vertexBlobSize);
+                std::memcpy(spec.Indices.data(), data.data() + metadataSize + vertexBlobSize, indexBlobSize);
+            }
         }
         return spec;
     }
@@ -122,9 +141,9 @@ public:
         entry.Offset = mFile.tellp();
         if constexpr (std::is_same_v<T, TextureSpecification>)
         {
-            auto metadataSize = sizeof(spec.Width) + sizeof(spec.Height);
             entry.Type = PakEntry::Type::Texture;
 
+            auto metadataSize = sizeof(spec.Width) + sizeof(spec.Height);
             mFile.write(reinterpret_cast<const char*>(&spec.Width), sizeof(spec.Width));
             mFile.write(reinterpret_cast<const char*>(&spec.Height), sizeof(spec.Height));
 
@@ -132,6 +151,7 @@ public:
             {
                 Logger::Info("Compressing texture '{}' ({} bytes) with level {}", spec.Name, spec.Data.size(), mCompressionLevel);
                 auto compressedData = ZSTD::Compress(spec.Data, mCompressionLevel);
+
                 entry.CompressionLevel = mCompressionLevel;
                 entry.Size = compressedData.size() + metadataSize;
                 mFile.write(reinterpret_cast<const char*>(compressedData.data()), static_cast<i32>(compressedData.size()));
@@ -151,16 +171,39 @@ public:
         }
         else if constexpr (std::is_same_v<T, MeshSpecification>)
         {
+            entry.Type = PakEntry::Type::Mesh;
+
+            auto metadataSize = sizeof(u32) + sizeof(u32);
             auto vertexCount = static_cast<u32>(spec.Vertices.size());
             auto indexCount = static_cast<u32>(spec.Indices.size());
+            auto uncompressedSize = vertexCount * sizeof(Vertex) + indexCount * sizeof(Index);
 
-            entry.Type = PakEntry::Type::Mesh;
-            entry.Size = vertexCount * sizeof(Vertex) + indexCount * sizeof(Index);
+            if (uncompressedSize > mCompressionThreshold)
+            {
+                Logger::Info("Compressing mesh '{}' ({} bytes) with level {}", spec.Name, uncompressedSize, mCompressionLevel);
+                auto compressedVertices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Vertices.data()), vertexCount * sizeof(Vertex) }, mCompressionLevel);
+                auto compressedIndices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Indices.data()), indexCount * sizeof(Index) }, mCompressionLevel);
+                auto compressedVerticesCount = static_cast<u32>(compressedVertices.size());
+                auto compressedIndicesCount = static_cast<u32>(compressedIndices.size());
 
-            mFile.write(reinterpret_cast<const char*>(&vertexCount), sizeof(vertexCount));
-            mFile.write(reinterpret_cast<const char*>(&indexCount), sizeof(indexCount));
-            mFile.write(reinterpret_cast<const char*>(spec.Vertices.data()), static_cast<i32>(vertexCount * sizeof(Vertex)));
-            mFile.write(reinterpret_cast<const char*>(spec.Indices.data()), static_cast<i32>(indexCount * sizeof(Index)));
+                entry.Size = compressedVertices.size() + compressedIndices.size() + metadataSize;
+                entry.CompressionLevel = mCompressionLevel;
+                mFile.write(reinterpret_cast<const char*>(&compressedVerticesCount), sizeof(compressedVerticesCount));
+                mFile.write(reinterpret_cast<const char*>(&compressedIndicesCount), sizeof(compressedIndicesCount));
+                mFile.write(reinterpret_cast<const char*>(compressedVertices.data()), compressedVerticesCount);
+                mFile.write(reinterpret_cast<const char*>(compressedIndices.data()), compressedIndicesCount);
+            }
+            else
+            {
+                auto vertexBlobSize = static_cast<u32>(vertexCount * sizeof(Vertex));
+                auto indexBlobSize = static_cast<u32>(indexCount * sizeof(Index));
+
+                entry.Size = uncompressedSize + metadataSize;
+                mFile.write(reinterpret_cast<const char*>(&vertexBlobSize), sizeof(vertexBlobSize));
+                mFile.write(reinterpret_cast<const char*>(&indexBlobSize), sizeof(indexBlobSize));
+                mFile.write(reinterpret_cast<const char*>(spec.Vertices.data()), vertexBlobSize);
+                mFile.write(reinterpret_cast<const char*>(spec.Indices.data()), indexBlobSize);
+            }
         }
         mEntries.push_back(entry);
     }
