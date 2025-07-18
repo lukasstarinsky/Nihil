@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AssetManager.hpp"
-#include "PakFile.hpp"
+#include "PakReader.hpp"
 
 class NIHIL_API PackedAssetManager : public AssetManager
 {

@@ -7,7 +7,7 @@
 
 #include "Graphics/Renderer.hpp"
 #include "ShaderCompiler.hpp"
-#include "PakFile.hpp"
+#include "PakWriter.hpp"
 
 RawAssetManager::RawAssetManager(const std::filesystem::path& root)
     : mRoot{root}
