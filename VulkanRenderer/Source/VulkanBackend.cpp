@@ -2,36 +2,8 @@
 
 VulkanBackend::VulkanBackend(const ApplicationConfig& appConfig, const PlatformState& platformState)
     : mPlatformState{platformState}
+    , mContext{appConfig, platformState}
 {
-    VkApplicationInfo appInfo {
-        .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-        .pNext = nullptr,
-        .pApplicationName = appConfig.Name.c_str(),
-        .applicationVersion = VK_MAKE_VERSION(0, 1, 0),
-        .pEngineName = "Nihil Engine",
-        .engineVersion = VK_MAKE_VERSION(0, 1, 0),
-        .apiVersion = VK_API_VERSION_1_3
-    };
-
-    const char* instanceExtensions[] = {
-        VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef NIHIL_PLATFORM_WINDOWS
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-#endif
-    };
-
-    VkInstanceCreateInfo instanceCreateInfo {
-        .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .pApplicationInfo = &appInfo,
-        .enabledLayerCount = 0,
-        .ppEnabledLayerNames = nullptr,
-        .enabledExtensionCount = COUNT_OF(instanceExtensions),
-        .ppEnabledExtensionNames = instanceExtensions
-    };
-
-    Ensure(vkCreateInstance(&instanceCreateInfo, nullptr, &mInstance) == VK_SUCCESS, "Failed to create Vulkan instance");
 }
 
 VulkanBackend::~VulkanBackend()

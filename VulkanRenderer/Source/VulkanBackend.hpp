@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/Application.hpp"
 #include "VulkanCommon.hpp"
+#include "VulkanContext.hpp"
 
 class VulkanBackend : public RendererBackend
 {
@@ -26,5 +26,5 @@ public:
 private:
     const PlatformState& mPlatformState;
 
-    VkInstance mInstance {};
+    VulkanContext mContext;
 };
