@@ -8,6 +8,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include "Core/Application.hpp"
 #include "Graphics/RendererBackend.hpp"
 
 template <typename... Args>
