@@ -1,0 +1,30 @@
+#pragma once
+
+#include "Core/Application.hpp"
+#include "VulkanCommon.hpp"
+
+class VulkanBackend : public RendererBackend
+{
+public:
+    explicit VulkanBackend(const ApplicationConfig& appConfig, const PlatformState& platformState);
+    ~VulkanBackend() override;
+
+    auto GetApi() const -> RendererAPI override;
+    auto GetApiString() const -> const char* override;
+
+    void BeginFrame(f32 r, f32 g, f32 b, f32 a) const override;
+    void OnResize(i32 width, i32 height) const override;
+    void EndFrame() const override;
+
+    auto CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr override;
+    auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr override;
+    auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr override;
+    auto CreateMesh(const MeshSpecification& meshSpec) const -> MeshPtr override;
+    auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr override;
+
+    void Draw(const MeshPtr& mesh) const override;
+private:
+    const PlatformState& mPlatformState;
+
+    VkInstance mInstance {};
+};
