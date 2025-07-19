@@ -35,7 +35,7 @@ void Renderer::Initialize(const ApplicationConfig& config)
     }
 
     // TODO: Move to scene
-    sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 2 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
+//    sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 2 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
 
     EventDispatcher::AddListener<ApplicationEvent>(OnAppEvent);
 }
@@ -85,8 +85,8 @@ void Renderer::EndFrame()
 
 void Renderer::BeginScene(const Camera& camera)
 {
-    sState.CameraUniformBuffer->SetData(camera.GetProjectionMatrix().Data(), sizeof(Mat4f), 0);
-    sState.CameraUniformBuffer->SetData(camera.GetViewMatrix().Data(), sizeof(Mat4f), sizeof(Mat4f));
+//    sState.CameraUniformBuffer->SetData(camera.GetProjectionMatrix().Data(), sizeof(Mat4f), 0);
+//    sState.CameraUniformBuffer->SetData(camera.GetViewMatrix().Data(), sizeof(Mat4f), sizeof(Mat4f));
 }
 
 void Renderer::Draw(const MeshPtr& mesh)

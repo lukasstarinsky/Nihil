@@ -8,16 +8,15 @@ Sandbox::Sandbox()
     Config.WindowWidth = 1280;
     Config.WindowHeight = 960;
     Config.Name = "Nihil Sandbox";
-    Config.RendererAPI = RendererAPI::OpenGL;
+    Config.RendererAPI = RendererAPI::Vulkan;
 }
 
 void Sandbox::OnInitialize()
 {
-    mAssetManager = std::make_unique<RawAssetManager>("Assets/");
 //    mAssetManager = std::make_unique<PackedAssetManager>("Assets/01.npack");
-    mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj", "Cube_Cube.002"));
-    mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
-    mMaterial = mAssetManager->GetDefaultMaterial();
+//    mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj", "Cube_Cube.002"));
+//    mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
+//    mMaterial = mAssetManager->GetDefaultMaterial();
 
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
     EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));
@@ -25,16 +24,16 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    mMaterial->SetUniform(0, Mat4f::Identity());
-
-    if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
-    {
-        Vec3f moveVector;
-        moveVector += Input::IsKeyDown(Key::W) ? mCamera.Front() : Input::IsKeyDown(Key::S) ? -mCamera.Front() : Vec3f{};
-        moveVector += Input::IsKeyDown(Key::A) ? -mCamera.Right() : Input::IsKeyDown(Key::D) ? mCamera.Right() : Vec3f{};
-        moveVector.Normalize();
-        mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
-    }
+//    mMaterial->SetUniform(0, Mat4f::Identity());
+//
+//    if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
+//    {
+//        Vec3f moveVector;
+//        moveVector += Input::IsKeyDown(Key::W) ? mCamera.Front() : Input::IsKeyDown(Key::S) ? -mCamera.Front() : Vec3f{};
+//        moveVector += Input::IsKeyDown(Key::A) ? -mCamera.Right() : Input::IsKeyDown(Key::D) ? mCamera.Right() : Vec3f{};
+//        moveVector.Normalize();
+//        mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
+//    }
 }
 
 void Sandbox::OnResize()
@@ -45,9 +44,9 @@ void Sandbox::OnResize()
 void Sandbox::OnRender()
 {
     Renderer::BeginScene(mCamera);
-    mTexture->Bind(0);
-    mMaterial->Bind();
-    Renderer::Draw(mMesh);
+//    mTexture->Bind(0);
+//    mMaterial->Bind();
+//    Renderer::Draw(mMesh);
 }
 
 void Sandbox::OnShutdown()
