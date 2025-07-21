@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Defines.hpp"
-#include "AssetManager/AssetManager.hpp"
 
 enum class RendererAPI;
 
@@ -37,6 +36,4 @@ public:
 public:
     ApplicationConfig Config {};
     ApplicationState State {};
-protected:
-    std::unique_ptr<AssetManager> mAssetManager {};
 };

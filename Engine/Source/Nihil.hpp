@@ -5,8 +5,8 @@
 #include <Core/Engine.hpp>
 #include <Core/Exception.hpp>
 #include <Core/Application.hpp>
-#include <AssetManager/RawAssetManager.hpp>
-#include <AssetManager/PackedAssetManager.hpp>
+#include <AssetPipeline//RawAssetManager.hpp>
+#include <AssetPipeline//PackedAssetManager.hpp>
 #include <Graphics/Renderer.hpp>
 #include <Platform/Platform.hpp>
 

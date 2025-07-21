@@ -20,4 +20,6 @@ private:
     MaterialPtr mMaterial {};
     TexturePtr mTexture {};
     Camera mCamera;
+
+    std::unique_ptr<AssetManager> mAssetManager {};
 };

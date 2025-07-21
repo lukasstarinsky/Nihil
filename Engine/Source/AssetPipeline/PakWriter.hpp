@@ -35,7 +35,7 @@ public:
             };
             mFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
 
-            if (spec.Data.size() > 0)
+            if (spec.Data.size() > mCompressionThreshold)
             {
                 Logger::Info("Compressing texture '{}' ({} bytes) with level {}", spec.Name, spec.Data.size(), mCompressionLevel);
                 auto compressedData = ZSTD::Compress(spec.Data, mCompressionLevel);
@@ -66,7 +66,7 @@ public:
             auto uncompressedSize = vertexCount * sizeof(Vertex) + indexCount * sizeof(Index);
 
             MeshHeader header {};
-            if (uncompressedSize > 0)
+            if (uncompressedSize > mCompressionThreshold)
             {
                 Logger::Info("Compressing mesh '{}' ({} bytes) with level {}", spec.Name, uncompressedSize, mCompressionLevel);
                 auto compressedVertices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Vertices.data()), vertexCount * sizeof(Vertex) }, mCompressionLevel);
