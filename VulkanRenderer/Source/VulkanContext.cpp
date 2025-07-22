@@ -1,5 +1,7 @@
 #include "VulkanContext.hpp"
 
+#include <list>
+
 VulkanContext::VulkanContext(const ApplicationConfig& appConfig, const PlatformState& platformState)
 {
     CreateInstance(appConfig);
@@ -94,13 +96,14 @@ void VulkanContext::CreatePhysicalDevice()
 
     for (const auto& device : physicalDevices)
     {
+        this->GraphicsQueueFamilyIndex = -1u;
+        this->PresentQueueFamilyIndex = -1u;
+
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
         if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         {
-            this->GraphicsQueueFamilyIndex = -1u;
-            this->PresentQueueFamilyIndex = -1u;
             u32 queueFamilyCount;
             vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
@@ -113,7 +116,11 @@ void VulkanContext::CreatePhysicalDevice()
                 {
                     this->GraphicsQueueFamilyIndex = i;
                 }
-                if (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
+
+                VkBool32 supportsPresent = false;
+                Ensure(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, this->Surface, &supportsPresent) == VK_SUCCESS, "Failed to check surface support for physical device");
+
+                if (supportsPresent)
                 {
                     this->PresentQueueFamilyIndex = i;
                 }
@@ -131,34 +138,52 @@ void VulkanContext::CreatePhysicalDevice()
 
 void VulkanContext::CreateLogicalDevice()
 {
-    f32 queuePriority = 1.0f;
-    VkDeviceQueueCreateInfo queueCreateInfo {
-        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .queueFamilyIndex = this->GraphicsQueueFamilyIndex,
-        .queueCount = 1,
-        .pQueuePriorities = &queuePriority
-    };
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::unordered_set<u32> uniqueQueueFamilies { this->GraphicsQueueFamilyIndex, this->PresentQueueFamilyIndex };
+
+    for (const auto queueFamily: uniqueQueueFamilies)
+    {
+        f32 queuePriority = 1.0f;
+        queueCreateInfos.push_back({
+            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .queueFamilyIndex = queueFamily,
+            .queueCount = 1,
+            .pQueuePriorities = &queuePriority
+        });
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures = {
 
+    };
+
+    std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
     VkDeviceCreateInfo deviceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .queueCreateInfoCount = 1,
-        .pQueueCreateInfos = &queueCreateInfo,
+        .queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size()),
+        .pQueueCreateInfos = queueCreateInfos.data(),
         .enabledLayerCount = 0,
         .ppEnabledLayerNames = nullptr,
-        .enabledExtensionCount = 0,
-        .ppEnabledExtensionNames = nullptr,
+        .enabledExtensionCount = static_cast<u32>(deviceExtensions.size()),
+        .ppEnabledExtensionNames = deviceExtensions.data(),
         .pEnabledFeatures = &deviceFeatures
     };
 
     Ensure(vkCreateDevice(this->PhysicalDevice, &deviceCreateInfo, nullptr, &this->Device) == VK_SUCCESS, "Failed to create Vulkan logical device");
 
     vkGetDeviceQueue(this->Device, this->GraphicsQueueFamilyIndex, 0, &this->GraphicsQueue);
+    if (this->PresentQueueFamilyIndex != this->GraphicsQueueFamilyIndex)
+    {
+        vkGetDeviceQueue(this->Device, this->PresentQueueFamilyIndex, 0, &this->PresentQueue);
+    }
+    else
+    {
+        this->PresentQueue = this->GraphicsQueue;
+    }
 }
