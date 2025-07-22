@@ -3,11 +3,14 @@
 VulkanContext::VulkanContext(const ApplicationConfig& appConfig, const PlatformState& platformState)
 {
     CreateInstance(appConfig);
-
+    CreateSurface(platformState);
+    CreatePhysicalDevice();
+    CreateLogicalDevice();
 }
 
 VulkanContext::~VulkanContext()
 {
+    vkDestroySurfaceKHR(this->Instance, this->Surface, nullptr);
     vkDestroyDevice(this->Device, nullptr);
     vkDestroyInstance(this->Instance, nullptr);
 }
@@ -64,6 +67,20 @@ void VulkanContext::CreateInstance(const ApplicationConfig& appConfig)
     };
 
     Ensure(vkCreateInstance(&instanceCreateInfo, nullptr, &this->Instance) == VK_SUCCESS, "Failed to create Vulkan instance");
+}
+
+void VulkanContext::CreateSurface(const PlatformState& platformState)
+{
+#ifdef NIHIL_PLATFORM_WINDOWS
+    VkWin32SurfaceCreateInfoKHR surfaceCreateInfo {
+        .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+        .pNext = nullptr,
+        .flags = 0,
+        .hinstance = platformState.Instance,
+        .hwnd = platformState.WindowHandle
+    };
+    Ensure(vkCreateWin32SurfaceKHR(this->Instance, &surfaceCreateInfo, nullptr, &this->Surface) == VK_SUCCESS, "Failed to create Vulkan surface");
+#endif
 }
 
 void VulkanContext::CreatePhysicalDevice()

@@ -6,6 +6,7 @@
 #elifdef NIHIL_PLATFORM_APPLE
 #endif
 
+#include <stacktrace>
 #include <vulkan/vulkan.h>
 
 #include "Core/Application.hpp"
@@ -16,6 +17,6 @@ inline void Ensure(bool predicate, std::format_string<Args...> msg, Args&&... ar
 {
     if (!predicate)
     {
-        throw std::runtime_error("Vulkan error: " + std::format(msg, std::forward<Args>(args)...));
+        throw std::runtime_error(std::format("Vulkan error: {}\n{}", std::format(msg, std::forward<Args>(args)...), std::stacktrace::current(1)));
     }
 }

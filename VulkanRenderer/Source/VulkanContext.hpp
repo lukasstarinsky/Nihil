@@ -9,10 +9,12 @@ public:
     ~VulkanContext();
 
     void CreateInstance(const ApplicationConfig& appConfig);
+    void CreateSurface(const PlatformState& platformState);
     void CreatePhysicalDevice();
     void CreateLogicalDevice();
 public:
     VkInstance Instance {};
+    VkSurfaceKHR Surface {};
     VkPhysicalDevice PhysicalDevice {};
     VkDevice Device {};
 
