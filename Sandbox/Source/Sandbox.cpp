@@ -13,8 +13,7 @@ Sandbox::Sandbox()
 
 void Sandbox::OnInitialize()
 {
-    mAssetManager = std::make_unique<RawAssetManager>("Assets/");
-//    mAssetManager = std::make_unique<PackedAssetManager>("Assets/01.npack");
+    mAssetManager = std::make_unique<PackedAssetManager>("Assets/01.npack");
     mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj", "Cube_Cube.002"));
     mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
     mMaterial = mAssetManager->GetDefaultMaterial();
@@ -69,7 +68,8 @@ auto Sandbox::OnKeyEvent(const KeyEvent& e) -> bool
 {
     if (e.Type == EventType::KeyPress && e.Key == Key::F2)
     {
-        mAssetManager->PackAll("./Assets/01.npack", 1, MEGABYTE(2));
+        RawAssetManager assetManager("Assets/");
+        assetManager.PackAll("01.npack", 1, MEGABYTE(2));
     }
     return true;
 }

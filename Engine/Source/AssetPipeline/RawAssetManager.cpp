@@ -197,87 +197,90 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
     return meshSpecs;
 }
 
-void RawAssetManager::PackAll(
-    [[maybe_unused]] const std::filesystem::path& outFilePath,
-    [[maybe_unused]] i32 compressionLevel,
-    [[maybe_unused]] u32 compressionThreshold
-) const
+void RawAssetManager::PackAll(const std::filesystem::path& outFilePath, i32 compressionLevel, u32 compressionThreshold) const
 {
-    // TODO: Pack all into single file or multiple files
-    PakWriter pakWriter(outFilePath, compressionLevel, compressionThreshold);
+    static const std::vector<const char*> textureExts { ".png", ".jpg", ".jpeg", ".bmp", ".tga" };
+    static const std::vector<const char*> shaderExts { ".glsl", ".hlsl", ".msl" };
+    static const std::vector<const char*> modelExts { ".obj", ".fbx", ".gltf", ".glb", ".dae" };
 
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
-    {
-        if (!entry.is_regular_file())
-            continue;
+    PakWriter pakWriter(mRoot / outFilePath, compressionLevel, compressionThreshold);
 
-        auto assetName = entry.path().filename().replace_extension().string();
-        auto textureSpec = RawAssetManager::LoadTexture(assetName);
-
-        Logger::Info("Packing texture '{}'", textureSpec.Name);
-        pakWriter.Write(textureSpec);
-    }
-
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Shaders"))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot))
     {
         if (!entry.is_regular_file())
             continue;
 
         auto& path = entry.path();
-        auto strippedExt = path.filename().replace_extension().string();
-        auto extension = path.extension().string();
+        auto extension = path.extension();
 
-        ShaderStage shaderStage {};
-        if (strippedExt.ends_with(".vs"))
+        // Pack textures
+        if (std::find(textureExts.begin(), textureExts.end(), extension) != textureExts.end())
         {
-            shaderStage = ShaderStage::Vertex;
-        }
-        else if (strippedExt.ends_with(".fs"))
-        {
-            shaderStage = ShaderStage::Fragment;
-        }
+            auto assetName = entry.path().filename().replace_extension().string();
+            auto textureSpec = RawAssetManager::LoadTexture(assetName);
 
-        auto sourceCode = File::Read(path);
-        if (extension == ".glsl")
+            Logger::Info("Packing texture '{}'", textureSpec.Name);
+            pakWriter.Write(textureSpec);
+        }
+        // Pack shaders
+        else if (std::find(shaderExts.begin(), shaderExts.end(), extension) != shaderExts.end())
         {
-            for (i32 i = 0; i < 2; ++i)
+            auto strippedExt = path.filename().replace_extension().string();
+
+            ShaderStage shaderStage {};
+            if (strippedExt.ends_with(".vs"))
             {
-                auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage, i == 0 ? RendererAPI::OpenGL : RendererAPI::Vulkan);
-                ShaderSpecification shaderSpec {
-                    .Name = std::format("{}{}", strippedExt, i == 0 ? ".glspv" : ".vkspv"),
-                    .Stage = shaderStage,
-                    .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
-                };
-                std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
+                shaderStage = ShaderStage::Vertex;
+            }
+            else if (strippedExt.ends_with(".fs"))
+            {
+                shaderStage = ShaderStage::Fragment;
+            }
 
-                Logger::Info("Packing shader '{}' for {}", shaderSpec.Name, i == 0 ? "OpenGL" : "Vulkan");
-                pakWriter.Write(shaderSpec);
-                break;
+            auto sourceCode = File::Read(path);
+            if (extension == ".glsl")
+            {
+                for (i32 i = 0; i < 2; ++i)
+                {
+                    auto binary = ShaderCompiler::GlslToSpv(sourceCode, shaderStage, i == 0 ? RendererAPI::OpenGL : RendererAPI::Vulkan);
+                    ShaderSpecification shaderSpec {
+                        .Name = std::format("{}{}", strippedExt, i == 0 ? ".glspv" : ".vkspv"),
+                        .Stage = shaderStage,
+                        .Data = std::vector<std::byte>(binary.size() * sizeof(binary[0]))
+                    };
+                    std::memcpy(shaderSpec.Data.data(), binary.data(), shaderSpec.Data.size());
+
+                    Logger::Info("Packing shader '{}' for {}", shaderSpec.Name, i == 0 ? "OpenGL" : "Vulkan");
+                    pakWriter.Write(shaderSpec);
+                    break;
+                }
+            }
+            else if (extension == ".hlsl")
+            {
+                Logger::Info("Packing shader '{}' for Direct3D", strippedExt);
+            }
+            else if (extension == ".msl")
+            {
+                Logger::Info("Packing shader '{}' for Metal", strippedExt);
             }
         }
-        else if (extension == ".hlsl")
+        // Pack models
+        else if (std::find(modelExts.begin(), modelExts.end(), extension) != modelExts.end())
         {
-            Logger::Info("Packing shader '{}' for Direct3D", strippedExt);
+            auto assetName = entry.path().filename().replace_extension().string();
+            auto meshSpecs = RawAssetManager::LoadAllMeshes(assetName);
+
+            for (const auto& meshSpec: meshSpecs)
+            {
+                Logger::Info("Packing mesh '{}'", meshSpec.Name);
+                pakWriter.Write(meshSpec);
+            }
         }
-        else if (extension == ".msl")
+        else
         {
-            Logger::Info("Packing shader '{}' for Metal", strippedExt);
-        }
-    }
-
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
-    {
-        if (entry.is_directory())
-            continue;
-
-        auto assetName = entry.path().filename().replace_extension().string();
-        auto meshSpecs = RawAssetManager::LoadAllMeshes(assetName);
-
-        for (const auto& meshSpec: meshSpecs)
-        {
-            Logger::Info("Packing mesh '{}'", meshSpec.Name);
-            pakWriter.Write(meshSpec);
+            Logger::Warn("Unsupported asset for packing: {}", path.string());
         }
     }
+
     pakWriter.Save();
 }
