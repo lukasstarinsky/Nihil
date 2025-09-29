@@ -4,7 +4,7 @@
 
 #include "AssetManager.hpp"
 
-class NIHIL_API RawAssetManager : public AssetManager
+class RawAssetManager : public AssetManager
 {
 public:
     explicit RawAssetManager(const std::filesystem::path& root);

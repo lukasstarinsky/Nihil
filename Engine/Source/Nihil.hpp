@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Core/Defines.hpp>
-#include <Core/Logger.hpp>
+#include <Common/Defines.hpp>
+#include <Common/Logger.hpp>
+#include <Common/Exception.hpp>
+#include <Common/Application.hpp>
 #include <Core/Engine.hpp>
-#include <Core/Exception.hpp>
-#include <Core/Application.hpp>
 #include <AssetPipeline//RawAssetManager.hpp>
 #include <AssetPipeline//PackedAssetManager.hpp>
 #include <Graphics/Renderer.hpp>

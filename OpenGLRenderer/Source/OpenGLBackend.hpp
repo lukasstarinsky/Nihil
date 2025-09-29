@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Application.hpp"
+#include "Common/Application.hpp"
 #include "OpenGLCommon.hpp"
 
 class OpenGLBackend : public RendererBackend

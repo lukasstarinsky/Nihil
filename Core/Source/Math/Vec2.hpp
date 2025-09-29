@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include "Core/Defines.hpp"
+#include "Common/Defines.hpp"
 
 class Vec2f
 {

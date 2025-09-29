@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(NihilCore LANGUAGES CXX)
+project(Nihil LANGUAGES CXX)
 
 file(GLOB_RECURSE HEADER_FILES Source/*.hpp)
 file(GLOB_RECURSE SOURCE_FILES Source/*.cpp)
@@ -10,8 +10,6 @@ if(NOT WIN32)
     list(REMOVE_ITEM HEADER_FILES ${WIN32_HEADER_FILES})
     list(REMOVE_ITEM SOURCE_FILES ${WIN32_SOURCE_FILES})
 endif()
-
-add_subdirectory(Tests)
 
 add_subdirectory(ThirdParty/stb)
 
@@ -26,9 +24,8 @@ add_custom_command(
 )
 add_custom_target(copy_assets ALL DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets")
 
-add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
-target_compile_definitions(${PROJECT_NAME} PRIVATE NIHIL_EXPORT)
+add_library(${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC Source)
 target_precompile_headers(${PROJECT_NAME} PRIVATE Source/pch.hpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::shaderc::shaderc stb assimp::assimp zstd::libzstd_shared)
-add_dependencies(${PROJECT_NAME} OpenGLRenderer copy_assets)
+target_link_libraries(${PROJECT_NAME} PUBLIC NihilCore PRIVATE unofficial::shaderc::shaderc stb assimp::assimp zstd::libzstd_shared)
+add_dependencies(${PROJECT_NAME} NihilCore OpenGLRenderer copy_assets)

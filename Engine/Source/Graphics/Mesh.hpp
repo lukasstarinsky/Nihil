@@ -18,7 +18,7 @@ struct MeshSpecification
 class Mesh;
 using MeshPtr = std::shared_ptr<Mesh>;
 
-class NIHIL_API Mesh
+class Mesh
 {
 public:
     virtual ~Mesh() = default;

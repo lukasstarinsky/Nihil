@@ -6,7 +6,7 @@
 #include "Graphics/Material.hpp"
 #include "Graphics/Mesh.hpp"
 
-class NIHIL_API AssetManager
+class AssetManager
 {
 public:
     virtual ~AssetManager() = default;

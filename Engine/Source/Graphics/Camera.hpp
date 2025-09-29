@@ -8,7 +8,7 @@ enum class CameraProjection
     Perspective
 };
 
-class NIHIL_API Camera
+class Camera
 {
 public:
     Camera() = default;

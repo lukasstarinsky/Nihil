@@ -2,8 +2,8 @@
 
 #include <array>
 
-#include "Core/Defines.hpp"
-#include "Core/Logger.hpp"
+#include "Common/Defines.hpp"
+#include "Common/Logger.hpp"
 #include "Vec3.hpp"
 
 class Mat4f

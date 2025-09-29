@@ -13,5 +13,3 @@
 #include "Common/Logger.hpp"
 #include "Common/Utilities.hpp"
 #include "Common/Exception.hpp"
-
-#include "Math/Math.hpp"

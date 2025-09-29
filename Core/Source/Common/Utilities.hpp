@@ -7,18 +7,20 @@
 #include "Defines.hpp"
 #include "Exception.hpp"
 
-namespace Time
+class NIHIL_API Time
 {
-    auto NIHIL_API GetFormattedTime(bool includeDate = false) -> std::string;
-}
+public:
+    static auto GetFormattedTime(bool includeDate = false) -> std::string;
+};
 
-namespace File
+class NIHIL_API File
 {
-    auto NIHIL_API Read(const std::filesystem::path& filePath) -> std::string;
-    auto NIHIL_API ReadLines(const std::filesystem::path& filePath) -> std::vector<std::string>;
+public:
+    static auto Read(const std::filesystem::path& filePath) -> std::string;
+    static auto ReadLines(const std::filesystem::path& filePath) -> std::vector<std::string>;
 
     template <typename T = std::byte>
-    auto ReadBinary(const std::filesystem::path& filePath) -> std::vector<T>
+    static auto ReadBinary(const std::filesystem::path& filePath) -> std::vector<T>
     {
         std::ifstream file(filePath, std::ios::binary | std::ios::ate);
         Ensure(file.is_open(), "Failed to open file: {}", filePath.string());
@@ -32,8 +34,8 @@ namespace File
         return buffer;
     }
 
-    void NIHIL_API WriteBinary(std::string_view filePath, const void* data, std::size_t size);
-}
+    static void WriteBinary(std::string_view filePath, const void* data, std::size_t size);
+};
 
 template <typename T, typename... U>
 concept IsAnyOf = (std::same_as<T, U> || ...);

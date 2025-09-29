@@ -7,7 +7,7 @@
 #include "Graphics/Texture.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Mesh.hpp"
-#include "Core/Utilities.hpp"
+#include "Common/Utilities.hpp"
 #include "Compression.hpp"
 #include "PakFile.hpp"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Defines.hpp"
+#include "Common/Defines.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Renderer.hpp"
 

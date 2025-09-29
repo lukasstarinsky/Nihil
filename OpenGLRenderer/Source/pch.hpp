@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cassert>
 
-#include "Core/Defines.hpp"
+#include "Common/Defines.hpp"
 
 #include "OpenGLCommon.hpp"
 #include "OpenGLLoader.hpp"

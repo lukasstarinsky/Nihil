@@ -3,7 +3,7 @@
 #include "AssetManager.hpp"
 #include "PakReader.hpp"
 
-class NIHIL_API PackedAssetManager : public AssetManager
+class PackedAssetManager : public AssetManager
 {
 public:
     explicit PackedAssetManager(const std::filesystem::path& pakFile);

@@ -1,5 +1,5 @@
 #include "PlatformWin32.hpp"
-#include "Core/Event.hpp"
+#include "Common/Event.hpp"
 #include "Platform/Platform.hpp"
 
 static PlatformState sState;

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Application.hpp"
-#include "Event.hpp"
+#include "Common/Application.hpp"
+#include "Common/Event.hpp"
 
-class NIHIL_API Engine
+class Engine
 {
 public:
     explicit Engine(Application* application);

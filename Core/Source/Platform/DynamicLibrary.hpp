@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-class DynamicLibrary
+class NIHIL_API DynamicLibrary
 {
 public:
     static auto Load(const char* name, DynamicLibrary* outDynamicLibrary) -> bool;
