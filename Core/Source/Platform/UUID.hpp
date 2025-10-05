@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common/Defines.hpp"
+
 namespace Nihil
 {
 
