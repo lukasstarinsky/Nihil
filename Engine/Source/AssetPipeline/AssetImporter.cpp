@@ -45,7 +45,6 @@ auto RawAssetManager::LoadTexture(std::string_view name) const -> TextureSpecifi
     auto size = width * height * numChannels;
 
     TextureSpecification textureSpec {
-        .Name = name.data(),
         .Width = width,
         .Height = height,
         .Data = std::vector<std::byte>(size)
@@ -124,31 +123,23 @@ auto RawAssetManager::LoadShader(std::string_view name) const -> ShaderSpecifica
     return shaderSpec;
 }
 
-auto RawAssetManager::LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification
-{
-    auto meshSpecs = LoadAllMeshes(file);
-    auto spec = std::find_if(meshSpecs.begin(), meshSpecs.end(), [&](const MeshSpecification& meshSpec) { return meshSpec.Name == std::format("{}::{}", file, name); });
-    Ensure(spec != meshSpecs.end(), "Mesh '{}' not found in file '{}'.", name, file);
-    return *spec;
-}
-
-auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<MeshSpecification>
+auto RawAssetManager::LoadMesh(std::string_view name) const -> MeshSpecification
 {
     std::filesystem::path filePath {};
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot))
     {
         if (!entry.is_regular_file())
             continue;
 
         // File name without extension
         auto assetName = entry.path().filename().replace_extension().string();
-        if (assetName == file)
+        if (assetName == name)
         {
             filePath = entry.path();
             break;
         }
     }
-    Ensure(!filePath.empty(), "Mesh file '{}' not found.", file);
+    Ensure(!filePath.empty(), "Mesh file '{}' not found.", name);
 
     auto fileData = File::ReadBinary(filePath);
     Assimp::Importer importer;
@@ -156,8 +147,10 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
     Ensure(scene && scene->HasMeshes(), "Failed to load mesh from file: {}", filePath.string());
 
     std::span<aiMesh*> loadedMeshes(scene->mMeshes, scene->mMeshes + scene->mNumMeshes);
-    std::vector<MeshSpecification> meshSpecs;
-    meshSpecs.reserve(loadedMeshes.size());
+    MeshSpecification meshSpec {};
+    meshSpec.Name = name;
+    meshSpec.SubMeshes.reserve(scene->mNumMeshes);
+
     for (const auto* mesh: loadedMeshes)
     {
         if (mesh->mName.length == 0)
@@ -166,8 +159,13 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
             continue;
         }
 
-        MeshSpecification meshSpec {};
-        meshSpec.Name = std::format("{}::{}", file, mesh->mName.C_Str());
+        SubMesh subMesh {
+            .Name = mesh->mName.C_Str(),
+            .BaseVertex = static_cast<u32>(meshSpec.Vertices.size()),
+            .BaseIndex = static_cast<u32>(meshSpec.Indices.size()),
+            .IndexCount = mesh->mNumFaces * 3
+        };
+        meshSpec.SubMeshes.push_back(subMesh);
 
         // Load vertices
         for (u32 i = 0; i < mesh->mNumVertices; ++i)
@@ -190,11 +188,9 @@ auto RawAssetManager::LoadAllMeshes(std::string_view file) const -> std::vector<
                 meshSpec.Indices.push_back(face.mIndices[j]);
             }
         }
-
-        meshSpecs.push_back(meshSpec);
     }
 
-    return meshSpecs;
+    return meshSpec;
 }
 
 void RawAssetManager::PackAll(const std::filesystem::path& outFilePath, i32 compressionLevel, u32 compressionThreshold) const
@@ -268,13 +264,10 @@ void RawAssetManager::PackAll(const std::filesystem::path& outFilePath, i32 comp
         else if (std::find(modelExts.begin(), modelExts.end(), extension) != modelExts.end())
         {
             auto assetName = entry.path().filename().replace_extension().string();
-            auto meshSpecs = RawAssetManager::LoadAllMeshes(assetName);
+            auto meshSpec = RawAssetManager::LoadMesh(assetName);
 
-            for (const auto& meshSpec: meshSpecs)
-            {
-                Logger::Info("Packing mesh '{}'", meshSpec.Name);
-                pakWriter.Write(meshSpec);
-            }
+            Logger::Info("Packing mesh '{}'", meshSpec.Name);
+            pakWriter.Write(meshSpec);
         }
         else
         {

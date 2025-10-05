@@ -1,6 +1,6 @@
 #include "Platform/MappedFile.hpp"
 
-#include "PlatformWin32.hpp"
+#include "Win32Platform.hpp"
 
 MappedFile::MappedFile(const std::filesystem::path& filePath)
 {

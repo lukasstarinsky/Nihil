@@ -1,4 +1,4 @@
-#include "PlatformWin32.hpp"
+#include "Win32Platform.hpp"
 #include "Common/Event.hpp"
 #include "Platform/Platform.hpp"
 
