@@ -1,16 +1,25 @@
 #pragma once
 
-enum class ShaderStage
+#include "Platform/UUID.hpp"
+#include "RendererAPI.hpp"
+
+enum class ShaderStage : u32
 {
     Vertex = 0,
     Fragment
 };
 
+struct ShaderVariant
+{
+    RendererAPI API;
+    std::vector<std::byte> Data;
+};
+
 struct ShaderSpecification
 {
-    std::string Name;
+    Nihil::UUID UUID {};
     ShaderStage Stage;
-    std::vector<std::byte> Data;
+    std::vector<ShaderVariant> Variants;
 };
 
 class Shader;

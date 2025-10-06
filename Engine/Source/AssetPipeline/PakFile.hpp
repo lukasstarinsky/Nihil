@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Platform/UUID.hpp"
+
 #pragma pack(push, 1)
 struct PakHeader
 {
     char Magic[4] = {'N', 'P', 'A', 'K'};
     u32 AssetCount;
-    u32 EntryOffset;
 };
 
 struct PakEntry
@@ -17,7 +18,7 @@ struct PakEntry
         Shader,
     };
 
-    u64 NameHash;
+    Nihil::UUID UUID {};
     Type Type;
     u64 Offset;
     i32 CompressionLevel;
@@ -34,5 +35,18 @@ struct MeshHeader
 {
     u32 VertexBlobSize;
     u32 IndexBlobSize;
+    u32 SubMeshCount;
+};
+
+struct ShaderHeader
+{
+    u32 Stage;
+    u32 VariantCount;
+};
+
+struct ShaderVariantHeader
+{
+    u32 API;
+    u32 BlobSize;
 };
 #pragma pack(pop)

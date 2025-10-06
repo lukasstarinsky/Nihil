@@ -1,29 +1,20 @@
 #pragma once
 
-#include <filesystem>
+#include "PakReader.hpp"
 #include "Graphics/Texture.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Material.hpp"
-#include "Graphics/Mesh.hpp"
 
 class AssetManager
 {
 public:
-    virtual ~AssetManager() = default;
+    explicit AssetManager(const std::filesystem::path& pakFile);
 
-    virtual auto LoadTexture(std::string_view name) const -> TextureSpecification = 0;
-    virtual auto LoadShader(std::string_view name) const -> ShaderSpecification = 0;
-    virtual auto LoadMesh(std::string_view file, std::string_view name) const -> MeshSpecification = 0;
+    auto HasAsset(const Nihil::UUID& uuid) const -> bool;
 
-    virtual void PackAll(const std::filesystem::path& outFilePath, i32 compressionLevel = 1, u32 compressionThreshold = MEGABYTE(8)) const = 0;
-
-    auto GetDefaultVertexShader() const -> ShaderPtr { return mDefaultVertexShader; };
-    auto GetDefaultFragmentShader() const -> ShaderPtr { return mDefaultFragmentShader; };
-    auto GetDefaultMaterial() const -> MaterialPtr { return mDefaultMaterial; };
-protected:
-    AssetManager() = default;
-protected:
-    ShaderPtr mDefaultVertexShader {};
-    ShaderPtr mDefaultFragmentShader {};
-    MaterialPtr mDefaultMaterial {};
+    auto GetTexture(const Nihil::UUID& uuid) const -> TextureSpecification;
+    auto GetShader(const Nihil::UUID& uuid) const -> ShaderSpecification;
+    auto GetMesh(const Nihil::UUID& uuid) const -> MeshSpecification;
+private:
+    PakReader mPakReader;
 };

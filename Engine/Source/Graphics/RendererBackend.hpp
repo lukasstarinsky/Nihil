@@ -1,19 +1,11 @@
 #pragma once
 
+#include "RendererAPI.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
 #include "Buffer.hpp"
 #include "Mesh.hpp"
 #include "Texture.hpp"
-
-enum class RendererAPI
-{
-    OpenGL = 0,
-    Vulkan,
-    Direct3D11,
-    Direct3D12,
-    Metal
-};
 
 class RendererBackend
 {

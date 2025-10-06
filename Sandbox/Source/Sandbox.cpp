@@ -4,6 +4,7 @@
 
 Sandbox::Sandbox()
     : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 800.0f / 600.0f}
+    , mAssetPipeline{"Assets/"}
 {
     Config.WindowWidth = 1280;
     Config.WindowHeight = 960;
@@ -13,18 +14,20 @@ Sandbox::Sandbox()
 
 void Sandbox::OnInitialize()
 {
-    try
+    if (!mAssetPipeline.ValidateManifest())
     {
-        mAssetManager = std::make_unique<PackedAssetManager>("Assets/01.npack");
+        Logger::Warn("Asset manifest is not valid, rebuilding all assets...");
+        mAssetPipeline.BuildAll("Assets/01.npack", 1, MEGABYTE(2));
     }
-    catch (const NihilException& e)
-    {
-        Logger::Warn("{}", e.what());
-        mAssetManager = std::make_unique<RawAssetManager>("Assets/");
-    }
-    mMesh = Mesh::Create(mAssetManager->LoadMesh("cottage_obj", "Cube_Cube.002"));
-    mTexture = Texture::Create(mAssetManager->LoadTexture("container2"));
-    mMaterial = mAssetManager->GetDefaultMaterial();
+
+    mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
+    mMesh = Mesh::Create(mAssetManager->GetMesh(mAssetPipeline.GetManifest().GetUUID("cottage_obj")));
+
+    auto vs = mAssetManager->GetShader(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.vs"));
+    auto fs = mAssetManager->GetShader(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.fs"));
+
+    mMaterial = Material::Create(Shader::Create(vs), Shader::Create(fs));
+    mTexture = Texture::Create(mAssetManager->GetTexture(mAssetPipeline.GetManifest().GetUUID("container2")));
 
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
     EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));
@@ -74,10 +77,5 @@ auto Sandbox::OnMouseEvent(const MouseEvent& e) -> bool
 
 auto Sandbox::OnKeyEvent(const KeyEvent& e) -> bool
 {
-    if (e.Type == EventType::KeyPress && e.Key == Key::F2)
-    {
-        RawAssetManager assetManager("Assets/");
-        assetManager.PackAll("01.npack", 1, MEGABYTE(2));
-    }
     return true;
 }

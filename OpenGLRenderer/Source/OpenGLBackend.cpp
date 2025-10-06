@@ -127,7 +127,10 @@ auto OpenGLBackend::CreateTexture(const TextureSpecification& textureSpec) const
 void OpenGLBackend::Draw(const MeshPtr& mesh) const
 {
     mesh->Bind();
-    glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+    for (const auto& subMesh : mesh->GetSubMeshes())
+    {
+        glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.IndexCount), GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(subMesh.BaseIndex * sizeof(u32)), static_cast<GLsizei>(subMesh.BaseVertex));
+    }
 }
 
 extern "C"

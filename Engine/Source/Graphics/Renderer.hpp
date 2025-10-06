@@ -3,6 +3,7 @@
 #include "Common/Application.hpp"
 #include "Common/Event.hpp"
 #include "Platform/Platform.hpp"
+#include "RendererAPI.hpp"
 #include "RendererBackend.hpp"
 #include "Camera.hpp"
 

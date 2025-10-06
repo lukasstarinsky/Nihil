@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include "Common/Defines.hpp"
+#include "Common/Exception.hpp"
 
 #include "OpenGLCommon.hpp"
 #include "OpenGLLoader.hpp"

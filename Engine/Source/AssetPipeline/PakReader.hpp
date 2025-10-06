@@ -16,24 +16,23 @@ class PakReader
 public:
     explicit PakReader(const std::filesystem::path& path);
 
+    auto HasEntry(const Nihil::UUID& uuid) const -> bool;
+
     template <typename T> requires IsAnyOf<T, TextureSpecification, ShaderSpecification, MeshSpecification>
-    auto Read(std::string_view name) const -> T
+    auto Read(const Nihil::UUID& uuid) const -> T
     {
-        u64 hash = std::hash<std::string_view>{}(name);
-        Ensure(mEntryMap.contains(hash), "Asset {} not found in NPak file.", name);
-        auto& entry = mEntryMap.at(hash);
+        Ensure(mEntryMap.contains(uuid), "Asset with uuid: '{}' not found in NPAK file.", uuid);
+        auto& entry = mEntryMap.at(uuid);
 
         std::vector<std::byte> data;
         data.resize(entry.Size);
-        std::memcpy(data.data(), mFile.GetData() + entry.Offset, entry.Size);
+        std::memcpy(data.data(), mBlobFile.GetData() + entry.Offset, entry.Size);
         const std::byte* dataPtr = data.data();
 
         T spec {};
-        spec.Name = name;
+        spec.UUID = uuid;
         if constexpr (std::same_as<T, TextureSpecification>)
         {
-            Ensure(entry.Type == PakEntry::Type::Texture, "Asset {} is not a texture.", name);
-
             TextureHeader header {};
             std::memcpy(&header, data.data(), sizeof(header));
             dataPtr += sizeof(header);
@@ -43,7 +42,6 @@ public:
             spec.Height = header.Height;
             if (entry.CompressionLevel > 0)
             {
-                Logger::Info("Decompressing texture '{}' ({} bytes) with level {}", name, entry.Size, entry.CompressionLevel);
                 spec.Data = ZSTD::Decompress({ dataPtr, dataBlobSize });
             }
             else
@@ -54,25 +52,36 @@ public:
         }
         else if constexpr (std::same_as<T, ShaderSpecification>)
         {
-            Ensure(entry.Type == PakEntry::Type::Shader, "Asset {} is not a shader.", name);
+            ShaderHeader header {};
+            std::memcpy(&header, data.data(), sizeof(header));
+            dataPtr += sizeof(header);
 
-            spec.Data.resize(entry.Size);
-            std::memcpy(spec.Data.data(), data.data(), entry.Size);
+            spec.Stage = static_cast<ShaderStage>(header.Stage);
+            spec.Variants.resize(header.VariantCount);
+
+            for (u32 i = 0; i < header.VariantCount; ++i)
+            {
+                ShaderVariantHeader variantHeader {};
+                std::memcpy(&variantHeader, dataPtr, sizeof(variantHeader));
+                dataPtr += sizeof(variantHeader);
+
+                spec.Variants[i].API = static_cast<RendererAPI>(variantHeader.API);
+                spec.Variants[i].Data.resize(variantHeader.BlobSize);
+                std::memcpy(spec.Variants[i].Data.data(), dataPtr, variantHeader.BlobSize);
+            }
         }
         else if constexpr (std::same_as<T, MeshSpecification>)
         {
-            Ensure(entry.Type == PakEntry::Type::Mesh, "Asset {} is not a mesh.", name);
-
             MeshHeader header {};
             std::memcpy(&header, data.data(), sizeof(header));
             dataPtr += sizeof(header);
 
             if (entry.CompressionLevel > 0)
             {
-                Logger::Info("Decompressing mesh '{}' ({} bytes) with level {}", name, entry.Size, entry.CompressionLevel);
                 auto vertexBlob = ZSTD::Decompress({ dataPtr, header.VertexBlobSize });
                 dataPtr += header.VertexBlobSize;
                 auto indexBlob = ZSTD::Decompress({ dataPtr, header.IndexBlobSize });
+                dataPtr += header.IndexBlobSize;
                 auto vertexCount = vertexBlob.size() / sizeof(Vertex);
                 auto indexCount = indexBlob.size() / sizeof(Index);
 
@@ -91,11 +100,15 @@ public:
                 std::memcpy(spec.Vertices.data(), dataPtr, header.VertexBlobSize);
                 dataPtr += header.VertexBlobSize;
                 std::memcpy(spec.Indices.data(), dataPtr, header.IndexBlobSize);
+                dataPtr += header.IndexBlobSize;
             }
+            spec.SubMeshes.resize(header.SubMeshCount);
+            std::memcpy(spec.SubMeshes.data(), dataPtr, header.SubMeshCount * sizeof(SubMesh));
         }
         return spec;
     }
 private:
-    std::unordered_map<u64, PakEntry> mEntryMap;
-    MappedFile mFile;
+    std::unordered_map<Nihil::UUID, PakEntry> mEntryMap;
+    MappedFile mBlobFile;
+    MappedFile mMetaFile;
 };

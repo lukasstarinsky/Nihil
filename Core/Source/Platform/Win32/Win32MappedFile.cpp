@@ -3,9 +3,32 @@
 #include "Win32Platform.hpp"
 
 MappedFile::MappedFile(const std::filesystem::path& filePath)
+    : mFilePath{filePath}
+{
+    Open();
+}
+
+MappedFile::~MappedFile()
+{
+    UnmapViewOfFile(mData);
+    CloseHandle(mMappingHandle);
+    CloseHandle(mFileHandle);
+}
+
+auto MappedFile::GetData() const -> std::byte*
+{
+    return mData;
+}
+
+auto MappedFile::GetSize() const -> std::size_t
+{
+    return mSize;
+}
+
+void MappedFile::Open()
 {
     mFileHandle = CreateFile(
-        filePath.string().c_str(),
+        mFilePath.string().c_str(),
         GENERIC_READ,
         FILE_SHARE_READ,
         nullptr,
@@ -13,7 +36,7 @@ MappedFile::MappedFile(const std::filesystem::path& filePath)
         FILE_ATTRIBUTE_NORMAL,
         nullptr
     );
-    Ensure(mFileHandle != INVALID_HANDLE_VALUE, "Win32: Failed to open file: {}", filePath.string().c_str());
+    Ensure(mFileHandle != INVALID_HANDLE_VALUE, "Win32: Failed to open file: {}", mFilePath.string().c_str());
 
     mSize = GetFileSize(mFileHandle, nullptr);
     Ensure(mSize != INVALID_FILE_SIZE, "Win32: GetFileSize() failed with error code: {}", GetLastError());
@@ -38,19 +61,9 @@ MappedFile::MappedFile(const std::filesystem::path& filePath)
     Ensure(mData, "Win32: MapViewOfFile() failed with error code: {}", GetLastError());
 }
 
-MappedFile::~MappedFile()
+void MappedFile::Close() const
 {
     UnmapViewOfFile(mData);
     CloseHandle(mMappingHandle);
     CloseHandle(mFileHandle);
-}
-
-auto MappedFile::GetData() const -> std::byte*
-{
-    return mData;
-}
-
-auto MappedFile::GetSize() const -> std::size_t
-{
-    return mSize;
 }

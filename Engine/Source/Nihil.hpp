@@ -5,10 +5,12 @@
 #include <Common/Exception.hpp>
 #include <Common/Application.hpp>
 #include <Core/Engine.hpp>
-#include <AssetPipeline//RawAssetManager.hpp>
-#include <AssetPipeline//PackedAssetManager.hpp>
+#include <AssetPipeline/AssetPipeline.hpp>
+#include <AssetPipeline/AssetManager.hpp>
+#include <AssetPipeline/AssetImporter.hpp>
 #include <Graphics/Renderer.hpp>
 #include <Platform/Platform.hpp>
+#include <Platform/UUID.hpp>
 
 #define CREATE_APPLICATION(Application)                 \
 try {                                                   \

@@ -15,6 +15,7 @@ public:
     auto ToString() const -> std::string;
 
     static auto FromString(const std::string& str) -> UUID;
+    static auto Generate() -> UUID;
 private:
     mutable std::byte mData[16]{};
 

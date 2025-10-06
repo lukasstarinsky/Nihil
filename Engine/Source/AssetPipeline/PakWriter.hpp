@@ -20,11 +20,12 @@ public:
     template <typename T> requires IsAnyOf<T, TextureSpecification, ShaderSpecification, MeshSpecification>
     void Write(const T& spec)
     {
-        ASSERT(mFile.is_open());
+        ASSERT(mMetaFile.is_open());
+        ASSERT(mBlobFile.is_open());
 
         PakEntry entry {};
-        entry.NameHash = std::hash<std::string_view>{}(spec.Name);
-        entry.Offset = mFile.tellp();
+        entry.UUID = spec.UUID;
+        entry.Offset = mBlobFile.tellp();
         if constexpr (std::is_same_v<T, TextureSpecification>)
         {
             entry.Type = PakEntry::Type::Texture;
@@ -33,29 +34,44 @@ public:
                 .Width = spec.Width,
                 .Height = spec.Height
             };
-            mFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+            mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+            entry.Size = sizeof(TextureHeader);
 
             if (spec.Data.size() > mCompressionThreshold)
             {
-                Logger::Info("Compressing texture '{}' ({} bytes) with level {}", spec.Name, spec.Data.size(), mCompressionLevel);
                 auto compressedData = ZSTD::Compress(spec.Data, mCompressionLevel);
 
                 entry.CompressionLevel = mCompressionLevel;
-                entry.Size = compressedData.size() + sizeof(TextureHeader);
-                mFile.write(reinterpret_cast<const char*>(compressedData.data()), static_cast<i32>(compressedData.size()));
+                entry.Size += compressedData.size();
+                mBlobFile.write(reinterpret_cast<const char*>(compressedData.data()), static_cast<i32>(compressedData.size()));
             }
             else
             {
-                entry.Size = spec.Data.size() + sizeof(TextureHeader);
-                mFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(spec.Data.size()));
+                entry.Size += spec.Data.size();
+                mBlobFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(spec.Data.size()));
             }
         }
         else if constexpr (std::is_same_v<T, ShaderSpecification>)
         {
             entry.Type = PakEntry::Type::Shader;
-            entry.Size = spec.Data.size();
 
-            mFile.write(reinterpret_cast<const char*>(spec.Data.data()), static_cast<i32>(entry.Size));
+            ShaderHeader header {
+                .Stage = static_cast<u32>(spec.Stage),
+                .VariantCount = static_cast<u32>(spec.Variants.size())
+            };
+            mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+            entry.Size = sizeof(ShaderHeader);
+
+            for (const auto& variant: spec.Variants)
+            {
+                ShaderVariantHeader variantHeader {
+                    .API = static_cast<u32>(variant.API),
+                    .BlobSize = static_cast<u32>(variant.Data.size())
+                };
+                mBlobFile.write(reinterpret_cast<const char*>(&variantHeader), sizeof(variantHeader));
+                mBlobFile.write(reinterpret_cast<const char*>(variant.Data.data()), static_cast<i32>(variant.Data.size()));
+                entry.Size += sizeof(ShaderVariantHeader) + static_cast<i32>(variant.Data.size());
+            }
         }
         else if constexpr (std::is_same_v<T, MeshSpecification>)
         {
@@ -66,41 +82,49 @@ public:
             auto uncompressedSize = vertexCount * sizeof(Vertex) + indexCount * sizeof(Index);
 
             MeshHeader header {};
+            header.SubMeshCount = static_cast<u32>(spec.SubMeshes.size());
+            entry.Size = sizeof(MeshHeader) + sizeof(SubMesh) * header.SubMeshCount;
             if (uncompressedSize > mCompressionThreshold)
             {
-                Logger::Info("Compressing mesh '{}' ({} bytes) with level {}", spec.Name, uncompressedSize, mCompressionLevel);
+                Logger::Info("Compressing mesh '{}' ({} bytes) with level {}", spec.UUID, uncompressedSize, mCompressionLevel);
                 auto compressedVertices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Vertices.data()), vertexCount * sizeof(Vertex) }, mCompressionLevel);
                 auto compressedIndices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Indices.data()), indexCount * sizeof(Index) }, mCompressionLevel);
                 auto compressedVerticesSize = static_cast<u32>(compressedVertices.size());
                 auto compressedIndicesSize = static_cast<u32>(compressedIndices.size());
 
-                entry.Size = compressedVertices.size() + compressedIndices.size() + sizeof(header);
+                entry.Size += compressedVertices.size() + compressedIndices.size();
                 entry.CompressionLevel = mCompressionLevel;
                 header.VertexBlobSize = compressedVerticesSize;
                 header.IndexBlobSize = compressedIndicesSize;
-                mFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
-                mFile.write(reinterpret_cast<const char*>(compressedVertices.data()), compressedVerticesSize);
-                mFile.write(reinterpret_cast<const char*>(compressedIndices.data()), compressedIndicesSize);
+                mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+                mBlobFile.write(reinterpret_cast<const char*>(compressedVertices.data()), compressedVerticesSize);
+                mBlobFile.write(reinterpret_cast<const char*>(compressedIndices.data()), compressedIndicesSize);
             }
             else
             {
                 auto vertexBlobSize = static_cast<u32>(vertexCount * sizeof(Vertex));
                 auto indexBlobSize = static_cast<u32>(indexCount * sizeof(Index));
 
-                entry.Size = uncompressedSize + sizeof(header);
+                entry.Size += uncompressedSize + sizeof(header);
                 header.VertexBlobSize = vertexBlobSize;
                 header.IndexBlobSize = indexBlobSize;
-                mFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
-                mFile.write(reinterpret_cast<const char*>(spec.Vertices.data()), vertexBlobSize);
-                mFile.write(reinterpret_cast<const char*>(spec.Indices.data()), indexBlobSize);
+                mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+                mBlobFile.write(reinterpret_cast<const char*>(spec.Vertices.data()), vertexBlobSize);
+                mBlobFile.write(reinterpret_cast<const char*>(spec.Indices.data()), indexBlobSize);
+            }
+            for (const auto& subMesh : spec.SubMeshes)
+            {
+                mBlobFile.write(reinterpret_cast<const char*>(&subMesh), sizeof(SubMesh));
             }
         }
         mEntries.push_back(entry);
     }
 private:
     PakHeader mHeader;
+    std::filesystem::path mPath;
     std::vector<PakEntry> mEntries;
-    std::ofstream mFile;
+    std::ofstream mBlobFile;
+    std::ofstream mMetaFile;
     i32 mCompressionLevel;
     u32 mCompressionThreshold;
 };

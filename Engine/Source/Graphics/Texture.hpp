@@ -2,9 +2,11 @@
 
 #include <vector>
 
+#include "Platform/UUID.hpp"
+
 struct TextureSpecification
 {
-    std::string Name;
+    Nihil::UUID UUID {};
     i32 Width, Height;
     std::vector<std::byte> Data;
 };

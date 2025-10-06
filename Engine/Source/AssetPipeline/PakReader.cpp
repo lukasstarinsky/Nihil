@@ -1,18 +1,24 @@
 #include "PakReader.hpp"
 
 PakReader::PakReader(const std::filesystem::path& path)
-    : mFile(path)
+    : mBlobFile{path}
+    , mMetaFile{path.string() + ".meta"}
 {
     PakHeader header {};
-    std::memcpy(&header, mFile.GetData(), sizeof(PakHeader));
-    Ensure(std::memcmp(header.Magic, "NPAK", 4) == 0, "Invalid NPAK magic in file '{}'", path.string());
+    std::memcpy(&header, mMetaFile.GetData(), sizeof(PakHeader));
+    Ensure(std::memcmp(header.Magic, "NPAK", 4) == 0, "Invalid NPAK file: {}", path.string());
 
     std::vector<PakEntry> entries;
     entries.resize(header.AssetCount);
-    std::memcpy(entries.data(), mFile.GetData() + header.EntryOffset, sizeof(PakEntry) * header.AssetCount);
+    std::memcpy(entries.data(), mMetaFile.GetData() + sizeof(PakHeader), header.AssetCount * sizeof(PakEntry));
 
     for (const auto& entry: entries)
     {
-        mEntryMap[entry.NameHash] = entry;
+        mEntryMap[entry.UUID] = entry;
     }
+}
+
+auto PakReader::HasEntry(const Nihil::UUID& uuid) const -> bool
+{
+    return mEntryMap.contains(uuid);
 }

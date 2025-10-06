@@ -22,7 +22,7 @@ OpenGLBuffer::~OpenGLBuffer()
 
 void OpenGLBuffer::SetData(const void* data, i32 size, i32 offset) const
 {
-    assert(mBufferType == BufferType::Uniform);
+    ASSERT(mBufferType == BufferType::Uniform);
     glNamedBufferSubData(mHandle, offset, size, data);
 }
 

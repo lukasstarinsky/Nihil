@@ -2,19 +2,22 @@
 
 PakWriter::PakWriter(const std::filesystem::path& path, i32 compressionLevel, u32 compressionThreshold)
     : mHeader{}
-    , mFile(path, std::ios::binary)
+    , mPath{path}
+    , mBlobFile{path, std::ios::binary}
+    , mMetaFile{path.string() + ".meta", std::ios::binary}
     , mCompressionLevel{compressionLevel}
     , mCompressionThreshold{compressionThreshold}
 {
-    Ensure(mFile.is_open(), "Failed to open NPak file {} for writing.", path.string());
+    Ensure(mBlobFile.is_open(), "Failed to open NPAK file {} for writing.", path.string());
+    Ensure(mMetaFile.is_open(), "Failed to open NPAK meta file {} for writing.", path.string() + ".meta");
 
     // Write dummy header to allow tellp() to work correctly
-    mFile.write(reinterpret_cast<const char*>(&mHeader), sizeof(PakHeader));
+    mMetaFile.write(reinterpret_cast<const char*>(&mHeader), sizeof(PakHeader));
 }
 
 PakWriter::~PakWriter()
 {
-    if (mFile.is_open())
+    if (mBlobFile.is_open() && mMetaFile.is_open())
     {
         Save();
     }
@@ -22,15 +25,24 @@ PakWriter::~PakWriter()
 
 void PakWriter::Save()
 {
+    if (mEntries.empty())
+    {
+        mBlobFile.close();
+        mMetaFile.close();
+        std::filesystem::remove(mPath);
+        std::filesystem::remove(mPath.string() + ".meta");
+        return;
+    }
+
     mHeader.AssetCount = mEntries.size();
-    mHeader.EntryOffset = mFile.tellp();
 
     for (const auto& entry: mEntries)
     {
-        mFile.write(reinterpret_cast<const char*>(&entry), sizeof(PakEntry));
+        mMetaFile.write(reinterpret_cast<const char*>(&entry), sizeof(PakEntry));
     }
 
-    mFile.seekp(0);
-    mFile.write(reinterpret_cast<const char*>(&mHeader), sizeof(PakHeader));
-    mFile.close();
+    mMetaFile.seekp(0);
+    mMetaFile.write(reinterpret_cast<const char*>(&mHeader), sizeof(PakHeader));
+    mMetaFile.close();
+    mBlobFile.close();
 }

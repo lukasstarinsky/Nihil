@@ -10,7 +10,11 @@ public:
 
     auto GetData() const -> std::byte*;
     auto GetSize() const -> std::size_t;
+
+    void Open();
+    void Close() const;
 private:
+    std::filesystem::path mFilePath {};
     std::byte* mData {};
     std::size_t mSize {};
 

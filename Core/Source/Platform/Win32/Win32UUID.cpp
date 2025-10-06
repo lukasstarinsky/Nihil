@@ -37,3 +37,8 @@ auto Nihil::UUID::FromString(const std::string& str) -> UUID
     Ensure(UuidFromString(reinterpret_cast<RPC_CSTR>(const_cast<char*>(str.c_str())), reinterpret_cast<::UUID*>(uuid.mData)) == RPC_S_OK, "Invalid UUID string: {}", str);
     return uuid;
 }
+
+auto Nihil::UUID::Generate() -> UUID
+{
+    return UUID{};
+}

@@ -1,9 +1,9 @@
 #include "OpenGLMesh.hpp"
 
 OpenGLMesh::OpenGLMesh(const MeshSpecification& meshSpec)
-    : mVertexBuffer{BufferType::Vertex, meshSpec.Vertices.data(), static_cast<i32>(meshSpec.Vertices.size() * sizeof(Vertex))}
+    : Mesh{meshSpec}
+    , mVertexBuffer{BufferType::Vertex, meshSpec.Vertices.data(), static_cast<i32>(meshSpec.Vertices.size() * sizeof(Vertex))}
     , mIndexBuffer{BufferType::Index, meshSpec.Indices.data(), static_cast<i32>(meshSpec.Indices.size() * sizeof(Index))}
-    , mIndexCount{static_cast<i32>(meshSpec.Indices.size())}
 {
     glCreateVertexArrays(1, &mVertexArray);
 
@@ -28,9 +28,4 @@ OpenGLMesh::~OpenGLMesh()
 void OpenGLMesh::Bind() const
 {
     glBindVertexArray(mVertexArray);
-}
-
-auto OpenGLMesh::GetIndexCount() const -> i32
-{
-    return mIndexCount;
 }

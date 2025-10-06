@@ -21,5 +21,6 @@ private:
     TexturePtr mTexture {};
     Camera mCamera;
 
+    AssetPipeline mAssetPipeline;
     std::unique_ptr<AssetManager> mAssetManager {};
 };

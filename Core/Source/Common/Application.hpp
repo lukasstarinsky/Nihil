@@ -2,7 +2,7 @@
 
 #include "Defines.hpp"
 
-enum class RendererAPI;
+enum class RendererAPI : u32;
 
 struct ApplicationConfig
 {

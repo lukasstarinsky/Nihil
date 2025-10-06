@@ -2,7 +2,7 @@
 
 #ifdef NIHIL_PLATFORM_WINDOWS
 #define GET_PROC_ADDRESS wglGetProcAddress
-#include "Platform/Win32/PlatformWin32.hpp"
+#include "Platform/Win32/Win32Platform.hpp"
 #include <GL/gl.h>
 #include <wglext.h>
 #elifdef NIHIL_PLATFORM_LINUX
@@ -12,12 +12,3 @@
 #include <glext.h>
 
 #include "Graphics/RendererBackend.hpp"
-
-template <typename... Args>
-inline void Ensure(bool predicate, std::format_string<Args...> msg, Args&&... args)
-{
-    if (!predicate)
-    {
-        throw std::runtime_error("OpenGL error: " + std::format(msg, std::forward<Args>(args)...));
-    }
-}

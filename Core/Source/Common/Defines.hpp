@@ -70,3 +70,10 @@ using f64 = double;
 
 static_assert(sizeof(f32) == 4, "Float is expected to be 4 bytes.");
 static_assert(sizeof(f64) == 8, "Double is expected to be 8 bytes.");
+
+
+/* ======= Concepts ======= */
+#include <concepts>
+
+template <typename T, typename... U>
+concept IsAnyOf = (std::same_as<T, U> || ...);
