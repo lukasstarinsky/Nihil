@@ -21,13 +21,13 @@ void Sandbox::OnInitialize()
     }
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
-    mMesh = Mesh::Create(mAssetManager->GetMesh(mAssetPipeline.GetManifest().GetUUID("cottage_obj")));
+    mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("cottage_obj"));
 
-    auto vs = mAssetManager->GetShader(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.vs"));
-    auto fs = mAssetManager->GetShader(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.fs"));
+    auto vs = mAssetManager->Get<Shader>(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.vs"));
+    auto fs = mAssetManager->Get<Shader>(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.fs"));
 
-    mMaterial = Material::Create(Shader::Create(vs), Shader::Create(fs));
-    mTexture = Texture::Create(mAssetManager->GetTexture(mAssetPipeline.GetManifest().GetUUID("container2")));
+    mMaterial = Material::Create(vs, fs);
+    mTexture = mAssetManager->Get<Texture>(mAssetPipeline.GetManifest().GetUUID("container2"));
 
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
     EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));

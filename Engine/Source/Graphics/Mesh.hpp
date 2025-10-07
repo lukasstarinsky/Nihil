@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Resource.hpp"
 #include "Platform/UUID.hpp"
 
 struct Vertex
@@ -28,11 +29,12 @@ struct MeshSpecification
 class Mesh;
 using MeshPtr = std::shared_ptr<Mesh>;
 
-class Mesh
+class Mesh : public Resource
 {
 public:
-    virtual ~Mesh() = default;
+    using Specification = MeshSpecification;
 
+    virtual ~Mesh() = default;
     virtual void Bind() const = 0;
 public:
     auto GetSubMeshes() const -> const std::vector<SubMesh>& { return mSubMeshes; }

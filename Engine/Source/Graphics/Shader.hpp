@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Resource.hpp"
 #include "Platform/UUID.hpp"
 #include "RendererAPI.hpp"
 
@@ -25,9 +26,11 @@ struct ShaderSpecification
 class Shader;
 using ShaderPtr = std::shared_ptr<Shader>;
 
-class Shader
+class Shader : public Resource
 {
 public:
+    using Specification = ShaderSpecification;
+
     virtual ~Shader() = default;
 public:
     static auto Create(const ShaderSpecification& shaderSpec) -> ShaderPtr;

@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "Resource.hpp"
 #include "Platform/UUID.hpp"
 
 struct TextureSpecification
@@ -14,11 +15,12 @@ struct TextureSpecification
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
 
-class Texture
+class Texture : public Resource
 {
 public:
-    virtual ~Texture() = default;
+    using Specification = TextureSpecification;
 
+    virtual ~Texture() = default;
     virtual void Bind(i32 slot) const = 0;
 public:
     static auto Create(const TextureSpecification& textureSpec) -> TexturePtr;
