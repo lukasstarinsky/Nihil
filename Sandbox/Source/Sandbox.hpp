@@ -17,8 +17,6 @@ public:
     auto OnKeyEvent(const KeyEvent& e) -> bool;
 private:
     MeshPtr mMesh {};
-    MaterialPtr mMaterial {};
-    TexturePtr mTexture {};
     Camera mCamera;
 
     AssetPipeline mAssetPipeline;

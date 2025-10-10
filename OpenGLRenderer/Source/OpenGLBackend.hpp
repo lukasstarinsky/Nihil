@@ -17,12 +17,12 @@ public:
     void EndFrame() const override;
 
     auto CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr override;
-    auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr override;
+    auto CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr override;
     auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr override;
-    auto CreateMesh(const MeshSpecification& meshSpec) const -> MeshPtr override;
+    auto CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr override;
     auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr override;
 
-    void Draw(const MeshPtr& mesh) const override;
+    void Draw(const MeshPtr& mesh, u32 subMeshIndex) const override;
 private:
     const PlatformState& mPlatformState;
 };

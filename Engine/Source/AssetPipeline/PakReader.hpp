@@ -102,6 +102,10 @@ public:
                 std::memcpy(spec.Indices.data(), dataPtr, header.IndexBlobSize);
                 dataPtr += header.IndexBlobSize;
             }
+            spec.Materials.resize(header.MaterialCount);
+            std::memcpy(spec.Materials.data(), dataPtr, header.MaterialCount * sizeof(MaterialSpecification));
+            dataPtr += header.MaterialCount * sizeof(MaterialSpecification);
+
             spec.SubMeshes.resize(header.SubMeshCount);
             std::memcpy(spec.SubMeshes.data(), dataPtr, header.SubMeshCount * sizeof(SubMesh));
         }

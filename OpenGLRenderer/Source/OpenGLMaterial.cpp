@@ -1,8 +1,9 @@
 #include "OpenGLMaterial.hpp"
 
-OpenGLMaterial::OpenGLMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader)
-    : mVertexShader{std::static_pointer_cast<OpenGLShader>(vertexShader)}
-    , mFragmentShader{std::static_pointer_cast<OpenGLShader>(fragmentShader)}
+OpenGLMaterial::OpenGLMaterial(const MaterialCreateInfo& materialCreateInfo)
+    : mVertexShader{std::static_pointer_cast<OpenGLShader>(materialCreateInfo.VertexShader)}
+    , mFragmentShader{std::static_pointer_cast<OpenGLShader>(materialCreateInfo.FragmentShader)}
+    , mTexture{std::static_pointer_cast<OpenGLTexture>(materialCreateInfo.Texture)}
 {
     ASSERT(mVertexShader->GetStage() == ShaderStage::Vertex);
     ASSERT(mFragmentShader->GetStage() == ShaderStage::Fragment);
@@ -21,6 +22,8 @@ OpenGLMaterial::~OpenGLMaterial()
 void OpenGLMaterial::Bind() const
 {
     glUseProgram(mHandle);
+    if (mTexture)
+        mTexture->Bind(0);
 }
 
 void OpenGLMaterial::SetUniform(i32 location, const Mat4f& data) const

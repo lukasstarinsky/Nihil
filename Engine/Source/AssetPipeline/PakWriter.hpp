@@ -12,7 +12,7 @@
 class PakWriter
 {
 public:
-    explicit PakWriter(const std::filesystem::path& path, i32 compressionLevel, u32 compressionThreshold);
+    explicit PakWriter(const std::filesystem::path& path, u32 compressionLevel, u32 compressionThreshold);
     ~PakWriter();
 
     void Save();
@@ -83,10 +83,10 @@ public:
 
             MeshHeader header {};
             header.SubMeshCount = static_cast<u32>(spec.SubMeshes.size());
-            entry.Size = sizeof(MeshHeader) + sizeof(SubMesh) * header.SubMeshCount;
+            header.MaterialCount = static_cast<u32>(spec.Materials.size());
+            entry.Size = sizeof(MeshHeader);
             if (uncompressedSize > mCompressionThreshold)
             {
-                Logger::Info("Compressing mesh '{}' ({} bytes) with level {}", spec.UUID, uncompressedSize, mCompressionLevel);
                 auto compressedVertices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Vertices.data()), vertexCount * sizeof(Vertex) }, mCompressionLevel);
                 auto compressedIndices = ZSTD::Compress({ reinterpret_cast<const std::byte*>(spec.Indices.data()), indexCount * sizeof(Index) }, mCompressionLevel);
                 auto compressedVerticesSize = static_cast<u32>(compressedVertices.size());
@@ -112,6 +112,13 @@ public:
                 mBlobFile.write(reinterpret_cast<const char*>(spec.Vertices.data()), vertexBlobSize);
                 mBlobFile.write(reinterpret_cast<const char*>(spec.Indices.data()), indexBlobSize);
             }
+            entry.Size += sizeof(MaterialSpecification) * header.MaterialCount;
+            for (const auto& material : spec.Materials)
+            {
+                mBlobFile.write(reinterpret_cast<const char*>(&material), sizeof(MaterialSpecification));
+            }
+
+            entry.Size += sizeof(SubMesh) * header.SubMeshCount;
             for (const auto& subMesh : spec.SubMeshes)
             {
                 mBlobFile.write(reinterpret_cast<const char*>(&subMesh), sizeof(SubMesh));
@@ -125,6 +132,6 @@ private:
     std::vector<PakEntry> mEntries;
     std::ofstream mBlobFile;
     std::ofstream mMetaFile;
-    i32 mCompressionLevel;
+    u32 mCompressionLevel;
     u32 mCompressionThreshold;
 };

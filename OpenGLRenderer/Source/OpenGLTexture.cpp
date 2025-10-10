@@ -4,8 +4,8 @@ OpenGLTexture::OpenGLTexture(const TextureSpecification& textureSpec)
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &mHandle);
 
-    glTextureParameteri(mHandle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(mHandle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(mHandle, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(mHandle, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTextureParameteri(mHandle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTextureParameteri(mHandle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -21,4 +21,9 @@ OpenGLTexture::~OpenGLTexture()
 void OpenGLTexture::Bind(i32 slot) const
 {
     glBindTextureUnit(slot, mHandle);
+}
+
+auto OpenGLTexture::GetHandle() const -> GLuint
+{
+    return mHandle;
 }

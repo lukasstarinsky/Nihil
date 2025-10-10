@@ -1,6 +1,6 @@
 #include "PakWriter.hpp"
 
-PakWriter::PakWriter(const std::filesystem::path& path, i32 compressionLevel, u32 compressionThreshold)
+PakWriter::PakWriter(const std::filesystem::path& path, u32 compressionLevel, u32 compressionThreshold)
     : mHeader{}
     , mPath{path}
     , mBlobFile{path, std::ios::binary}

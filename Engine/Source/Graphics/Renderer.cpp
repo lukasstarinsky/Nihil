@@ -89,10 +89,10 @@ void Renderer::BeginScene(const Camera& camera)
     sState.CameraUniformBuffer->SetData(camera.GetViewMatrix().Data(), sizeof(Mat4f), sizeof(Mat4f));
 }
 
-void Renderer::Draw(const MeshPtr& mesh)
+void Renderer::Draw(const MeshPtr& mesh, u32 subMeshIndex)
 {
     ASSERT(sRendererBackend);
-    sRendererBackend->Draw(mesh);
+    sRendererBackend->Draw(mesh, subMeshIndex);
 }
 
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
@@ -113,10 +113,10 @@ auto Shader::Create(const ShaderSpecification& shaderSpec) -> ShaderPtr
     return sRendererBackend->CreateShader(shaderSpec);
 }
 
-auto Material::Create(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) -> MaterialPtr
+auto Material::Create(const MaterialCreateInfo& materialCreateInfo) -> MaterialPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateMaterial(vertexShader, fragmentShader);
+    return sRendererBackend->CreateMaterial(materialCreateInfo);
 }
 
 auto Buffer::Create(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) -> BufferPtr
@@ -125,10 +125,10 @@ auto Buffer::Create(BufferType bufferType, const void* data, i32 size, i32 unifo
     return sRendererBackend->CreateBuffer(bufferType, data, size, uniformBinding);
 }
 
-auto Mesh::Create(const MeshSpecification& meshSpec) -> MeshPtr
+auto Mesh::Create(const MeshCreateInfo& meshCreateInfo) -> MeshPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateMesh(meshSpec);
+    return sRendererBackend->CreateMesh(meshCreateInfo);
 }
 
 auto Texture::Create(const TextureSpecification& textureSpec) -> TexturePtr

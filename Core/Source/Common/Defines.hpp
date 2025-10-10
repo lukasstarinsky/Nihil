@@ -10,6 +10,8 @@
 #define GIGABYTE(x) MEGABYTE(1024 * x)
 #define TERABYTE(x) GIGABYTE(1024 * x)
 
+#define UNUSED [[maybe_unused]]
+
 /* ======= Platform Detection ======= */
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     #ifdef _WIN64

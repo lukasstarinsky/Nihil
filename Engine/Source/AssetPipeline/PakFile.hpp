@@ -21,7 +21,7 @@ struct PakEntry
     Nihil::UUID UUID {};
     Type Type;
     u64 Offset;
-    i32 CompressionLevel;
+    u32 CompressionLevel;
     u64 Size;
 };
 
@@ -35,6 +35,7 @@ struct MeshHeader
 {
     u32 VertexBlobSize;
     u32 IndexBlobSize;
+    u32 MaterialCount;
     u32 SubMeshCount;
 };
 

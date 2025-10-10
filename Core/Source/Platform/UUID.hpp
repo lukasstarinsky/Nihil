@@ -8,7 +8,9 @@ namespace Nihil
 class NIHIL_API UUID
 {
 public:
-    explicit UUID();
+    UUID() = default;
+    UUID(std::byte data[16]);
+    UUID(i32 num);
 
     bool operator==(const UUID& other) const;
     auto Hash() const -> size_t;

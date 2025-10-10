@@ -20,10 +20,10 @@ public:
     virtual void EndFrame() const = 0;
 
     virtual auto CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr = 0;
-    virtual auto CreateMaterial(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) const -> MaterialPtr = 0;
+    virtual auto CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr = 0;
     virtual auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr = 0;
-    virtual auto CreateMesh(const MeshSpecification& meshSpec) const -> MeshPtr = 0;
+    virtual auto CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr = 0;
     virtual auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr = 0;
 
-    virtual void Draw(const MeshPtr& mesh) const = 0;
+    virtual void Draw(const MeshPtr& mesh, u32 subMeshIndex = UINT_MAX) const = 0;
 };

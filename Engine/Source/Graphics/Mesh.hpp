@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Resource.hpp"
+#include "Material.hpp"
 #include "Platform/UUID.hpp"
 
 struct Vertex
@@ -13,6 +14,7 @@ using Index = u32;
 
 struct SubMesh
 {
+    u32 MaterialIndex {};
     u32 BaseVertex {};
     u32 BaseIndex {};
     u32 IndexCount {};
@@ -24,6 +26,15 @@ struct MeshSpecification
     std::vector<Vertex> Vertices;
     std::vector<Index> Indices;
     std::vector<SubMesh> SubMeshes;
+    std::vector<MaterialSpecification> Materials;
+};
+
+struct MeshCreateInfo
+{
+    std::vector<Vertex> Vertices;
+    std::vector<Index> Indices;
+    std::vector<SubMesh> SubMeshes;
+    std::vector<MaterialPtr> Materials;
 };
 
 class Mesh;
@@ -35,20 +46,10 @@ public:
     using Specification = MeshSpecification;
 
     virtual ~Mesh() = default;
+
     virtual void Bind() const = 0;
-public:
-    auto GetSubMeshes() const -> const std::vector<SubMesh>& { return mSubMeshes; }
-    auto GetIndexCount() const -> u32 { return mIndexCount; }
+    virtual auto GetMaterial(u32 index) const -> MaterialPtr = 0;
+    virtual auto GetSubMeshes() const -> const std::vector<SubMesh>& = 0;
 
-    static auto Create(const MeshSpecification& meshSpec) -> MeshPtr;
-protected:
-    explicit Mesh(const MeshSpecification& meshSpec)
-        : mSubMeshes{meshSpec.SubMeshes}
-        , mIndexCount{static_cast<u32>(meshSpec.Indices.size())}
-    {
-
-    }
-
-    std::vector<SubMesh> mSubMeshes;
-    u32 mIndexCount {};
+    static auto Create(const MeshCreateInfo& meshCreateInfo) -> MeshPtr;
 };

@@ -17,17 +17,11 @@ void Sandbox::OnInitialize()
     if (!mAssetPipeline.ValidateManifest())
     {
         Logger::Warn("Asset manifest is not valid, rebuilding all assets...");
-        mAssetPipeline.BuildAll("Assets/01.npack", 1, MEGABYTE(2));
+        mAssetPipeline.BuildAll("Assets/01.npack", 1, MEGABYTE(1));
     }
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
-    mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("cottage_obj"));
-
-    auto vs = mAssetManager->Get<Shader>(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.vs"));
-    auto fs = mAssetManager->Get<Shader>(mAssetPipeline.GetManifest().GetUUID("DefaultObjectShader.fs"));
-
-    mMaterial = Material::Create(vs, fs);
-    mTexture = mAssetManager->Get<Texture>(mAssetPipeline.GetManifest().GetUUID("container2"));
+    mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
 
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
     EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));
@@ -35,8 +29,6 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 {
-    mMaterial->SetUniform(0, Mat4f::Identity());
-
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
@@ -55,8 +47,6 @@ void Sandbox::OnResize()
 void Sandbox::OnRender()
 {
     Renderer::BeginScene(mCamera);
-    mTexture->Bind(0);
-    mMaterial->Bind();
     Renderer::Draw(mMesh);
 }
 

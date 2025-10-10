@@ -2,11 +2,14 @@
 
 #include <rpc.h>
 
-Nihil::UUID::UUID()
+Nihil::UUID::UUID(std::byte data[16])
 {
-    ::UUID uuid;
-    UuidCreate(&uuid);
-    std::memcpy(mData, &uuid, sizeof(::UUID));
+    std::memcpy(mData, data, sizeof(mData));
+}
+
+Nihil::UUID::UUID(i32 num)
+{
+    std::memset(mData, num, sizeof(mData));
 }
 
 bool Nihil::UUID::operator==(const UUID& other) const
@@ -40,5 +43,9 @@ auto Nihil::UUID::FromString(const std::string& str) -> UUID
 
 auto Nihil::UUID::Generate() -> UUID
 {
-    return UUID{};
+    Nihil::UUID nUUID;
+    ::UUID uuid;
+    UuidCreate(&uuid);
+    std::memcpy(nUUID.mData, &uuid, sizeof(::UUID));
+    return nUUID;
 }

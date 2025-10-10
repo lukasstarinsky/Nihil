@@ -5,17 +5,16 @@
 #include <assimp/postprocess.h>
 #include <stb/stb_image.h>
 
-#include "Graphics/Renderer.hpp"
 #include "ShaderCompiler.hpp"
 
 auto AssetImporter::ImportTexture(const std::filesystem::path& filePath) -> TextureSpecification
 {
     auto fileData = File::ReadBinary(filePath);
     i32 width, height, numChannels;
-    auto data = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(fileData.data()), static_cast<int>(fileData.size()), &width, &height, &numChannels, 4);
+    auto data = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(fileData.data()), static_cast<int>(fileData.size()), &width, &height, &numChannels, STBI_rgb_alpha);
     Ensure(data, "Failed to load texture '{}'", filePath.filename().string());
 
-    auto size = width * height * numChannels;
+    auto size = width * height * 4;
 
     TextureSpecification textureSpec {
         .UUID = Nihil::UUID::Generate(),
@@ -62,25 +61,27 @@ auto AssetImporter::ImportShader(const std::filesystem::path& path) -> ShaderSpe
         std::memcpy(shaderSpec.Variants[0].Data.data(), glBinary.data(), shaderSpec.Variants[0].Data.size());
         return shaderSpec;
     }
-    else if (extension == ".hlsl")
+    else
     {
-        Logger::Info("Packing shader '{}' for Direct3D", strippedExt);
-    }
-    else if (extension == ".msl")
-    {
-        Logger::Info("Packing shader '{}' for Metal", strippedExt);
+        Logger::Warn("Unsupported shader format: {}", extension.string());
     }
     return {};
 }
 
-auto AssetImporter::ImportMesh(const std::filesystem::path& filePath) -> MeshSpecification
+auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Manifest& manifest) -> MeshSpecification
 {
     auto fileData = File::ReadBinary(filePath);
-    Assimp::Importer importer;
-    const auto* scene = importer.ReadFileFromMemory(fileData.data(), static_cast<u32>(fileData.size()), aiProcess_Triangulate);
-    Ensure(scene && scene->HasMeshes(), "Failed to load mesh from file: {}", filePath.string());
+    u32 flags = aiProcess_Triangulate;
+    if (filePath.extension() == ".obj")
+    {
+        flags |= aiProcess_FlipUVs;
+    }
 
+    Assimp::Importer importer;
+    const auto* scene = importer.ReadFileFromMemory(fileData.data(), static_cast<u32>(fileData.size()), flags);
+    Ensure(scene && scene->HasMeshes(), "Failed to load mesh from file: {}", filePath.string());
     std::span<aiMesh*> loadedMeshes(scene->mMeshes, scene->mMeshes + scene->mNumMeshes);
+
     MeshSpecification meshSpec {};
     meshSpec.UUID = Nihil::UUID::Generate();
     meshSpec.SubMeshes.reserve(scene->mNumMeshes);
@@ -94,6 +95,7 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath) -> MeshSpe
         }
 
         SubMesh subMesh {
+            .MaterialIndex = mesh->mMaterialIndex,
             .BaseVertex = static_cast<u32>(meshSpec.Vertices.size()),
             .BaseIndex = static_cast<u32>(meshSpec.Indices.size()),
             .IndexCount = mesh->mNumFaces * 3
@@ -119,6 +121,54 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath) -> MeshSpe
             for (u32 j = 0; j < face.mNumIndices; ++j)
             {
                 meshSpec.Indices.push_back(face.mIndices[j]);
+            }
+        }
+    }
+
+    if (filePath.extension() == ".obj")
+    {
+        // Process .mtl manually because assimp panics when textures are not in the same directory
+        auto mtlPath = filePath;
+        mtlPath.replace_extension(".mtl");
+
+        std::unordered_map<std::string, u32> materialIndexMap;
+
+        if (std::filesystem::exists(mtlPath))
+        {
+            auto mtl = File::ReadLines(mtlPath);
+
+            for (const auto& line: mtl)
+            {
+                if (line.starts_with("newmtl "))
+                {
+                    auto name = line.substr(7);
+                    materialIndexMap[name] = static_cast<u32>(meshSpec.Materials.size());
+                    meshSpec.Materials.emplace_back();
+                }
+                else if (line.starts_with("map_Kd "))
+                {
+                    auto& material = meshSpec.Materials.back();
+                    auto texturePath = line.substr(7);
+                    auto textureName = texturePath.substr(texturePath.find_last_of('/') + 1);
+                    auto modelName = filePath.stem().string();
+                    material.TextureUUID = manifest.GetUUID(modelName + "/" + textureName);
+                }
+            }
+
+            // Remap submesh material indices
+            for (u32 i = 0; i < meshSpec.SubMeshes.size(); ++i)
+            {
+                auto& subMesh = meshSpec.SubMeshes[i];
+                auto material = scene->mMaterials[subMesh.MaterialIndex];
+                auto it = materialIndexMap.find(material->GetName().C_Str());
+                if (it != materialIndexMap.end())
+                {
+                    subMesh.MaterialIndex = it->second;
+                }
+                else
+                {
+                    subMesh.MaterialIndex = 0;
+                }
             }
         }
     }

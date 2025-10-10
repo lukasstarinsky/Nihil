@@ -23,7 +23,7 @@ namespace Renderer
     void EndFrame();
 
     void BeginScene(const Camera& camera);
-    void Draw(const MeshPtr& mesh);
+    void Draw(const MeshPtr& mesh, u32 subMeshIndex = UINT32_MAX);
 
     auto ApiToModuleString(RendererAPI api) -> const char*;
 }

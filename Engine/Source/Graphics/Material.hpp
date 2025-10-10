@@ -2,6 +2,21 @@
 
 #include "Math/Math.hpp"
 #include "Shader.hpp"
+#include "Texture.hpp"
+
+struct MaterialSpecification
+{
+    Nihil::UUID VertexShaderUUID {};
+    Nihil::UUID FragmentShaderUUID {};
+    Nihil::UUID TextureUUID {};
+};
+
+struct MaterialCreateInfo
+{
+    ShaderPtr VertexShader;
+    ShaderPtr FragmentShader;
+    TexturePtr Texture;
+};
 
 class Material;
 using MaterialPtr = std::shared_ptr<Material>;
@@ -12,9 +27,7 @@ public:
     virtual ~Material() = default;
 
     virtual void Bind() const = 0;
-
-    // TODO: will this be here?
     virtual void SetUniform(i32 location, const Mat4f& data) const = 0;
 
-    static auto Create(const ShaderPtr& vertexShader, const ShaderPtr& fragmentShader) -> MaterialPtr;
+    static auto Create(const MaterialCreateInfo& materialCreateInfo) -> MaterialPtr;
 };

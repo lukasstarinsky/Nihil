@@ -1,6 +1,5 @@
 #include "AssetPipeline.hpp"
 
-#include "ShaderCompiler.hpp"
 #include "AssetImporter.hpp"
 #include "PakWriter.hpp"
 #include "Graphics/RendererBackend.hpp"
@@ -20,36 +19,87 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
     PakWriter pakWriter(outputFile, compressionLevel, compressionThreshold);
     mManifest.Clear();
 
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
         if (!entry.is_regular_file())
             continue;
 
         auto& path = entry.path();
         auto extension = path.extension();
-        auto assetName = entry.path().filename().replace_extension().string();
+        auto assetName = entry.path().lexically_relative(mRoot / "Textures").generic_string();
 
         if (mManifest.HasAsset(assetName))
             continue;
 
-        // Scan Textures
         if (std::find(sTextureExts.begin(), sTextureExts.end(), extension) != sTextureExts.end())
         {
             auto textureSpec = AssetImporter::ImportTexture(path);
+
+            if (assetName == "default.png")
+            {
+                textureSpec.UUID = Nihil::UUID(2);
+            }
+
             mManifest.AddAsset(assetName, textureSpec.UUID);
             pakWriter.Write<TextureSpecification>(textureSpec);
         }
-        // Scan Shaders
-        else if (std::find(sShaderExts.begin(), sShaderExts.end(), extension) != sShaderExts.end())
+    }
+
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Shaders"))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        auto& path = entry.path();
+        auto extension = path.extension();
+        auto assetName = entry.path().stem().string();
+
+        if (mManifest.HasAsset(assetName))
+            continue;
+
+        if (std::find(sShaderExts.begin(), sShaderExts.end(), extension) != sShaderExts.end())
         {
             auto shaderSpec = AssetImporter::ImportShader(path);
+
+            // TODO: this is voodoo, but the question is, is it too much voodoo for our purposes? - TD
+            // Maybe make some enum of defaults
+            if (assetName == "DefaultObjectShader.vs")
+            {
+                shaderSpec.UUID = Nihil::UUID(0);
+            }
+            else if (assetName == "DefaultObjectShader.fs")
+            {
+                shaderSpec.UUID = Nihil::UUID(1);
+            }
+
             mManifest.AddAsset(assetName, shaderSpec.UUID);
             pakWriter.Write<ShaderSpecification>(shaderSpec);
         }
-        // Scan Meshes
-        else if (std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
+    }
+
+    // Import models last to ensure all textures and shaders are already in the manifest
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        auto& path = entry.path();
+        auto extension = path.extension();
+        auto assetName = entry.path().stem().string();
+
+        if (mManifest.HasAsset(assetName))
+            continue;
+
+        if (std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
         {
-            auto meshSpec = AssetImporter::ImportMesh(path);
+            auto meshSpec = AssetImporter::ImportMesh(path, mManifest);
+
+            for (auto& material : meshSpec.Materials)
+            {
+                material.VertexShaderUUID = Nihil::UUID(0);
+                material.FragmentShaderUUID = Nihil::UUID(1);
+            }
+
             mManifest.AddAsset(assetName, meshSpec.UUID);
             pakWriter.Write<MeshSpecification>(meshSpec);
         }
@@ -60,7 +110,23 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
 
 bool AssetPipeline::ValidateManifest()
 {
-    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot))
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        auto& path = entry.path();
+        auto extension = path.extension();
+        auto assetName = entry.path().lexically_relative(mRoot / "Textures").generic_string();
+
+        if (std::find(sTextureExts.begin(), sTextureExts.end(), extension) != sTextureExts.end())
+        {
+            if (!mManifest.HasAsset(assetName))
+                return false;
+        }
+    }
+
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Shaders"))
     {
         if (!entry.is_regular_file())
             continue;
@@ -69,15 +135,29 @@ bool AssetPipeline::ValidateManifest()
         auto extension = path.extension();
         auto assetName = entry.path().filename().replace_extension().string();
 
-        if (std::find(sTextureExts.begin(), sTextureExts.end(), extension) != sTextureExts.end() ||
-            std::find(sShaderExts.begin(), sShaderExts.end(), extension) != sShaderExts.end() ||
-            std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
+        if (std::find(sShaderExts.begin(), sShaderExts.end(), extension) != sShaderExts.end())
         {
             if (!mManifest.HasAsset(assetName))
                 return false;
         }
-
     }
+
+    for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Models"))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        auto& path = entry.path();
+        auto extension = path.extension();
+        auto assetName = entry.path().filename().replace_extension().string();
+
+        if (std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
+        {
+            if (!mManifest.HasAsset(assetName))
+                return false;
+        }
+    }
+
     return true;
 }
 

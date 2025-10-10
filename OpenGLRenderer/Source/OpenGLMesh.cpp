@@ -1,9 +1,10 @@
 #include "OpenGLMesh.hpp"
 
-OpenGLMesh::OpenGLMesh(const MeshSpecification& meshSpec)
-    : Mesh{meshSpec}
-    , mVertexBuffer{BufferType::Vertex, meshSpec.Vertices.data(), static_cast<i32>(meshSpec.Vertices.size() * sizeof(Vertex))}
-    , mIndexBuffer{BufferType::Index, meshSpec.Indices.data(), static_cast<i32>(meshSpec.Indices.size() * sizeof(Index))}
+OpenGLMesh::OpenGLMesh(const MeshCreateInfo& meshCreateInfo)
+    : mSubMeshes{meshCreateInfo.SubMeshes}
+    , mMaterials{meshCreateInfo.Materials}
+    , mVertexBuffer{BufferType::Vertex, meshCreateInfo.Vertices.data(), static_cast<i32>(meshCreateInfo.Vertices.size() * sizeof(Vertex))}
+    , mIndexBuffer{BufferType::Index, meshCreateInfo.Indices.data(), static_cast<i32>(meshCreateInfo.Indices.size() * sizeof(Index))}
 {
     glCreateVertexArrays(1, &mVertexArray);
 
@@ -28,4 +29,15 @@ OpenGLMesh::~OpenGLMesh()
 void OpenGLMesh::Bind() const
 {
     glBindVertexArray(mVertexArray);
+}
+
+auto OpenGLMesh::GetMaterial(u32 index) const -> MaterialPtr
+{
+    ASSERT(index <= mMaterials.size() && index >= 0);
+    return mMaterials[index];
+}
+
+auto OpenGLMesh::GetSubMeshes() const -> const std::vector<SubMesh>&
+{
+    return mSubMeshes;
 }

@@ -24,19 +24,9 @@ auto Manifest::GetName(const Nihil::UUID& uuid) const -> std::string
     return mUUIDToName.at(uuid);
 }
 
-auto Manifest::GetAllAssets() const -> const std::unordered_map<std::string, Nihil::UUID>&
-{
-    return mNameToUUID;
-}
-
 auto Manifest::HasAsset(const std::string& name) const -> bool
 {
     return mNameToUUID.contains(name);
-}
-
-auto Manifest::IsEmpty() const -> bool
-{
-    return !std::filesystem::exists(mFilePath) || std::filesystem::is_empty(mFilePath);
 }
 
 void Manifest::Save() const
