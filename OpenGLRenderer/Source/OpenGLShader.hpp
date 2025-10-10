@@ -5,7 +5,7 @@
 class OpenGLShader : public Shader
 {
 public:
-    OpenGLShader(const ShaderSpecification& shaderSpec);
+    OpenGLShader(const ShaderCreateInfo& shaderCreateInfo);
     ~OpenGLShader() override;
 
     auto GetHandle() const -> GLuint;

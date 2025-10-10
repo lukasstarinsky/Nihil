@@ -16,11 +16,11 @@ public:
     void OnResize(i32 width, i32 height) const override;
     void EndFrame() const override;
 
-    auto CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr override;
+    auto CreateShader(const ShaderCreateInfo& shaderCreateInfo) const -> ShaderPtr override;
     auto CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr override;
-    auto CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr override;
+    auto CreateBuffer(const BufferCreateInfo& bufferCreateInfo) const -> BufferPtr override;
     auto CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr override;
-    auto CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr override;
+    auto CreateTexture(const TextureCreateInfo& textureCreateInfo) const -> TexturePtr override;
 
     void Draw(const MeshPtr& mesh, u32 subMeshIndex) const override;
 private:

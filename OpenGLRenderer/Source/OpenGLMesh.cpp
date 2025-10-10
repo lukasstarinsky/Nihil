@@ -3,8 +3,8 @@
 OpenGLMesh::OpenGLMesh(const MeshCreateInfo& meshCreateInfo)
     : mSubMeshes{meshCreateInfo.SubMeshes}
     , mMaterials{meshCreateInfo.Materials}
-    , mVertexBuffer{BufferType::Vertex, meshCreateInfo.Vertices.data(), static_cast<i32>(meshCreateInfo.Vertices.size() * sizeof(Vertex))}
-    , mIndexBuffer{BufferType::Index, meshCreateInfo.Indices.data(), static_cast<i32>(meshCreateInfo.Indices.size() * sizeof(Index))}
+    , mVertexBuffer{{BufferType::Vertex, meshCreateInfo.Vertices.data(), static_cast<i32>(meshCreateInfo.Vertices.size() * sizeof(Vertex))}}
+    , mIndexBuffer{{BufferType::Index, meshCreateInfo.Indices.data(), static_cast<i32>(meshCreateInfo.Indices.size() * sizeof(Index))}}
 {
     glCreateVertexArrays(1, &mVertexArray);
 

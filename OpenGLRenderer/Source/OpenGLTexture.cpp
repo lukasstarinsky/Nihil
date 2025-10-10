@@ -1,6 +1,6 @@
 #include "OpenGLTexture.hpp"
 
-OpenGLTexture::OpenGLTexture(const TextureSpecification& textureSpec)
+OpenGLTexture::OpenGLTexture(const TextureCreateInfo& textureCreateInfo)
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &mHandle);
 
@@ -9,8 +9,8 @@ OpenGLTexture::OpenGLTexture(const TextureSpecification& textureSpec)
     glTextureParameteri(mHandle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTextureParameteri(mHandle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTextureStorage2D(mHandle, 1, GL_RGBA8, textureSpec.Width, textureSpec.Height);
-    glTextureSubImage2D(mHandle, 0, 0, 0, textureSpec.Width, textureSpec.Height, GL_RGBA, GL_UNSIGNED_BYTE, textureSpec.Data.data());
+    glTextureStorage2D(mHandle, 1, GL_RGBA8, textureCreateInfo.Width, textureCreateInfo.Height);
+    glTextureSubImage2D(mHandle, 0, 0, 0, textureCreateInfo.Width, textureCreateInfo.Height, GL_RGBA, GL_UNSIGNED_BYTE, textureCreateInfo.Data.data());
 }
 
 OpenGLTexture::~OpenGLTexture()

@@ -22,8 +22,7 @@ OpenGLMaterial::~OpenGLMaterial()
 void OpenGLMaterial::Bind() const
 {
     glUseProgram(mHandle);
-    if (mTexture)
-        mTexture->Bind(0);
+    mTexture->Bind(0);
 }
 
 void OpenGLMaterial::SetUniform(i32 location, const Mat4f& data) const

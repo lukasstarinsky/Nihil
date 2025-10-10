@@ -1,17 +1,17 @@
 #include "OpenGLBuffer.hpp"
 
-OpenGLBuffer::OpenGLBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding)
-    : mBufferType{bufferType}
+OpenGLBuffer::OpenGLBuffer(const BufferCreateInfo& bufferCreateInfo)
+    : mBufferType{bufferCreateInfo.Type}
 {
     glCreateBuffers(1, &mHandle);
-    if (bufferType == BufferType::Uniform)
+    if (mBufferType == BufferType::Uniform)
     {
-        glNamedBufferStorage(mHandle, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
-        glBindBufferBase(GL_UNIFORM_BUFFER, uniformBinding, mHandle);
+        glNamedBufferStorage(mHandle, bufferCreateInfo.Size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+        glBindBufferBase(GL_UNIFORM_BUFFER, bufferCreateInfo.UniformBinding, mHandle);
     }
     else
     {
-        glNamedBufferStorage(mHandle, size, data, 0);
+        glNamedBufferStorage(mHandle, bufferCreateInfo.Size, bufferCreateInfo.Data, 0);
     }
 }
 

@@ -23,6 +23,8 @@ struct ShaderSpecification
     std::vector<ShaderVariant> Variants;
 };
 
+using ShaderCreateInfo = ShaderSpecification;
+
 class Shader;
 using ShaderPtr = std::shared_ptr<Shader>;
 
@@ -33,5 +35,5 @@ public:
 
     virtual ~Shader() = default;
 public:
-    static auto Create(const ShaderSpecification& shaderSpec) -> ShaderPtr;
+    static auto Create(const ShaderCreateInfo& shaderCreateInfo) -> ShaderPtr;
 };

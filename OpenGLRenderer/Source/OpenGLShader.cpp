@@ -11,12 +11,12 @@ static auto ShaderTypeToGLenum(ShaderStage shaderType) -> GLenum
     return GL_VERTEX_SHADER;
 }
 
-OpenGLShader::OpenGLShader(const ShaderSpecification& shaderSpec)
-    : mShaderStage{shaderSpec.Stage}
+OpenGLShader::OpenGLShader(const ShaderCreateInfo& shaderCreateInfo)
+    : mShaderStage{shaderCreateInfo.Stage}
 {
     mHandle = glCreateShader(ShaderTypeToGLenum(mShaderStage));
 
-    for (const auto& variant: shaderSpec.Variants)
+    for (const auto& variant: shaderCreateInfo.Variants)
     {
         if (variant.API == RendererAPI::OpenGL)
         {

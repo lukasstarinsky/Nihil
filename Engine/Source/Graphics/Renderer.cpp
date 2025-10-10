@@ -35,7 +35,13 @@ void Renderer::Initialize(const ApplicationConfig& config)
     }
 
     // TODO: Move to scene
-    sState.CameraUniformBuffer = Buffer::Create(BufferType::Uniform, nullptr, 2 * sizeof(Mat4f), CAMERA_UB_DEFAULT_BINDING);
+    BufferCreateInfo cameraUBCreateInfo {
+        .Type = BufferType::Uniform,
+        .Data = nullptr,
+        .Size = 2 * sizeof(Mat4f),
+        .UniformBinding = CAMERA_UB_DEFAULT_BINDING
+    };
+    sState.CameraUniformBuffer = Buffer::Create(cameraUBCreateInfo);
 
     EventDispatcher::AddListener<ApplicationEvent>(OnAppEvent);
 }
@@ -107,10 +113,10 @@ auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
     }
 }
 
-auto Shader::Create(const ShaderSpecification& shaderSpec) -> ShaderPtr
+auto Shader::Create(const ShaderCreateInfo& shaderCreateInfo) -> ShaderPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateShader(shaderSpec);
+    return sRendererBackend->CreateShader(shaderCreateInfo);
 }
 
 auto Material::Create(const MaterialCreateInfo& materialCreateInfo) -> MaterialPtr
@@ -119,10 +125,10 @@ auto Material::Create(const MaterialCreateInfo& materialCreateInfo) -> MaterialP
     return sRendererBackend->CreateMaterial(materialCreateInfo);
 }
 
-auto Buffer::Create(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) -> BufferPtr
+auto Buffer::Create(const BufferCreateInfo& bufferCreateInfo) -> BufferPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateBuffer(bufferType, data, size, uniformBinding);
+    return sRendererBackend->CreateBuffer(bufferCreateInfo);
 }
 
 auto Mesh::Create(const MeshCreateInfo& meshCreateInfo) -> MeshPtr
@@ -131,8 +137,8 @@ auto Mesh::Create(const MeshCreateInfo& meshCreateInfo) -> MeshPtr
     return sRendererBackend->CreateMesh(meshCreateInfo);
 }
 
-auto Texture::Create(const TextureSpecification& textureSpec) -> TexturePtr
+auto Texture::Create(const TextureCreateInfo& textureCreateInfo) -> TexturePtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateTexture(textureSpec);
+    return sRendererBackend->CreateTexture(textureCreateInfo);
 }

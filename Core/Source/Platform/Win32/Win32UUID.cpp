@@ -2,16 +2,6 @@
 
 #include <rpc.h>
 
-Nihil::UUID::UUID(std::byte data[16])
-{
-    std::memcpy(mData, data, sizeof(mData));
-}
-
-Nihil::UUID::UUID(i32 num)
-{
-    std::memset(mData, num, sizeof(mData));
-}
-
 bool Nihil::UUID::operator==(const UUID& other) const
 {
     return std::memcmp(mData, other.mData, 16) == 0;

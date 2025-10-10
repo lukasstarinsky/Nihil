@@ -99,9 +99,9 @@ void OpenGLBackend::EndFrame() const
 #endif
 }
 
-auto OpenGLBackend::CreateShader(const ShaderSpecification& shaderSpec) const -> ShaderPtr
+auto OpenGLBackend::CreateShader(const ShaderCreateInfo& shaderCreateInfo) const -> ShaderPtr
 {
-    return std::make_shared<OpenGLShader>(shaderSpec);
+    return std::make_shared<OpenGLShader>(shaderCreateInfo);
 }
 
 auto OpenGLBackend::CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr
@@ -109,9 +109,9 @@ auto OpenGLBackend::CreateMaterial(const MaterialCreateInfo& materialCreateInfo)
     return std::make_shared<OpenGLMaterial>(materialCreateInfo);
 }
 
-auto OpenGLBackend::CreateBuffer(BufferType bufferType, const void* data, i32 size, i32 uniformBinding) const -> BufferPtr
+auto OpenGLBackend::CreateBuffer(const BufferCreateInfo& bufferCreateInfo) const -> BufferPtr
 {
-    return std::make_shared<OpenGLBuffer>(bufferType, data, size, uniformBinding);
+    return std::make_shared<OpenGLBuffer>(bufferCreateInfo);
 }
 
 auto OpenGLBackend::CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr
@@ -119,9 +119,9 @@ auto OpenGLBackend::CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> Me
     return std::make_shared<OpenGLMesh>(meshCreateInfo);
 }
 
-auto OpenGLBackend::CreateTexture(const TextureSpecification& textureSpec) const -> TexturePtr
+auto OpenGLBackend::CreateTexture(const TextureCreateInfo& textureCreateInfo) const -> TexturePtr
 {
-    return std::make_shared<OpenGLTexture>(textureSpec);
+    return std::make_shared<OpenGLTexture>(textureCreateInfo);
 }
 
 void OpenGLBackend::Draw(const MeshPtr& mesh, u32 subMeshIndex) const

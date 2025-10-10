@@ -1,14 +1,15 @@
 #pragma once
 
+#include "DefaultResource.hpp"
 #include "Math/Math.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 
 struct MaterialSpecification
 {
-    Nihil::UUID VertexShaderUUID {};
-    Nihil::UUID FragmentShaderUUID {};
-    Nihil::UUID TextureUUID {};
+    Nihil::UUID VertexShaderUUID = DefaultResource::VertexShader;
+    Nihil::UUID FragmentShaderUUID = DefaultResource::FragmentShader;
+    Nihil::UUID TextureUUID = DefaultResource::Texture;
 };
 
 struct MaterialCreateInfo

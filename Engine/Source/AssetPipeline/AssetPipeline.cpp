@@ -2,6 +2,7 @@
 
 #include "AssetImporter.hpp"
 #include "PakWriter.hpp"
+#include "Graphics/DefaultResource.hpp"
 #include "Graphics/RendererBackend.hpp"
 
 static const std::vector<const char*> sTextureExts { ".png", ".jpg", ".jpeg", ".bmp", ".tga" };
@@ -37,7 +38,7 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
 
             if (assetName == "default.png")
             {
-                textureSpec.UUID = Nihil::UUID(2);
+                textureSpec.UUID = DefaultResource::Texture;
             }
 
             mManifest.AddAsset(assetName, textureSpec.UUID);
@@ -62,14 +63,13 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
             auto shaderSpec = AssetImporter::ImportShader(path);
 
             // TODO: this is voodoo, but the question is, is it too much voodoo for our purposes? - TD
-            // Maybe make some enum of defaults
             if (assetName == "DefaultObjectShader.vs")
             {
-                shaderSpec.UUID = Nihil::UUID(0);
+                shaderSpec.UUID = DefaultResource::VertexShader;
             }
             else if (assetName == "DefaultObjectShader.fs")
             {
-                shaderSpec.UUID = Nihil::UUID(1);
+                shaderSpec.UUID = DefaultResource::FragmentShader;
             }
 
             mManifest.AddAsset(assetName, shaderSpec.UUID);
@@ -93,13 +93,6 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
         if (std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
         {
             auto meshSpec = AssetImporter::ImportMesh(path, mManifest);
-
-            for (auto& material : meshSpec.Materials)
-            {
-                material.VertexShaderUUID = Nihil::UUID(0);
-                material.FragmentShaderUUID = Nihil::UUID(1);
-            }
-
             mManifest.AddAsset(assetName, meshSpec.UUID);
             pakWriter.Write<MeshSpecification>(meshSpec);
         }
@@ -133,7 +126,7 @@ bool AssetPipeline::ValidateManifest()
 
         auto& path = entry.path();
         auto extension = path.extension();
-        auto assetName = entry.path().filename().replace_extension().string();
+        auto assetName = entry.path().stem().string();
 
         if (std::find(sShaderExts.begin(), sShaderExts.end(), extension) != sShaderExts.end())
         {
@@ -149,7 +142,7 @@ bool AssetPipeline::ValidateManifest()
 
         auto& path = entry.path();
         auto extension = path.extension();
-        auto assetName = entry.path().filename().replace_extension().string();
+        auto assetName = entry.path().stem().string();
 
         if (std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
         {
