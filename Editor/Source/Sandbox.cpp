@@ -35,7 +35,7 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
         moveVector += Input::IsKeyDown(Key::W) ? mCamera.Front() : Input::IsKeyDown(Key::S) ? -mCamera.Front() : Vec3f{};
         moveVector += Input::IsKeyDown(Key::A) ? -mCamera.Right() : Input::IsKeyDown(Key::D) ? mCamera.Right() : Vec3f{};
         moveVector.Normalize();
-        mCamera.Translate(moveVector * deltaTimeSeconds * 5.0f);
+        mCamera.Translate(moveVector * deltaTimeSeconds * 15.0f);
     }
 }
 
