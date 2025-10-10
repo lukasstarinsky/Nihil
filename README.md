@@ -27,9 +27,7 @@
    # OR
    ./Binaries/Release/NihilSandbox.exe
    ```
-
 ## 📦 Dependencies
-
 | **Name** | **Usage** |
 |-----------|------------|
 | [shaderc](https://github.com/google/shaderc) | Compilation of shaders to spv |
@@ -38,3 +36,11 @@
 | [assimp](https://github.com/assimp/assimp) | Importing mesh files |
 | [zstd](https://github.com/facebook/zstd) | Asset Compression/Decompression |
 | [stb](https://github.com/nothings/stb) | Importing of images, sound, fonts |
+## 🛠️ Project Structure
+| **Project**    | **Type**       | **Description**                                                   |
+|----------------|----------------|-------------------------------------------------------------------|
+| Core           | Shared Library | Common functionality (error handling, user input, platform layer) |
+| OpenGLRenderer | Shared Library | Rendering backend (OpenGL)                                        |
+| Engine         | Static Library | Engine Core                                                       |
+| Editor         | Executable     | Nihil Development Editor                                          |
+| Runtime        | Executable     | Runtime application template                                      |
