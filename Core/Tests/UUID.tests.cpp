@@ -4,8 +4,8 @@
 
 TEST(UUID, Compare)
 {
-    auto uuid1 = Nihil::UUID();
-    auto uuid2 = Nihil::UUID();
+    auto uuid1 = Nihil::UUID::Generate();
+    auto uuid2 = Nihil::UUID::Generate();
     auto uuid3 = uuid1;
 
     ASSERT_FALSE(uuid1 == uuid2);
@@ -14,7 +14,7 @@ TEST(UUID, Compare)
 
 TEST(UUID, Stringify)
 {
-    auto uuid1 = Nihil::UUID();
+    auto uuid1 = Nihil::UUID::Generate();
     auto str1 = uuid1.ToString();
     auto uuid2 = Nihil::UUID::FromString(str1);
     auto str2 = uuid2.ToString();

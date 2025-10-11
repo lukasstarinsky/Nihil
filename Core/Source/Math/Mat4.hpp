@@ -148,6 +148,20 @@ public:
         return out;
     }
 
+    // http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho
+    static constexpr auto Orthographic(float left, float right, float bottom, float top, float nearPlane, float farPlane) -> Mat4f
+    {
+        Mat4f out = Identity();
+        out[0] = 2.0f / (right - left);
+        out[5] = 2.0f / (top - bottom);
+        out[10] = -2.0f / (farPlane - nearPlane);
+        out[12] = -(right + left) / (right - left);
+        out[13] = -(top + bottom) / (top - bottom);
+        out[14] = -(farPlane + nearPlane) / (farPlane - nearPlane);
+        out[15] = 1.0f;
+        return out;
+    }
+
     // http://www.songho.ca/opengl/gl_lookattoaxes.html
     static constexpr auto LookAt(const Vec3f& eye, const Vec3f& lookAt, const Vec3f& up) -> Mat4f
     {
