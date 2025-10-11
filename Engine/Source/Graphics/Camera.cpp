@@ -1,18 +1,22 @@
 #include "Camera.hpp"
 
-Camera::Camera(CameraProjection projection, const Vec3f& position, const Vec3f& lookAt, const Vec3f& up, f32 fovDegrees, f32 aspectRatio)
-    : mPosition{position}
+Camera::Camera(CameraProjection projection, const Vec3f& position, const Vec3f& lookAt, const Vec3f& up, f32 fovDegreesOrWidth, f32 aspectRatioOrHeight)
+    : mProjection{projection}
+    , mPosition{position}
     , mLookAt{lookAt}
     , mUp{up}
-    , mFovDegrees{fovDegrees}
+    , mFovDegrees{fovDegreesOrWidth}
 {
     if (projection == CameraProjection::Orthographic)
     {
-        Throw("Orthographic projection is not yet supported.");
+        mProjectionMatrix = Mat4f::Orthographic(0, fovDegreesOrWidth, 0, aspectRatioOrHeight, -1.0f, 1.0f);
+        mViewMatrix = Mat4f::Identity();
     }
-
-    mProjectionMatrix = Mat4f::Perspective(DEG_TO_RAD(fovDegrees), aspectRatio, 0.1f, 100.0f);
-    mViewMatrix = Mat4f::LookAt(position, lookAt, up);
+    else
+    {
+        mProjectionMatrix = Mat4f::Perspective(DEG_TO_RAD(fovDegreesOrWidth), aspectRatioOrHeight, 0.1f, 100.0f);
+        mViewMatrix = Mat4f::LookAt(position, lookAt, up);
+    }
     mRight = Vec3f::Normalize(Vec3f::Cross(mLookAt, mUp));
 }
 
@@ -43,6 +47,9 @@ auto Camera::Right() const -> const Vec3f&
 
 void Camera::Rotate(f32 pitch, f32 yaw)
 {
+    if (mProjection == CameraProjection::Orthographic)
+        return;
+
     mPitch += pitch;
     mYaw += yaw;
 

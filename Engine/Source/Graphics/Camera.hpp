@@ -11,8 +11,7 @@ enum class CameraProjection
 class Camera
 {
 public:
-    Camera() = default;
-    Camera(CameraProjection projection, const Vec3f& position, const Vec3f& lookAt, const Vec3f& up, f32 fovDegrees, f32 aspectRatio);
+    Camera(CameraProjection projection, const Vec3f& position, const Vec3f& lookAt, const Vec3f& up, f32 fovDegreesOrWidth, f32 aspectRatioOrHeight);
 
     auto GetProjectionMatrix() const -> const Mat4f&;
     auto GetViewMatrix() const -> const Mat4f&;
@@ -24,6 +23,7 @@ public:
     void Translate(const Vec3f& translation);
     void Rotate(f32 pitch, f32 yaw);
 private:
+    CameraProjection mProjection {};
     Mat4f mProjectionMatrix {};
     Mat4f mViewMatrix {};
 
