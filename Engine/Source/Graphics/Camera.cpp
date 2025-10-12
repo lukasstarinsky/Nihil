@@ -30,11 +30,6 @@ auto Camera::GetViewMatrix() const -> const Mat4f&
     return mViewMatrix;
 }
 
-void Camera::SetAspectRatio(f32 aspectRatio)
-{
-    mProjectionMatrix = Mat4f::Perspective(DEG_TO_RAD(mFovDegrees), aspectRatio, 0.1f, 100.0f);
-}
-
 auto Camera::Front() const -> const Vec3f&
 {
     return mLookAt;
@@ -69,4 +64,16 @@ void Camera::Translate(const Vec3f& translation)
 {
     mPosition += translation;
     mViewMatrix = Mat4f::LookAt(mPosition, mPosition + mLookAt, mUp);
+}
+
+void Camera::OnResize(i32 width, i32 height)
+{
+    if (mProjection == CameraProjection::Orthographic)
+    {
+        mProjectionMatrix = Mat4f::Orthographic(0, width, 0, height, -1.0f, 1.0f);
+    }
+    else
+    {
+        mProjectionMatrix = Mat4f::Perspective(DEG_TO_RAD(mFovDegrees), static_cast<f32>(width) / static_cast<f32>(height), 0.1f, 100.0f);
+    }
 }

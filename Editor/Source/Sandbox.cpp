@@ -3,7 +3,7 @@
 #define MOUSE_SENSITIVITY 0.008f
 
 Sandbox::Sandbox()
-    : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 800.0f / 600.0f}
+    : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 1280.0f / 960.0f}
     , mAssetPipeline{"Assets/"}
 {
     Config.WindowWidth = 1280;
@@ -45,7 +45,7 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 
 void Sandbox::OnResize()
 {
-    mCamera.SetAspectRatio(static_cast<f32>(Config.WindowWidth) / static_cast<f32>(Config.WindowHeight));
+    mCamera.OnResize(Config.WindowWidth, Config.WindowHeight);
 }
 
 void Sandbox::OnRender()
