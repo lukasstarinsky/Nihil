@@ -5,15 +5,16 @@ layout(location = 1) in vec2 inTexCoord;
 
 layout(location = 0) out vec2 outTexCoord;
 
-layout(binding = 0) uniform CameraUniformBuffer
+layout(std140, binding = 0) uniform CameraUniformBuffer
 {
     mat4 uProjection;
     mat4 uView;
 };
 
-#ifdef OPENGL
-layout(location = 0) uniform mat4 uModel;
-#endif
+layout(std140, binding = 1) uniform ObjectUniformBuffer
+{
+    mat4 uModel;
+};
 
 void main()
 {

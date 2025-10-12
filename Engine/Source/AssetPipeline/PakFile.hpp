@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Platform/UUID.hpp"
+#include "Graphics/Material.hpp"
 
 #pragma pack(push, 1)
 struct PakHeader
@@ -41,10 +42,33 @@ struct MeshHeader
     u32 SubMeshCount;
 };
 
+struct MaterialParameterEntry
+{
+    u32 NameLength;
+    u32 Type;
+};
+
+struct MaterialHeader
+{
+    Nihil::UUID VertexShaderUUID {};
+    Nihil::UUID FragmentShaderUUID {};
+    u32 ParameterCount;
+    // Followed by array of MaterialParameter
+};
+
+struct MaterialInstanceTextureEntry
+{
+    i32 Slot;
+    Nihil::UUID TextureUUID {};
+};
+
 struct MaterialInstanceHeader
 {
     Nihil::UUID BaseMaterialUUID {};
+    u32 UniformDataSize;
+    // Followed by array of bytes
     u32 TextureCount;
+    // Followed by array of MaterialInstanceTextureEntry
 };
 
 struct ShaderHeader

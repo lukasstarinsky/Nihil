@@ -4,6 +4,7 @@
 struct RendererState
 {
     BufferPtr CameraUniformBuffer;
+    BufferPtr ObjectUniformBuffer;
 };
 
 static DynamicLibrary sRendererModule;
@@ -34,14 +35,21 @@ void Renderer::Initialize(const ApplicationConfig& config)
         std::rethrow_exception(exception);
     }
 
-    // TODO: Move to scene
-    BufferCreateInfo cameraUBCreateInfo {
+    BufferCreateInfo cameraUBOCreateInfo {
         .Type = BufferType::Uniform,
         .Data = nullptr,
-        .Size = 2 * sizeof(Mat4f),
-        .UniformBinding = CAMERA_UB_DEFAULT_BINDING
+        .Size = sizeof(CameraData),
+        .UniformBinding = UniformBinding::Camera
     };
-    sState.CameraUniformBuffer = Buffer::Create(cameraUBCreateInfo);
+    sState.CameraUniformBuffer = Buffer::Create(cameraUBOCreateInfo);
+
+    BufferCreateInfo objectUBOCreateInfo {
+        .Type = BufferType::Uniform,
+        .Data = nullptr,
+        .Size = sizeof(ObjectData),
+        .UniformBinding = UniformBinding::Object
+    };
+    sState.ObjectUniformBuffer = Buffer::Create(objectUBOCreateInfo);
 
     EventDispatcher::AddListener<ApplicationEvent>(OnAppEvent);
 }
@@ -91,20 +99,28 @@ void Renderer::EndFrame()
 
 void Renderer::BeginScene(const Camera& camera)
 {
-    sState.CameraUniformBuffer->SetData(camera.GetProjectionMatrix().Data(), sizeof(Mat4f), 0);
-    sState.CameraUniformBuffer->SetData(camera.GetViewMatrix().Data(), sizeof(Mat4f), sizeof(Mat4f));
+    ASSERT(sRendererBackend);
+    CameraData cameraData {
+        .Projection = camera.GetProjectionMatrix(),
+        .View = camera.GetViewMatrix()
+    };
+    sState.CameraUniformBuffer->SetData(&cameraData, sizeof(CameraData), 0);
 }
 
 void Renderer::Draw(const MeshPtr& mesh, const Mat4f& model, u32 subMeshIndex)
 {
     ASSERT(sRendererBackend);
 
+    ObjectData objectData {
+        .Model = model
+    };
+    sState.ObjectUniformBuffer->SetData(&objectData, sizeof(ObjectData), 0);
+
     mesh->Bind();
     if (subMeshIndex != UINT32_MAX)
     {
         const auto& subMesh = mesh->GetSubMeshes()[subMeshIndex];
         auto material = mesh->GetMaterial(subMesh.MaterialIndex);
-        material->SetUniform(0, model);
         material->Bind();
         sRendererBackend->Draw(subMesh);
     }
@@ -113,7 +129,6 @@ void Renderer::Draw(const MeshPtr& mesh, const Mat4f& model, u32 subMeshIndex)
         for (const auto& subMesh: mesh->GetSubMeshes())
         {
             auto material = mesh->GetMaterial(subMesh.MaterialIndex);
-            material->SetUniform(0, model);
             material->Bind();
             sRendererBackend->Draw(subMesh);
         }

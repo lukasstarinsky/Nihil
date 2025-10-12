@@ -1,7 +1,5 @@
 #pragma once
 
-#define CAMERA_UB_DEFAULT_BINDING 0
-
 enum class BufferType
 {
     Vertex = 0,
@@ -9,12 +7,20 @@ enum class BufferType
     Uniform
 };
 
+enum class UniformBinding
+{
+    None = -1,
+    Camera,
+    Object,
+    Material,
+};
+
 struct BufferCreateInfo
 {
     BufferType Type;
     const void* Data;
     i32 Size;
-    i32 UniformBinding = CAMERA_UB_DEFAULT_BINDING;
+    UniformBinding UniformBinding = UniformBinding::None;
 };
 
 class Buffer;

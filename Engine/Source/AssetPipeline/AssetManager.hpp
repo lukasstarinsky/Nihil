@@ -47,7 +47,8 @@ public:
         {
             MaterialCreateInfo createInfo {
                 .VertexShader = AssetManager::Get<Shader>(spec.VertexShaderUUID),
-                .FragmentShader = AssetManager::Get<Shader>(spec.FragmentShaderUUID)
+                .FragmentShader = AssetManager::Get<Shader>(spec.FragmentShaderUUID),
+                .Layout = std::move(spec.Layout)
             };
             resource = T::Create(createInfo);
         }
@@ -56,7 +57,8 @@ public:
             auto baseMaterial = AssetManager::Get<Material>(spec.BaseMaterialUUID);
             MaterialInstanceCreateInfo createInfo {
                 .BaseMaterial = baseMaterial,
-                .Textures = {}
+                .UniformData = std::move(spec.UniformData),
+                .Textures = std::move(spec)
             };
             for (const auto& [slot, texUUID] : spec.Textures)
             {

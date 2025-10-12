@@ -11,8 +11,6 @@ public:
     ~OpenGLMaterial() override;
 
     void Bind() const override;
-
-    void SetUniform(i32 location, const Mat4f& data) const override;
 private:
     GLuint mHandle {};
     std::shared_ptr<OpenGLShader> mVertexShader {};

@@ -7,6 +7,17 @@
 #include "RendererBackend.hpp"
 #include "Camera.hpp"
 
+struct CameraData
+{
+    Mat4f Projection;
+    Mat4f View;
+};
+
+struct ObjectData
+{
+    Mat4f Model;
+};
+
 namespace Renderer
 {
     using CreatePluginFn = RendererBackend*(*)(const ApplicationConfig& appConfig, const PlatformState& platformState, std::exception_ptr& exceptionPtr);

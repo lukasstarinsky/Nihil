@@ -105,7 +105,7 @@ public:
                 auto vertexBlobSize = static_cast<u32>(vertexCount * sizeof(Vertex));
                 auto indexBlobSize = static_cast<u32>(indexCount * sizeof(Index));
 
-                entry.Size += uncompressedSize + sizeof(header);
+                entry.Size += uncompressedSize;
                 header.VertexBlobSize = vertexBlobSize;
                 header.IndexBlobSize = indexBlobSize;
                 mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
@@ -121,27 +121,51 @@ public:
         else if constexpr (std::is_same_v<T, MaterialSpecification>)
         {
             entry.Type = PakEntry::Type::Material;
-            entry.Size = sizeof(Nihil::UUID) * 2;
+            entry.Size = sizeof(MaterialHeader);
 
-            mBlobFile.write(reinterpret_cast<const char*>(&spec.VertexShaderUUID), sizeof(spec.VertexShaderUUID));
-            mBlobFile.write(reinterpret_cast<const char*>(&spec.FragmentShaderUUID), sizeof(spec.FragmentShaderUUID));
+            MaterialHeader header {
+                .VertexShaderUUID = spec.VertexShaderUUID,
+                .FragmentShaderUUID = spec.FragmentShaderUUID,
+                .ParameterCount = static_cast<u32>(spec.Layout.size())
+            };
+            mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+
+            for (const auto& param: spec.Layout)
+            {
+                MaterialParameterEntry paramEntry {
+                    .NameLength = static_cast<u32>(param.Name.size()),
+                    .Type = static_cast<u32>(param.Type)
+                };
+                entry.Size += sizeof(MaterialParameterEntry);
+                mBlobFile.write(reinterpret_cast<const char*>(&paramEntry), sizeof(paramEntry));
+
+                entry.Size += paramEntry.NameLength;
+                mBlobFile.write(param.Name.data(), paramEntry.NameLength);
+            }
         }
         else if constexpr (std::is_same_v<T, MaterialInstanceSpecification>)
         {
             entry.Type = PakEntry::Type::MaterialInstance;
 
-            MaterialInstanceHeader header {};
-            header.BaseMaterialUUID = spec.BaseMaterialUUID;
-            header.TextureCount = static_cast<u32>(spec.Textures.size());
+            MaterialInstanceHeader header {
+                .BaseMaterialUUID = spec.BaseMaterialUUID,
+                .UniformDataSize = static_cast<u32>(spec.UniformData.size()),
+                .TextureCount = static_cast<u32>(spec.Textures.size())
+            };
             mBlobFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
             entry.Size = sizeof(MaterialInstanceHeader);
 
+            mBlobFile.write(reinterpret_cast<const char*>(spec.UniformData.data()), static_cast<i32>(spec.UniformData.size()));
+            entry.Size += static_cast<u32>(spec.UniformData.size());
+
             for (const auto& [slot, uuid]: spec.Textures)
             {
-                entry.Size += sizeof(slot);
-                entry.Size += sizeof(uuid);
-                mBlobFile.write(reinterpret_cast<const char*>(&slot), sizeof(slot));
-                mBlobFile.write(reinterpret_cast<const char*>(&uuid), sizeof(uuid));
+                MaterialInstanceTextureEntry texEntry {
+                    .Slot = slot,
+                    .TextureUUID = uuid
+                };
+                mBlobFile.write(reinterpret_cast<const char*>(&texEntry), sizeof(texEntry));
+                entry.Size += sizeof(MaterialInstanceTextureEntry);
             }
         }
         mEntries.push_back(entry);

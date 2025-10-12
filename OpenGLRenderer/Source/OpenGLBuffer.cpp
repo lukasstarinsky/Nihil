@@ -7,7 +7,7 @@ OpenGLBuffer::OpenGLBuffer(const BufferCreateInfo& createInfo)
     if (mBufferType == BufferType::Uniform)
     {
         glNamedBufferStorage(mHandle, createInfo.Size, nullptr, GL_DYNAMIC_STORAGE_BIT);
-        glBindBufferBase(GL_UNIFORM_BUFFER, createInfo.UniformBinding, mHandle);
+        glBindBufferBase(GL_UNIFORM_BUFFER, static_cast<GLuint>(createInfo.UniformBinding), mHandle);
     }
     else
     {

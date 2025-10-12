@@ -7,6 +7,7 @@
 #include "Graphics/Texture.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Mesh.hpp"
+#include "Graphics/Material.hpp"
 #include "Common/Utilities.hpp"
 #include "Compression.hpp"
 #include "PakFile.hpp"
@@ -114,10 +115,29 @@ public:
         }
         else if constexpr (std::same_as<T, MaterialSpecification>)
         {
-            std::memcpy(&spec.VertexShaderUUID, dataPtr, sizeof(Nihil::UUID));
-            dataPtr += sizeof(Nihil::UUID);
-            std::memcpy(&spec.FragmentShaderUUID, dataPtr, sizeof(Nihil::UUID));
-            dataPtr += sizeof(Nihil::UUID);
+            MaterialHeader header {};
+            std::memcpy(&header, data.data(), sizeof(header));
+            dataPtr += sizeof(header);
+
+            spec.VertexShaderUUID = header.VertexShaderUUID;
+            spec.FragmentShaderUUID = header.FragmentShaderUUID;
+
+            for (u32 i = 0; i < header.ParameterCount; ++i)
+            {
+                MaterialParameterEntry paramEntry {};
+                std::memcpy(&paramEntry, dataPtr, sizeof(paramEntry));
+                dataPtr += sizeof(paramEntry);
+
+                std::string name(paramEntry.NameLength, '\0');
+                std::memcpy(name.data(), dataPtr, paramEntry.NameLength);
+                dataPtr += paramEntry.NameLength;
+
+                MaterialParameter param {
+                    .Name = std::move(name),
+                    .Type = static_cast<enum class MaterialParameter::Type>(paramEntry.Type)
+                };
+                spec.Layout.push_back(param);
+            }
         }
         else if constexpr (std::same_as<T, MaterialInstanceSpecification>)
         {
@@ -126,15 +146,17 @@ public:
             dataPtr += sizeof(header);
 
             spec.BaseMaterialUUID = header.BaseMaterialUUID;
+
+            spec.UniformData.resize(header.UniformDataSize);
+            std::memcpy(spec.UniformData.data(), dataPtr, header.UniformDataSize);
+            dataPtr += header.UniformDataSize;
+
             for (u32 i = 0; i < header.TextureCount; ++i)
             {
-                u32 slot;
-                Nihil::UUID textureUUID {};
-                std::memcpy(&slot, dataPtr, sizeof(slot));
-                dataPtr += sizeof(slot);
-                std::memcpy(&textureUUID, dataPtr, sizeof(textureUUID));
-                dataPtr += sizeof(textureUUID);
-                spec.Textures[slot] = textureUUID;
+                MaterialInstanceTextureEntry texEntry {};
+                std::memcpy(&texEntry, dataPtr, sizeof(texEntry));
+                dataPtr += sizeof(texEntry);
+                spec.Textures[texEntry.Slot] = texEntry.TextureUUID;
             }
         }
         return spec;

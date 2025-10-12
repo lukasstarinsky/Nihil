@@ -2,22 +2,38 @@
 
 MaterialInstance::MaterialInstance(const MaterialInstanceCreateInfo& createInfo)
     : mBaseMaterial{createInfo.BaseMaterial}
+    , mUniformData{createInfo.UniformData}
     , mTextures{createInfo.Textures}
 {
+    ASSERT(!mBaseMaterial->mLayout.empty());
+
+    i32 bufferSize = 0;
+    for (const auto& param: mBaseMaterial->mLayout)
+    {
+        bufferSize += static_cast<i32>(param.Type);
+    }
+
+    BufferCreateInfo bufferCreateInfo {
+        .Type = BufferType::Uniform,
+        .Data = nullptr,
+        .Size = bufferSize,
+        .UniformBinding = UniformBinding::Material
+    };
+    mUniformBuffer = Buffer::Create(bufferCreateInfo);
 }
 
 void MaterialInstance::Bind() const
 {
     mBaseMaterial->Bind();
-    for (const auto& [slot, texture] : mTextures)
+    for (const auto& [slot, texture]: mTextures)
     {
         texture->Bind(slot);
     }
 }
 
-void MaterialInstance::SetUniform(i32 location, const Mat4f& data) const
+void MaterialInstance::UploadData() const
 {
-    mBaseMaterial->SetUniform(location, data);
+    mUniformBuffer->SetData(mUniformData.data(), static_cast<i32>(mUniformData.size()), 0);
 }
 
 auto MaterialInstance::Create(const MaterialInstanceCreateInfo& createInfo) -> MaterialInstancePtr

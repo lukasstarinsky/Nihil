@@ -24,7 +24,10 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
     MaterialSpecification defaultMatSpec {
         .UUID = DefaultResource::ObjectMaterial,
         .VertexShaderUUID = DefaultResource::ObjectVertexShader,
-        .FragmentShaderUUID = DefaultResource::ObjectFragmentShader
+        .FragmentShaderUUID = DefaultResource::ObjectFragmentShader,
+        .Layout = {
+            { "Test", MaterialParameter::Type::Mat4 },
+        }
     };
     mManifest.AddAsset(DefaultResource::ObjectMaterialName.data(), defaultMatSpec.UUID);
     pakWriter.Write<MaterialSpecification>(defaultMatSpec);
