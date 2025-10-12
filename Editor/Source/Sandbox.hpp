@@ -21,4 +21,5 @@ private:
 
     AssetPipeline mAssetPipeline;
     std::unique_ptr<AssetManager> mAssetManager {};
+//    std::unique_ptr<UI::Manager> mUIManager {};
 };

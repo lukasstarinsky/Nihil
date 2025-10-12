@@ -27,5 +27,5 @@ public:
 
     virtual void SetData(const void* data, i32 size, i32 offset) const = 0;
 
-    static auto Create(const BufferCreateInfo& bufferCreateInfo) -> BufferPtr;
+    static auto Create(const BufferCreateInfo& createInfo) -> BufferPtr;
 };

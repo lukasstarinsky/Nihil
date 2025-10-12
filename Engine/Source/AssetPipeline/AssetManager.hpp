@@ -13,7 +13,7 @@ public:
 
     auto HasAsset(const Nihil::UUID& uuid) const -> bool;
 
-    template <typename T> requires IsAnyOf<T, Texture, Shader, Mesh>
+    template <typename T> requires IsAnyOf<T, Texture, Shader, Mesh, Material, MaterialInstance>
     auto Get(const Nihil::UUID& uuid) -> std::shared_ptr<T>
     {
         auto it = mCache.find(uuid);
@@ -28,24 +28,42 @@ public:
 
         if constexpr (std::is_same_v<T, Mesh>)
         {
-            MeshCreateInfo meshCreateInfo {
+            MeshCreateInfo createInfo {
                 .Vertices = std::move(spec.Vertices),
                 .Indices = std::move(spec.Indices),
                 .SubMeshes = std::move(spec.SubMeshes),
                 .Materials = {}
             };
-            meshCreateInfo.Materials.reserve(spec.Materials.size());
+            createInfo.Materials.reserve(spec.Materials.size());
 
-            for (const auto& matSpec: spec.Materials)
+            for (const auto& matUUID: spec.Materials)
             {
-                MaterialCreateInfo materialCreateInfo {
-                    .VertexShader = AssetManager::Get<Shader>(matSpec.VertexShaderUUID),
-                    .FragmentShader = AssetManager::Get<Shader>(matSpec.FragmentShaderUUID),
-                    .Texture = AssetManager::Get<Texture>(matSpec.TextureUUID)
-                };
-                meshCreateInfo.Materials.push_back(Material::Create(materialCreateInfo));
+                auto material = AssetManager::Get<MaterialInstance>(matUUID);
+                createInfo.Materials.push_back(material);
             }
-            resource = Mesh::Create(meshCreateInfo);
+            resource = T::Create(createInfo);
+        }
+        else if constexpr (std::is_same_v<T, Material>)
+        {
+            MaterialCreateInfo createInfo {
+                .VertexShader = AssetManager::Get<Shader>(spec.VertexShaderUUID),
+                .FragmentShader = AssetManager::Get<Shader>(spec.FragmentShaderUUID)
+            };
+            resource = T::Create(createInfo);
+        }
+        else if constexpr (std::is_same_v<T, MaterialInstance>)
+        {
+            auto baseMaterial = AssetManager::Get<Material>(spec.BaseMaterialUUID);
+            MaterialInstanceCreateInfo createInfo {
+                .BaseMaterial = baseMaterial,
+                .Textures = {}
+            };
+            for (const auto& [slot, texUUID] : spec.Textures)
+            {
+                auto texture = AssetManager::Get<Texture>(texUUID);
+                createInfo.Textures[slot] = texture;
+            }
+            resource = T::Create(createInfo);
         }
         else
         {

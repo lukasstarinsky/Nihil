@@ -1,10 +1,10 @@
 #include "OpenGLMesh.hpp"
 
-OpenGLMesh::OpenGLMesh(const MeshCreateInfo& meshCreateInfo)
-    : mSubMeshes{meshCreateInfo.SubMeshes}
-    , mMaterials{meshCreateInfo.Materials}
-    , mVertexBuffer{{BufferType::Vertex, meshCreateInfo.Vertices.data(), static_cast<i32>(meshCreateInfo.Vertices.size() * sizeof(Vertex))}}
-    , mIndexBuffer{{BufferType::Index, meshCreateInfo.Indices.data(), static_cast<i32>(meshCreateInfo.Indices.size() * sizeof(Index))}}
+OpenGLMesh::OpenGLMesh(const MeshCreateInfo& createInfo)
+    : mSubMeshes{createInfo.SubMeshes}
+    , mMaterials{createInfo.Materials}
+    , mVertexBuffer{{BufferType::Vertex, createInfo.Vertices.data(), static_cast<i32>(createInfo.Vertices.size() * sizeof(Vertex))}}
+    , mIndexBuffer{{BufferType::Index, createInfo.Indices.data(), static_cast<i32>(createInfo.Indices.size() * sizeof(Index))}}
 {
     glCreateVertexArrays(1, &mVertexArray);
 
@@ -31,9 +31,9 @@ void OpenGLMesh::Bind() const
     glBindVertexArray(mVertexArray);
 }
 
-auto OpenGLMesh::GetMaterial(u32 index) const -> MaterialPtr
+auto OpenGLMesh::GetMaterial(u32 index) const -> const MaterialInstancePtr&
 {
-    ASSERT(index <= mMaterials.size() && index >= 0);
+    ASSERT(index < mMaterials.size() && index >= 0);
     return mMaterials[index];
 }
 

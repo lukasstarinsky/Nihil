@@ -7,7 +7,7 @@
 class OpenGLMaterial : public Material
 {
 public:
-    OpenGLMaterial(const MaterialCreateInfo& materialCreateInfo);
+    explicit OpenGLMaterial(const MaterialCreateInfo& createInfo);
     ~OpenGLMaterial() override;
 
     void Bind() const override;
@@ -17,5 +17,4 @@ private:
     GLuint mHandle {};
     std::shared_ptr<OpenGLShader> mVertexShader {};
     std::shared_ptr<OpenGLShader> mFragmentShader {};
-    std::shared_ptr<OpenGLTexture> mTexture {};
 };

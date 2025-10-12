@@ -99,53 +99,34 @@ void OpenGLBackend::EndFrame() const
 #endif
 }
 
-auto OpenGLBackend::CreateShader(const ShaderCreateInfo& shaderCreateInfo) const -> ShaderPtr
+auto OpenGLBackend::CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr
 {
-    return std::make_shared<OpenGLShader>(shaderCreateInfo);
+    return std::make_shared<OpenGLShader>(createInfo);
 }
 
-auto OpenGLBackend::CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr
+auto OpenGLBackend::CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr
 {
-    return std::make_shared<OpenGLMaterial>(materialCreateInfo);
+    return std::make_shared<OpenGLMaterial>(createInfo);
 }
 
-auto OpenGLBackend::CreateBuffer(const BufferCreateInfo& bufferCreateInfo) const -> BufferPtr
+auto OpenGLBackend::CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr
 {
-    return std::make_shared<OpenGLBuffer>(bufferCreateInfo);
+    return std::make_shared<OpenGLBuffer>(createInfo);
 }
 
-auto OpenGLBackend::CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr
+auto OpenGLBackend::CreateMesh(const MeshCreateInfo& createInfo) const -> MeshPtr
 {
-    return std::make_shared<OpenGLMesh>(meshCreateInfo);
+    return std::make_shared<OpenGLMesh>(createInfo);
 }
 
-auto OpenGLBackend::CreateTexture(const TextureCreateInfo& textureCreateInfo) const -> TexturePtr
+auto OpenGLBackend::CreateTexture(const TextureCreateInfo& createInfo) const -> TexturePtr
 {
-    return std::make_shared<OpenGLTexture>(textureCreateInfo);
+    return std::make_shared<OpenGLTexture>(createInfo);
 }
 
-void OpenGLBackend::Draw(const MeshPtr& mesh, u32 subMeshIndex) const
+void OpenGLBackend::Draw(const SubMesh& subMesh) const
 {
-    mesh->Bind();
-
-    if (subMeshIndex != UINT32_MAX)
-    {
-        const auto& subMesh = mesh->GetSubMeshes()[subMeshIndex];
-        auto material = mesh->GetMaterial(subMesh.MaterialIndex);
-        material->SetUniform(0, Mat4f::Scale({0.02f, 0.02f, 0.02f}));
-        material->Bind();
-        glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.IndexCount), GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(subMesh.BaseIndex * sizeof(u32)), static_cast<GLsizei>(subMesh.BaseVertex));
-    }
-    else
-    {
-        for (const auto& subMesh: mesh->GetSubMeshes())
-        {
-            auto material = mesh->GetMaterial(subMesh.MaterialIndex);
-            material->SetUniform(0, Mat4f::Scale({0.02f, 0.02f, 0.02f}));
-            material->Bind();
-            glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.IndexCount), GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(subMesh.BaseIndex * sizeof(u32)), static_cast<GLsizei>(subMesh.BaseVertex));
-        }
-    }
+    glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.IndexCount), GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(subMesh.BaseIndex * sizeof(u32)), static_cast<GLsizei>(subMesh.BaseVertex));
 }
 
 extern "C"

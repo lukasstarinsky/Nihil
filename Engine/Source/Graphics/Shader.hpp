@@ -35,5 +35,5 @@ public:
 
     virtual ~Shader() = default;
 public:
-    static auto Create(const ShaderCreateInfo& shaderCreateInfo) -> ShaderPtr;
+    static auto Create(const ShaderCreateInfo& createInfo) -> ShaderPtr;
 };

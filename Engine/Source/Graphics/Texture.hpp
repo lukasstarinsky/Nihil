@@ -3,11 +3,12 @@
 #include <vector>
 
 #include "Resource.hpp"
+#include "DefaultResource.hpp"
 #include "Platform/UUID.hpp"
 
 struct TextureSpecification
 {
-    Nihil::UUID UUID {};
+    Nihil::UUID UUID = DefaultResource::Texture;
     i32 Width, Height;
     std::vector<std::byte> Data;
 };
@@ -25,5 +26,5 @@ public:
     virtual ~Texture() = default;
     virtual void Bind(i32 slot) const = 0;
 public:
-    static auto Create(const TextureCreateInfo& textureCreateInfo) -> TexturePtr;
+    static auto Create(const TextureCreateInfo& createInfo) -> TexturePtr;
 };

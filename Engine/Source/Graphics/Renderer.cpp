@@ -95,10 +95,29 @@ void Renderer::BeginScene(const Camera& camera)
     sState.CameraUniformBuffer->SetData(camera.GetViewMatrix().Data(), sizeof(Mat4f), sizeof(Mat4f));
 }
 
-void Renderer::Draw(const MeshPtr& mesh, u32 subMeshIndex)
+void Renderer::Draw(const MeshPtr& mesh, const Mat4f& model, u32 subMeshIndex)
 {
     ASSERT(sRendererBackend);
-    sRendererBackend->Draw(mesh, subMeshIndex);
+
+    mesh->Bind();
+    if (subMeshIndex != UINT32_MAX)
+    {
+        const auto& subMesh = mesh->GetSubMeshes()[subMeshIndex];
+        auto material = mesh->GetMaterial(subMesh.MaterialIndex);
+        material->SetUniform(0, model);
+        material->Bind();
+        sRendererBackend->Draw(subMesh);
+    }
+    else
+    {
+        for (const auto& subMesh: mesh->GetSubMeshes())
+        {
+            auto material = mesh->GetMaterial(subMesh.MaterialIndex);
+            material->SetUniform(0, model);
+            material->Bind();
+            sRendererBackend->Draw(subMesh);
+        }
+    }
 }
 
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
@@ -113,32 +132,32 @@ auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
     }
 }
 
-auto Shader::Create(const ShaderCreateInfo& shaderCreateInfo) -> ShaderPtr
+auto Shader::Create(const ShaderCreateInfo& createInfo) -> ShaderPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateShader(shaderCreateInfo);
+    return sRendererBackend->CreateShader(createInfo);
 }
 
-auto Material::Create(const MaterialCreateInfo& materialCreateInfo) -> MaterialPtr
+auto Material::Create(const MaterialCreateInfo& createInfo) -> MaterialPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateMaterial(materialCreateInfo);
+    return sRendererBackend->CreateMaterial(createInfo);
 }
 
-auto Buffer::Create(const BufferCreateInfo& bufferCreateInfo) -> BufferPtr
+auto Buffer::Create(const BufferCreateInfo& createInfo) -> BufferPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateBuffer(bufferCreateInfo);
+    return sRendererBackend->CreateBuffer(createInfo);
 }
 
-auto Mesh::Create(const MeshCreateInfo& meshCreateInfo) -> MeshPtr
+auto Mesh::Create(const MeshCreateInfo& createInfo) -> MeshPtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateMesh(meshCreateInfo);
+    return sRendererBackend->CreateMesh(createInfo);
 }
 
-auto Texture::Create(const TextureCreateInfo& textureCreateInfo) -> TexturePtr
+auto Texture::Create(const TextureCreateInfo& createInfo) -> TexturePtr
 {
     ASSERT(sRendererBackend);
-    return sRendererBackend->CreateTexture(textureCreateInfo);
+    return sRendererBackend->CreateTexture(createInfo);
 }

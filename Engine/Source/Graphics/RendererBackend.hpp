@@ -19,11 +19,11 @@ public:
     virtual void OnResize(i32 width, i32 height) const = 0;
     virtual void EndFrame() const = 0;
 
-    virtual auto CreateShader(const ShaderCreateInfo& shaderCreateInfo) const -> ShaderPtr = 0;
-    virtual auto CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr = 0;
-    virtual auto CreateBuffer(const BufferCreateInfo& bufferCreateInfo) const -> BufferPtr = 0;
-    virtual auto CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr = 0;
-    virtual auto CreateTexture(const TextureCreateInfo& textureCreateInfo) const -> TexturePtr = 0;
+    virtual auto CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr = 0;
+    virtual auto CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr = 0;
+    virtual auto CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr = 0;
+    virtual auto CreateMesh(const MeshCreateInfo& createInfo) const -> MeshPtr = 0;
+    virtual auto CreateTexture(const TextureCreateInfo& CreateInfo) const -> TexturePtr = 0;
 
-    virtual void Draw(const MeshPtr& mesh, u32 subMeshIndex = UINT_MAX) const = 0;
+    virtual void Draw(const SubMesh& subMesh) const = 0;
 };

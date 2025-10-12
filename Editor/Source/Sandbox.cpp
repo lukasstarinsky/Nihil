@@ -8,7 +8,7 @@ Sandbox::Sandbox()
 {
     Config.WindowWidth = 1280;
     Config.WindowHeight = 960;
-    Config.Name = "Nihil Sandbox";
+    Config.Name = "Nihil Editor";
     Config.RendererAPI = RendererAPI::OpenGL;
 }
 
@@ -21,8 +21,12 @@ void Sandbox::OnInitialize()
     }
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
-    mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
+//    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get());
+//
+//    auto* button = new UI::Button(nullptr);
+//    mUIManager->SetRootWidget(button);
 
+    mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
     EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));
 }
@@ -47,7 +51,9 @@ void Sandbox::OnResize()
 void Sandbox::OnRender()
 {
     Renderer::BeginScene(mCamera);
-    Renderer::Draw(mMesh);
+    Renderer::Draw(mMesh, Mat4f::Scale({0.02f, 0.02f, 0.02f}));
+
+//    mUIManager->Render();
 }
 
 void Sandbox::OnShutdown()

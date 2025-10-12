@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Resource.hpp"
-#include "Material.hpp"
+#include "MaterialInstance.hpp"
 #include "Platform/UUID.hpp"
 
 struct Vertex
@@ -26,7 +26,7 @@ struct MeshSpecification
     std::vector<Vertex> Vertices;
     std::vector<Index> Indices;
     std::vector<SubMesh> SubMeshes;
-    std::vector<MaterialSpecification> Materials;
+    std::vector<Nihil::UUID> Materials;
 };
 
 struct MeshCreateInfo
@@ -34,7 +34,7 @@ struct MeshCreateInfo
     std::vector<Vertex> Vertices;
     std::vector<Index> Indices;
     std::vector<SubMesh> SubMeshes;
-    std::vector<MaterialPtr> Materials;
+    std::vector<MaterialInstancePtr> Materials;
 };
 
 class Mesh;
@@ -48,8 +48,8 @@ public:
     virtual ~Mesh() = default;
 
     virtual void Bind() const = 0;
-    virtual auto GetMaterial(u32 index) const -> MaterialPtr = 0;
+    virtual auto GetMaterial(u32 index) const -> const MaterialInstancePtr& = 0;
     virtual auto GetSubMeshes() const -> const std::vector<SubMesh>& = 0;
 
-    static auto Create(const MeshCreateInfo& meshCreateInfo) -> MeshPtr;
+    static auto Create(const MeshCreateInfo& createInfo) -> MeshPtr;
 };

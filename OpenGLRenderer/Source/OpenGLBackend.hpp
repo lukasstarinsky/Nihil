@@ -16,13 +16,13 @@ public:
     void OnResize(i32 width, i32 height) const override;
     void EndFrame() const override;
 
-    auto CreateShader(const ShaderCreateInfo& shaderCreateInfo) const -> ShaderPtr override;
-    auto CreateMaterial(const MaterialCreateInfo& materialCreateInfo) const -> MaterialPtr override;
-    auto CreateBuffer(const BufferCreateInfo& bufferCreateInfo) const -> BufferPtr override;
-    auto CreateMesh(const MeshCreateInfo& meshCreateInfo) const -> MeshPtr override;
-    auto CreateTexture(const TextureCreateInfo& textureCreateInfo) const -> TexturePtr override;
+    auto CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr override;
+    auto CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr override;
+    auto CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr override;
+    auto CreateMesh(const MeshCreateInfo& createInfo) const -> MeshPtr override;
+    auto CreateTexture(const TextureCreateInfo& createInfo) const -> TexturePtr override;
 
-    void Draw(const MeshPtr& mesh, u32 subMeshIndex) const override;
+    void Draw(const SubMesh& subMesh) const override;
 private:
     const PlatformState& mPlatformState;
 };

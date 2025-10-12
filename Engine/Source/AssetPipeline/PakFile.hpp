@@ -16,6 +16,8 @@ struct PakEntry
         Texture = 0,
         Mesh,
         Shader,
+        Material,
+        MaterialInstance
     };
 
     Nihil::UUID UUID {};
@@ -37,6 +39,12 @@ struct MeshHeader
     u32 IndexBlobSize;
     u32 MaterialCount;
     u32 SubMeshCount;
+};
+
+struct MaterialInstanceHeader
+{
+    Nihil::UUID BaseMaterialUUID {};
+    u32 TextureCount;
 };
 
 struct ShaderHeader

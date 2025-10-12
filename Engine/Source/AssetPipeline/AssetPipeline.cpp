@@ -20,6 +20,15 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
     PakWriter pakWriter(outputFile, compressionLevel, compressionThreshold);
     mManifest.Clear();
 
+    // Build Default Materials
+    MaterialSpecification defaultMatSpec {
+        .UUID = DefaultResource::ObjectMaterial,
+        .VertexShaderUUID = DefaultResource::ObjectVertexShader,
+        .FragmentShaderUUID = DefaultResource::ObjectFragmentShader
+    };
+    mManifest.AddAsset(DefaultResource::ObjectMaterialName.data(), defaultMatSpec.UUID);
+    pakWriter.Write<MaterialSpecification>(defaultMatSpec);
+
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
         if (!entry.is_regular_file())
@@ -36,7 +45,7 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
         {
             auto textureSpec = AssetImporter::ImportTexture(path);
 
-            if (assetName == "default.png")
+            if (assetName == DefaultResource::TextureFile)
             {
                 textureSpec.UUID = DefaultResource::Texture;
             }
@@ -63,13 +72,13 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
             auto shaderSpec = AssetImporter::ImportShader(path);
 
             // TODO: this is voodoo, but the question is, is it too much voodoo for our purposes? - TD
-            if (assetName == "DefaultObjectShader.vs")
+            if (assetName == DefaultResource::ObjectVertexShaderFile)
             {
-                shaderSpec.UUID = DefaultResource::VertexShader;
+                shaderSpec.UUID = DefaultResource::ObjectVertexShader;
             }
-            else if (assetName == "DefaultObjectShader.fs")
+            else if (assetName == DefaultResource::ObjectFragmentShaderFile)
             {
-                shaderSpec.UUID = DefaultResource::FragmentShader;
+                shaderSpec.UUID = DefaultResource::ObjectFragmentShader;
             }
 
             mManifest.AddAsset(assetName, shaderSpec.UUID);
@@ -92,7 +101,34 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
 
         if (std::find(sMeshExts.begin(), sMeshExts.end(), extension) != sMeshExts.end())
         {
-            auto meshSpec = AssetImporter::ImportMesh(path, mManifest);
+            auto importedMesh = AssetImporter::ImportMesh(path);
+
+            MeshSpecification meshSpec {};
+            meshSpec.UUID = Nihil::UUID::Generate();
+            meshSpec.Vertices = std::move(importedMesh.Vertices);
+            meshSpec.Indices = std::move(importedMesh.Indices);
+            meshSpec.SubMeshes = std::move(importedMesh.SubMeshes);
+            meshSpec.Materials.resize(importedMesh.Materials.size());
+            for (size_t i = 0; i < importedMesh.Materials.size(); ++i)
+            {
+                auto& importedMat = importedMesh.Materials[i];
+                MaterialInstanceSpecification materialSpec {};
+                materialSpec.UUID = Nihil::UUID::Generate();
+                materialSpec.BaseMaterialUUID = DefaultResource::ObjectMaterial;
+                meshSpec.Materials[i] = materialSpec.UUID;
+
+                // TODO: Determine slot by reflection on the shaders
+                for (i32 j = 0; j < static_cast<i32>(importedMat.TextureNames.size()); ++j)
+                {
+                    materialSpec.Textures[j] = mManifest.HasAsset(importedMat.TextureNames[j])
+                                                 ? mManifest.GetUUID(importedMat.TextureNames[j])
+                                                 : DefaultResource::Texture;
+                }
+
+                mManifest.AddAsset(std::format("{}/mat_{}", assetName, importedMat.Name), materialSpec.UUID);
+                pakWriter.Write<MaterialInstanceSpecification>(materialSpec);
+            }
+
             mManifest.AddAsset(assetName, meshSpec.UUID);
             pakWriter.Write<MeshSpecification>(meshSpec);
         }
@@ -150,6 +186,9 @@ bool AssetPipeline::ValidateManifest()
                 return false;
         }
     }
+
+    if (!mManifest.HasAsset(DefaultResource::ObjectMaterialName.data()))
+        return false;
 
     return true;
 }

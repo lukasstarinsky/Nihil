@@ -68,7 +68,7 @@ auto AssetImporter::ImportShader(const std::filesystem::path& path) -> ShaderSpe
     return {};
 }
 
-auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Manifest& manifest) -> MeshSpecification
+auto AssetImporter::ImportMesh(const std::filesystem::path& filePath) -> ImportedMesh
 {
     auto fileData = File::ReadBinary(filePath);
     u32 flags = aiProcess_Triangulate;
@@ -82,9 +82,8 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Mani
     Ensure(scene && scene->HasMeshes(), "Failed to load mesh from file: {}", filePath.string());
     std::span<aiMesh*> loadedMeshes(scene->mMeshes, scene->mMeshes + scene->mNumMeshes);
 
-    MeshSpecification meshSpec {};
-    meshSpec.UUID = Nihil::UUID::Generate();
-    meshSpec.SubMeshes.reserve(scene->mNumMeshes);
+    ImportedMesh importedMesh {};
+    importedMesh.SubMeshes.reserve(scene->mNumMeshes);
 
     for (const auto* mesh: loadedMeshes)
     {
@@ -96,11 +95,11 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Mani
 
         SubMesh subMesh {
             .MaterialIndex = mesh->mMaterialIndex,
-            .BaseVertex = static_cast<u32>(meshSpec.Vertices.size()),
-            .BaseIndex = static_cast<u32>(meshSpec.Indices.size()),
+            .BaseVertex = static_cast<u32>(importedMesh.Vertices.size()),
+            .BaseIndex = static_cast<u32>(importedMesh.Indices.size()),
             .IndexCount = mesh->mNumFaces * 3
         };
-        meshSpec.SubMeshes.push_back(subMesh);
+        importedMesh.SubMeshes.push_back(subMesh);
 
         // Load vertices
         for (u32 i = 0; i < mesh->mNumVertices; ++i)
@@ -111,7 +110,7 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Mani
             {
                 vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
             }
-            meshSpec.Vertices.push_back(vertex);
+            importedMesh.Vertices.push_back(vertex);
         }
 
         // Load indices
@@ -120,7 +119,7 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Mani
             const auto& face = mesh->mFaces[i];
             for (u32 j = 0; j < face.mNumIndices; ++j)
             {
-                meshSpec.Indices.push_back(face.mIndices[j]);
+                importedMesh.Indices.push_back(face.mIndices[j]);
             }
         }
     }
@@ -142,23 +141,24 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Mani
                 if (line.starts_with("newmtl "))
                 {
                     auto name = line.substr(7);
-                    materialIndexMap[name] = static_cast<u32>(meshSpec.Materials.size());
-                    meshSpec.Materials.emplace_back();
+                    materialIndexMap[name] = static_cast<u32>(importedMesh.Materials.size());
+
+                    auto& material = importedMesh.Materials.emplace_back();
+                    material.Name = name;
                 }
                 else if (line.starts_with("map_Kd "))
                 {
-                    auto& material = meshSpec.Materials.back();
+                    auto& material = importedMesh.Materials.back();
                     auto texturePath = line.substr(7);
-                    auto textureName = texturePath.substr(texturePath.find_last_of('/') + 1);
                     auto modelName = filePath.stem().string();
-                    material.TextureUUID = manifest.GetUUID(modelName + "/" + textureName);
+                    auto textureName = texturePath.substr(texturePath.find_last_of('/') + 1);
+                    material.TextureNames.push_back(std::format("{}/{}", modelName, textureName));
                 }
             }
 
             // Remap submesh material indices
-            for (u32 i = 0; i < meshSpec.SubMeshes.size(); ++i)
+            for (auto& subMesh: importedMesh.SubMeshes)
             {
-                auto& subMesh = meshSpec.SubMeshes[i];
                 auto material = scene->mMaterials[subMesh.MaterialIndex];
                 auto it = materialIndexMap.find(material->GetName().C_Str());
                 if (it != materialIndexMap.end())
@@ -173,5 +173,5 @@ auto AssetImporter::ImportMesh(const std::filesystem::path& filePath, const Mani
         }
     }
 
-    return meshSpec;
+    return importedMesh;
 }

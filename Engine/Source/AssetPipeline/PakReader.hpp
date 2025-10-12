@@ -18,7 +18,7 @@ public:
 
     auto HasEntry(const Nihil::UUID& uuid) const -> bool;
 
-    template <typename T> requires IsAnyOf<T, TextureSpecification, ShaderSpecification, MeshSpecification>
+    template <typename T> requires IsAnyOf<T, TextureSpecification, ShaderSpecification, MeshSpecification, MaterialSpecification, MaterialInstanceSpecification>
     auto Read(const Nihil::UUID& uuid) const -> T
     {
         Ensure(mEntryMap.contains(uuid), "Asset with uuid: '{}' not found in NPAK file.", uuid);
@@ -48,6 +48,7 @@ public:
             {
                 spec.Data.resize(dataBlobSize);
                 std::memcpy(spec.Data.data(), dataPtr, dataBlobSize);
+                dataPtr += dataBlobSize;
             }
         }
         else if constexpr (std::same_as<T, ShaderSpecification>)
@@ -68,6 +69,7 @@ public:
                 spec.Variants[i].API = static_cast<RendererAPI>(variantHeader.API);
                 spec.Variants[i].Data.resize(variantHeader.BlobSize);
                 std::memcpy(spec.Variants[i].Data.data(), dataPtr, variantHeader.BlobSize);
+                dataPtr += variantHeader.BlobSize;
             }
         }
         else if constexpr (std::same_as<T, MeshSpecification>)
@@ -103,11 +105,37 @@ public:
                 dataPtr += header.IndexBlobSize;
             }
             spec.Materials.resize(header.MaterialCount);
-            std::memcpy(spec.Materials.data(), dataPtr, header.MaterialCount * sizeof(MaterialSpecification));
-            dataPtr += header.MaterialCount * sizeof(MaterialSpecification);
+            std::memcpy(spec.Materials.data(), dataPtr, header.MaterialCount * sizeof(Nihil::UUID));
+            dataPtr += header.MaterialCount * sizeof(Nihil::UUID);
 
             spec.SubMeshes.resize(header.SubMeshCount);
             std::memcpy(spec.SubMeshes.data(), dataPtr, header.SubMeshCount * sizeof(SubMesh));
+            dataPtr += header.SubMeshCount * sizeof(SubMesh);
+        }
+        else if constexpr (std::same_as<T, MaterialSpecification>)
+        {
+            std::memcpy(&spec.VertexShaderUUID, dataPtr, sizeof(Nihil::UUID));
+            dataPtr += sizeof(Nihil::UUID);
+            std::memcpy(&spec.FragmentShaderUUID, dataPtr, sizeof(Nihil::UUID));
+            dataPtr += sizeof(Nihil::UUID);
+        }
+        else if constexpr (std::same_as<T, MaterialInstanceSpecification>)
+        {
+            MaterialInstanceHeader header {};
+            std::memcpy(&header, data.data(), sizeof(header));
+            dataPtr += sizeof(header);
+
+            spec.BaseMaterialUUID = header.BaseMaterialUUID;
+            for (u32 i = 0; i < header.TextureCount; ++i)
+            {
+                u32 slot;
+                Nihil::UUID textureUUID {};
+                std::memcpy(&slot, dataPtr, sizeof(slot));
+                dataPtr += sizeof(slot);
+                std::memcpy(&textureUUID, dataPtr, sizeof(textureUUID));
+                dataPtr += sizeof(textureUUID);
+                spec.Textures[slot] = textureUUID;
+            }
         }
         return spec;
     }
