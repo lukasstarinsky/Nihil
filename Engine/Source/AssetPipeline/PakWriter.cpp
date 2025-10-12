@@ -46,3 +46,9 @@ void PakWriter::Save()
     mMetaFile.close();
     mBlobFile.close();
 }
+
+void PakWriter::WriteRaw(PakEntry& entry, const void* data, size_t size)
+{
+    mBlobFile.write(reinterpret_cast<const char*>(data), static_cast<i32>(size));
+    entry.Size += size;
+}

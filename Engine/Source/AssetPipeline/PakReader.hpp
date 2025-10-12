@@ -20,7 +20,7 @@ public:
     auto HasEntry(const Nihil::UUID& uuid) const -> bool;
 
     template <typename T> requires IsAnyOf<T, TextureSpecification, ShaderSpecification, MeshSpecification, MaterialSpecification, MaterialInstanceSpecification>
-    auto Read(const Nihil::UUID& uuid) const -> T
+    auto Deserialize(const Nihil::UUID& uuid) const -> T
     {
         Ensure(mEntryMap.contains(uuid), "Asset with uuid: '{}' not found in NPAK file.", uuid);
         auto& entry = mEntryMap.at(uuid);
@@ -34,9 +34,7 @@ public:
         spec.UUID = uuid;
         if constexpr (std::same_as<T, TextureSpecification>)
         {
-            TextureHeader header {};
-            std::memcpy(&header, data.data(), sizeof(header));
-            dataPtr += sizeof(header);
+            auto header = Read<TextureEntry>(dataPtr);
             auto dataBlobSize = entry.Size - sizeof(header);
 
             spec.Width = header.Width;
@@ -44,40 +42,33 @@ public:
             if (entry.CompressionLevel > 0)
             {
                 spec.Data = ZSTD::Decompress({ dataPtr, dataBlobSize });
+                dataPtr += dataBlobSize;
             }
             else
             {
                 spec.Data.resize(dataBlobSize);
-                std::memcpy(spec.Data.data(), dataPtr, dataBlobSize);
-                dataPtr += dataBlobSize;
+                ReadRaw(dataPtr, spec.Data.data(), dataBlobSize);
             }
         }
         else if constexpr (std::same_as<T, ShaderSpecification>)
         {
-            ShaderHeader header {};
-            std::memcpy(&header, data.data(), sizeof(header));
-            dataPtr += sizeof(header);
+            auto header = Read<ShaderEntry>(dataPtr);
 
             spec.Stage = static_cast<ShaderStage>(header.Stage);
             spec.Variants.resize(header.VariantCount);
 
             for (u32 i = 0; i < header.VariantCount; ++i)
             {
-                ShaderVariantHeader variantHeader {};
-                std::memcpy(&variantHeader, dataPtr, sizeof(variantHeader));
-                dataPtr += sizeof(variantHeader);
+                auto variantHeader = Read<ShaderVariantEntry>(dataPtr);
 
                 spec.Variants[i].API = static_cast<RendererAPI>(variantHeader.API);
                 spec.Variants[i].Data.resize(variantHeader.BlobSize);
-                std::memcpy(spec.Variants[i].Data.data(), dataPtr, variantHeader.BlobSize);
-                dataPtr += variantHeader.BlobSize;
+                ReadRaw(dataPtr, spec.Variants[i].Data.data(), variantHeader.BlobSize);
             }
         }
         else if constexpr (std::same_as<T, MeshSpecification>)
         {
-            MeshHeader header {};
-            std::memcpy(&header, data.data(), sizeof(header));
-            dataPtr += sizeof(header);
+            auto header = Read<MeshEntry>(dataPtr);
 
             if (entry.CompressionLevel > 0)
             {
@@ -99,38 +90,30 @@ public:
                 auto indexCount = header.IndexBlobSize / sizeof(Index);
 
                 spec.Vertices.resize(vertexCount);
+                ReadRaw(dataPtr, spec.Vertices.data(), header.VertexBlobSize);
+
                 spec.Indices.resize(indexCount);
-                std::memcpy(spec.Vertices.data(), dataPtr, header.VertexBlobSize);
-                dataPtr += header.VertexBlobSize;
-                std::memcpy(spec.Indices.data(), dataPtr, header.IndexBlobSize);
-                dataPtr += header.IndexBlobSize;
+                ReadRaw(dataPtr, spec.Indices.data(), header.IndexBlobSize);
             }
             spec.Materials.resize(header.MaterialCount);
-            std::memcpy(spec.Materials.data(), dataPtr, header.MaterialCount * sizeof(Nihil::UUID));
-            dataPtr += header.MaterialCount * sizeof(Nihil::UUID);
+            ReadRaw(dataPtr, spec.Materials.data(), header.MaterialCount * sizeof(Nihil::UUID));
 
             spec.SubMeshes.resize(header.SubMeshCount);
-            std::memcpy(spec.SubMeshes.data(), dataPtr, header.SubMeshCount * sizeof(SubMesh));
-            dataPtr += header.SubMeshCount * sizeof(SubMesh);
+            ReadRaw(dataPtr, spec.SubMeshes.data(), header.SubMeshCount * sizeof(SubMesh));
         }
         else if constexpr (std::same_as<T, MaterialSpecification>)
         {
-            MaterialHeader header {};
-            std::memcpy(&header, data.data(), sizeof(header));
-            dataPtr += sizeof(header);
+            auto header = Read<MaterialEntry>(dataPtr);
 
             spec.VertexShaderUUID = header.VertexShaderUUID;
             spec.FragmentShaderUUID = header.FragmentShaderUUID;
 
             for (u32 i = 0; i < header.ParameterCount; ++i)
             {
-                MaterialParameterEntry paramEntry {};
-                std::memcpy(&paramEntry, dataPtr, sizeof(paramEntry));
-                dataPtr += sizeof(paramEntry);
+                auto paramEntry = Read<MaterialParameterEntry>(dataPtr);
 
                 std::string name(paramEntry.NameLength, '\0');
-                std::memcpy(name.data(), dataPtr, paramEntry.NameLength);
-                dataPtr += paramEntry.NameLength;
+                ReadRaw(dataPtr, name.data(), paramEntry.NameLength);
 
                 MaterialParameter param {
                     .Name = std::move(name),
@@ -141,25 +124,31 @@ public:
         }
         else if constexpr (std::same_as<T, MaterialInstanceSpecification>)
         {
-            MaterialInstanceHeader header {};
-            std::memcpy(&header, data.data(), sizeof(header));
-            dataPtr += sizeof(header);
+            auto header = Read<MaterialInstanceEntry>(dataPtr);
 
             spec.BaseMaterialUUID = header.BaseMaterialUUID;
 
             spec.UniformData.resize(header.UniformDataSize);
-            std::memcpy(spec.UniformData.data(), dataPtr, header.UniformDataSize);
-            dataPtr += header.UniformDataSize;
+            ReadRaw(dataPtr, spec.UniformData.data(), header.UniformDataSize);
 
             for (u32 i = 0; i < header.TextureCount; ++i)
             {
-                MaterialInstanceTextureEntry texEntry {};
-                std::memcpy(&texEntry, dataPtr, sizeof(texEntry));
-                dataPtr += sizeof(texEntry);
+                auto texEntry = Read<MaterialInstanceTextureEntry>(dataPtr);
                 spec.Textures[texEntry.Slot] = texEntry.TextureUUID;
             }
         }
         return spec;
+    }
+private:
+    void ReadRaw(const std::byte*& dataPtr, void* out, size_t size) const;
+
+    template<typename T>
+    auto Read(const std::byte*& dataPtr) const -> T
+    {
+        T result {};
+        std::memcpy(&result, dataPtr, sizeof(T));
+        dataPtr += sizeof(T);
+        return result;
     }
 private:
     std::unordered_map<Nihil::UUID, PakEntry> mEntryMap;

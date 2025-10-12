@@ -23,7 +23,7 @@ public:
         }
 
         Ensure(HasAsset(uuid), "{} with UUID '{}' not found in asset pack.", typeid(T).name(), uuid);
-        auto spec = mPakReader.Read<typename T::Specification>(uuid);
+        auto spec = mPakReader.Deserialize<typename T::Specification>(uuid);
         std::shared_ptr<T> resource {};
 
         if constexpr (std::is_same_v<T, Mesh>)
@@ -58,7 +58,7 @@ public:
             MaterialInstanceCreateInfo createInfo {
                 .BaseMaterial = baseMaterial,
                 .UniformData = std::move(spec.UniformData),
-                .Textures = std::move(spec)
+                .Textures = {}
             };
             for (const auto& [slot, texUUID] : spec.Textures)
             {

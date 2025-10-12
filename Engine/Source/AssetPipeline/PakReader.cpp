@@ -22,3 +22,9 @@ auto PakReader::HasEntry(const Nihil::UUID& uuid) const -> bool
 {
     return mEntryMap.contains(uuid);
 }
+
+auto PakReader::ReadRaw(const std::byte*& dataPtr, void* out, size_t size) const -> void
+{
+    std::memcpy(out, dataPtr, size);
+    dataPtr += size;
+}

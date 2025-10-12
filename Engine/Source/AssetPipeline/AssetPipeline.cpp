@@ -30,7 +30,7 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
         }
     };
     mManifest.AddAsset(DefaultResource::ObjectMaterialName.data(), defaultMatSpec.UUID);
-    pakWriter.Write<MaterialSpecification>(defaultMatSpec);
+    pakWriter.Serialize<MaterialSpecification>(defaultMatSpec);
 
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
@@ -54,7 +54,7 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
             }
 
             mManifest.AddAsset(assetName, textureSpec.UUID);
-            pakWriter.Write<TextureSpecification>(textureSpec);
+            pakWriter.Serialize<TextureSpecification>(textureSpec);
         }
     }
 
@@ -85,7 +85,7 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
             }
 
             mManifest.AddAsset(assetName, shaderSpec.UUID);
-            pakWriter.Write<ShaderSpecification>(shaderSpec);
+            pakWriter.Serialize<ShaderSpecification>(shaderSpec);
         }
     }
 
@@ -129,11 +129,11 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
                 }
 
                 mManifest.AddAsset(std::format("{}/mat_{}", assetName, importedMat.Name), materialSpec.UUID);
-                pakWriter.Write<MaterialInstanceSpecification>(materialSpec);
+                pakWriter.Serialize<MaterialInstanceSpecification>(materialSpec);
             }
 
             mManifest.AddAsset(assetName, meshSpec.UUID);
-            pakWriter.Write<MeshSpecification>(meshSpec);
+            pakWriter.Serialize<MeshSpecification>(meshSpec);
         }
     }
 

@@ -25,35 +25,41 @@ struct PakEntry
     Type Type;
     u64 Offset;
     u32 CompressionLevel;
-    u64 Size;
+    u64 Size {};
 };
 
-struct TextureHeader
+struct TextureEntry
 {
     i32 Width;
     i32 Height;
+    // Followed by array of bytes
 };
 
-struct MeshHeader
+struct MeshEntry
 {
     u32 VertexBlobSize;
     u32 IndexBlobSize;
     u32 MaterialCount;
     u32 SubMeshCount;
+    // Followed by vertex blob
+    // Followed by index blob
+    // Followed by array of Material UUIDs
+    // Followed by array of SubMeshes
 };
 
 struct MaterialParameterEntry
 {
     u32 NameLength;
     u32 Type;
+    // Followed by array of bytes
 };
 
-struct MaterialHeader
+struct MaterialEntry
 {
     Nihil::UUID VertexShaderUUID {};
     Nihil::UUID FragmentShaderUUID {};
     u32 ParameterCount;
-    // Followed by array of MaterialParameter
+    // Followed by array of MaterialParameterEntry
 };
 
 struct MaterialInstanceTextureEntry
@@ -62,7 +68,7 @@ struct MaterialInstanceTextureEntry
     Nihil::UUID TextureUUID {};
 };
 
-struct MaterialInstanceHeader
+struct MaterialInstanceEntry
 {
     Nihil::UUID BaseMaterialUUID {};
     u32 UniformDataSize;
@@ -71,15 +77,17 @@ struct MaterialInstanceHeader
     // Followed by array of MaterialInstanceTextureEntry
 };
 
-struct ShaderHeader
+struct ShaderEntry
 {
     u32 Stage;
     u32 VariantCount;
+    // Followed by array of ShaderVariantHeader
 };
 
-struct ShaderVariantHeader
+struct ShaderVariantEntry
 {
     u32 API;
     u32 BlobSize;
+    // Followed by array of bytes
 };
 #pragma pack(pop)
