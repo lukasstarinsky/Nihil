@@ -32,6 +32,7 @@ public:
     virtual ~Buffer() = default;
 
     virtual void Bind() const = 0;
+    virtual auto GetSize() const -> i32 = 0;
     virtual void SetData(const void* data, i32 size, i32 offset) const = 0;
 
     static auto Create(const BufferCreateInfo& createInfo) -> BufferPtr;

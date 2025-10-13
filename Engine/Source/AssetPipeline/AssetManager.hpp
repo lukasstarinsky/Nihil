@@ -31,6 +31,7 @@ public:
             MeshCreateInfo createInfo {
                 .Vertices = std::move(spec.Vertices),
                 .Indices = std::move(spec.Indices),
+                .VertexLayout = std::move(spec.VertexLayout),
                 .SubMeshes = std::move(spec.SubMeshes),
                 .Materials = {}
             };

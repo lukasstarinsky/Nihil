@@ -79,6 +79,10 @@ public:
             MeshEntry header {
                 .VertexBlobSize = 0,
                 .IndexBlobSize = 0,
+                .VertexLayout = {
+                    .Stride = spec.VertexLayout.Stride,
+                    .AttributeCount = static_cast<u32>(spec.VertexLayout.Attributes.size())
+                },
                 .MaterialCount = static_cast<u32>(spec.Materials.size()),
                 .SubMeshCount = static_cast<u32>(spec.SubMeshes.size())
             };
@@ -111,6 +115,7 @@ public:
                 entry.Size -= vertexBlobSize + indexBlobSize;
                 entry.Size += uncompressedSize;
             }
+            WriteRaw(entry, spec.VertexLayout.Attributes.data(), static_cast<u32>(header.VertexLayout.AttributeCount * sizeof(VertexAttributeEntry)));
             WriteRaw(entry, spec.Materials.data(), static_cast<u32>(header.MaterialCount * sizeof(Nihil::UUID)));
             WriteRaw(entry, spec.SubMeshes.data(), static_cast<u32>(header.SubMeshCount * sizeof(SubMesh)));
         }

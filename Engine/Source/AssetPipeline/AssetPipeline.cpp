@@ -43,27 +43,6 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
     mManifest.AddAsset(DefaultResource::UIMaterialName.data(), uiBaseMatSpec.UUID);
     pakWriter.Serialize<MaterialSpecification>(uiBaseMatSpec);
 
-    // Default meshes
-    MeshSpecification uiMeshCreateInfo {
-        .UUID = DefaultResource::QuadMesh,
-        .Vertices = {
-            {.Position = {0.0f, 0.0f, 0.0f}, .TexCoord = {0.0f, 0.0f}},
-            {.Position = {1.0f, 0.0f, 0.0f}, .TexCoord = {1.0f, 0.0f}},
-            {.Position = {1.0f, 1.0f, 0.0f}, .TexCoord = {1.0f, 1.0f}},
-            {.Position = {0.0f, 1.0f, 0.0f}, .TexCoord = {0.0f, 1.0f}},
-        },
-        .Indices = {
-            0, 1, 2,
-            0, 2, 3
-        },
-        .SubMeshes = {
-            {.MaterialIndex = 0, .BaseVertex = 0, .BaseIndex = 0, .IndexCount = 6}
-        },
-        .Materials = {}
-    };
-    mManifest.AddAsset("Quad", uiMeshCreateInfo.UUID);
-    pakWriter.Serialize<MeshSpecification>(uiMeshCreateInfo);
-
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
         if (!entry.is_regular_file())
@@ -146,21 +125,23 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
         {
             auto importedMesh = AssetImporter::ImportMesh(path);
 
-            MeshSpecification meshSpec {};
-            meshSpec.UUID = Nihil::UUID::Generate();
-            meshSpec.Vertices = std::move(importedMesh.Vertices);
-            meshSpec.Indices = std::move(importedMesh.Indices);
-            meshSpec.SubMeshes = std::move(importedMesh.SubMeshes);
-            meshSpec.Materials.resize(importedMesh.Materials.size());
+            MeshSpecification meshSpec {
+                .UUID = Nihil::UUID::Generate(),
+                .Vertices = std::move(importedMesh.Vertices),
+                .Indices = std::move(importedMesh.Indices),
+                .VertexLayout = VertexLayout::GetDefault(),
+                .SubMeshes = std::move(importedMesh.SubMeshes),
+                .Materials = std::vector<Nihil::UUID>(importedMesh.Materials.size()),
+            };
             for (size_t i = 0; i < importedMesh.Materials.size(); ++i)
             {
                 auto& importedMat = importedMesh.Materials[i];
-                MaterialInstanceSpecification materialSpec {};
-                materialSpec.UUID = Nihil::UUID::Generate();
-                materialSpec.BaseMaterialUUID = DefaultResource::ObjectMaterial;
+                MaterialInstanceSpecification materialSpec {
+                    .UUID = Nihil::UUID::Generate(),
+                    .BaseMaterialUUID = DefaultResource::ObjectMaterial
+                };
                 meshSpec.Materials[i] = materialSpec.UUID;
 
-                // TODO: Determine slot by reflection on the shaders
                 for (i32 j = 0; j < static_cast<i32>(importedMat.TextureNames.size()); ++j)
                 {
                     materialSpec.Textures[j] = mManifest.HasAsset(importedMat.TextureNames[j])

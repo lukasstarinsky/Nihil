@@ -35,14 +35,31 @@ struct TextureEntry
     // Followed by array of bytes
 };
 
+struct VertexAttributeEntry
+{
+    u32 Location;
+    u32 Type;
+    u32 Offset;
+    u32 Binding;
+    u8 PerInstance;
+};
+
+struct VertexLayoutEntry
+{
+    u32 Stride;
+    u32 AttributeCount;
+};
+
 struct MeshEntry
 {
     u32 VertexBlobSize;
     u32 IndexBlobSize;
+    VertexLayoutEntry VertexLayout;
     u32 MaterialCount;
     u32 SubMeshCount;
     // Followed by vertex blob
     // Followed by index blob
+    // Followed by array of VertexAttributeEntry
     // Followed by array of Material UUIDs
     // Followed by array of SubMeshes
 };

@@ -111,7 +111,6 @@ void Renderer::Disable(RenderState state)
 
 void Renderer::BeginScene(const Camera& camera)
 {
-    ASSERT(sRendererBackend);
     CameraData cameraData {
         .Projection = camera.GetProjectionMatrix(),
         .View = camera.GetViewMatrix()
@@ -119,57 +118,49 @@ void Renderer::BeginScene(const Camera& camera)
     sState.CameraUniformBuffer->SetData(&cameraData, sizeof(CameraData), 0);
 }
 
-void Renderer::Draw(const MeshPtr& mesh, const Mat4f& model, u32 subMeshIndex)
+void Renderer::BeginObject(const Mat4f& model)
 {
-    ASSERT(sRendererBackend);
-
     ObjectData objectData {
         .Model = model
     };
     sState.ObjectUniformBuffer->SetData(&objectData, sizeof(ObjectData), 0);
+}
 
+void Renderer::Draw(const MeshPtr& mesh, const SubMesh& subMesh, const Mat4f& model)
+{
+    ASSERT(sRendererBackend);
+
+    BeginObject(model);
     mesh->Bind();
-    if (subMeshIndex != UINT32_MAX)
+    auto& material = mesh->GetMaterial(subMesh.MaterialIndex);
+    material->Bind();
+    sRendererBackend->Draw(subMesh);
+}
+
+void Renderer::Draw(const MeshPtr& mesh, const Mat4f& model)
+{
+    ASSERT(sRendererBackend);
+
+    BeginObject(model);
+    mesh->Bind();
+    for (const auto& subMesh : mesh->GetSubMeshes())
     {
-        const auto& subMesh = mesh->GetSubMeshes()[subMeshIndex];
-        auto material = mesh->GetMaterial(subMesh.MaterialIndex);
+        auto& material = mesh->GetMaterial(subMesh.MaterialIndex);
         material->Bind();
         sRendererBackend->Draw(subMesh);
     }
-    else
-    {
-        for (const auto& subMesh: mesh->GetSubMeshes())
-        {
-            auto material = mesh->GetMaterial(subMesh.MaterialIndex);
-            material->Bind();
-            sRendererBackend->Draw(subMesh);
-        }
-    }
 }
 
-void Renderer::Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOverride, const Mat4f& model, u32 subMeshIndex)
+void Renderer::Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOverride, const Mat4f& model)
 {
     ASSERT(sRendererBackend);
 
-    ObjectData objectData {
-        .Model = model
-    };
-    sState.ObjectUniformBuffer->SetData(&objectData, sizeof(ObjectData), 0);
-
+    BeginObject(model);
     mesh->Bind();
-    if (subMeshIndex != UINT32_MAX)
+    materialOverride->Bind();
+    for (const auto& subMesh: mesh->GetSubMeshes())
     {
-        const auto& subMesh = mesh->GetSubMeshes()[subMeshIndex];
-        materialOverride->Bind();
         sRendererBackend->Draw(subMesh);
-    }
-    else
-    {
-        for (const auto& subMesh: mesh->GetSubMeshes())
-        {
-            materialOverride->Bind();
-            sRendererBackend->Draw(subMesh);
-        }
     }
 }
 

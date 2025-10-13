@@ -38,8 +38,10 @@ namespace Renderer
     void Disable(RenderState state);
 
     void BeginScene(const Camera& camera);
-    void Draw(const MeshPtr& mesh, const Mat4f& model = Mat4f::Identity(), u32 subMeshIndex = UINT32_MAX);
-    void Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOverride, const Mat4f& model = Mat4f::Identity(), u32 subMeshIndex = UINT32_MAX);
+    void BeginObject(const Mat4f& model);
+    void Draw(const MeshPtr& mesh, const Mat4f& model = Mat4f::Identity());
+    void Draw(const MeshPtr& mesh, const SubMesh& subMesh, const Mat4f& model = Mat4f::Identity());
+    void Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOverride, const Mat4f& model = Mat4f::Identity());
 
     auto ApiToModuleString(RendererAPI api) -> const char*;
 }

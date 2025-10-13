@@ -95,6 +95,10 @@ public:
                 spec.Indices.resize(indexCount);
                 ReadRaw(dataPtr, spec.Indices.data(), header.IndexBlobSize);
             }
+            spec.VertexLayout.Stride = header.VertexLayout.Stride;
+            spec.VertexLayout.Attributes.resize(header.VertexLayout.AttributeCount);
+            ReadRaw(dataPtr, spec.VertexLayout.Attributes.data(), header.VertexLayout.AttributeCount * sizeof(VertexAttributeEntry));
+
             spec.Materials.resize(header.MaterialCount);
             ReadRaw(dataPtr, spec.Materials.data(), header.MaterialCount * sizeof(Nihil::UUID));
 

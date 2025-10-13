@@ -1,7 +1,8 @@
 #include "OpenGLBuffer.hpp"
 
 OpenGLBuffer::OpenGLBuffer(const BufferCreateInfo& createInfo)
-    : mBufferType{createInfo.Type}
+    : mSize{createInfo.Size}
+    , mBufferType{createInfo.Type}
     , mUniformBinding{createInfo.UniformBinding}
 {
     glCreateBuffers(1, &mHandle);
@@ -33,6 +34,11 @@ void OpenGLBuffer::SetData(const void* data, i32 size, i32 offset) const
 {
     ASSERT(mBufferType == BufferType::Uniform);
     glNamedBufferSubData(mHandle, offset, size, data);
+}
+
+auto OpenGLBuffer::GetSize() const -> i32
+{
+    return mSize;
 }
 
 auto OpenGLBuffer::GetHandle() const -> GLuint
