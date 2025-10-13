@@ -21,11 +21,13 @@ public:
 
     auto CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr override;
     auto CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr override;
+    auto CreateUniformBuffer(const UniformBufferCreateInfo& createInfo) const -> UniformBufferPtr override;
     auto CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr override;
     auto CreateMesh(const MeshCreateInfo& createInfo) const -> MeshPtr override;
     auto CreateTexture(const TextureCreateInfo& createInfo) const -> TexturePtr override;
 
     void Draw(const SubMesh& subMesh) const override;
+    void DrawInstanced(const MeshPtr& mesh, i32 instanceCount) const override;
 private:
     const PlatformState& mPlatformState;
 };

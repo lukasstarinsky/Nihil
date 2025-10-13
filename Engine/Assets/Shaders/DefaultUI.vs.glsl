@@ -1,9 +1,11 @@
 #version 460 core
 
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec2 inTexCoord;
+layout(location = 0) in vec3 inVertexPosition;
+layout(location = 1) in vec3 inVertexUV;
+layout(location = 2) in vec3 inInstancePosition;
+layout(location = 3) in vec3 inInstanceSize;
 
-layout(location = 0) out vec2 outTexCoord;
+layout(location = 0) out vec4 outFragColor;
 
 layout(std140, binding = 0) uniform CameraUniformBuffer
 {
@@ -11,13 +13,9 @@ layout(std140, binding = 0) uniform CameraUniformBuffer
     mat4 uView;
 };
 
-layout(std140, binding = 1) uniform ObjectUniformBuffer
-{
-    mat4 uModel;
-};
-
 void main()
 {
-    gl_Position = uProjection * uView * uModel * vec4(inPosition, 1.0);
-    outTexCoord = inTexCoord;
+    vec3 scaledPos = inVertexPosition * 0.5 * inInstanceSize + inInstancePosition;
+    gl_Position = uProjection * vec4(scaledPos, 1.0);
+    outFragColor = vec4(1.0, 0.0, 1.0, 1.0);
 }

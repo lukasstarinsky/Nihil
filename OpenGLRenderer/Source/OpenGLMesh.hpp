@@ -21,4 +21,5 @@ private:
     OpenGLBuffer mVertexBuffer;
     OpenGLBuffer mIndexBuffer;
     GLuint mVertexArray {};
+    u32 mIndexCount {};
 };

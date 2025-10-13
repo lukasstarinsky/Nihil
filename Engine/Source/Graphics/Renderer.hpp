@@ -42,6 +42,7 @@ namespace Renderer
     void Draw(const MeshPtr& mesh, const Mat4f& model = Mat4f::Identity());
     void Draw(const MeshPtr& mesh, const SubMesh& subMesh, const Mat4f& model = Mat4f::Identity());
     void Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOverride, const Mat4f& model = Mat4f::Identity());
+    void DrawInstanced(const MeshPtr& mesh, i32 instanceCount);
 
     auto ApiToModuleString(RendererAPI api) -> const char*;
 }

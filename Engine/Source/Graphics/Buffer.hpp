@@ -1,26 +1,16 @@
 #pragma once
 
-enum class BufferType
+enum class BufferFlags
 {
-    Vertex = 0,
-    Index,
-    Uniform
-};
-
-enum class UniformBinding : i32
-{
-    None = -1,
-    Camera,
-    Object,
-    Material,
+    None = 0,
+    DynamicStorage
 };
 
 struct BufferCreateInfo
 {
-    BufferType Type;
-    const void* Data;
-    i32 Size;
-    UniformBinding UniformBinding = UniformBinding::None;
+    BufferFlags Flags = BufferFlags::None;
+    const void* Data {};
+    i32 Size {};
 };
 
 class Buffer;

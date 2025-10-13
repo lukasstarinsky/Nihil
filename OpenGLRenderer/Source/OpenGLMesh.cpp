@@ -17,8 +17,9 @@ static auto VertexAttributeTypeToGLenum(enum VertexAttribute::Type type) -> GLen
 OpenGLMesh::OpenGLMesh(const MeshCreateInfo& createInfo)
     : mSubMeshes{createInfo.SubMeshes}
     , mMaterials{createInfo.Materials}
-    , mVertexBuffer{{BufferType::Vertex, createInfo.Vertices.data(), static_cast<i32>(createInfo.Vertices.size() * sizeof(Vertex))}}
-    , mIndexBuffer{{BufferType::Index, createInfo.Indices.data(), static_cast<i32>(createInfo.Indices.size() * sizeof(Index))}}
+    , mVertexBuffer{{BufferFlags::None, createInfo.Vertices.data(), static_cast<i32>(createInfo.Vertices.size() * sizeof(Vertex))}}
+    , mIndexBuffer{{BufferFlags::None, createInfo.Indices.data(), static_cast<i32>(createInfo.Indices.size() * sizeof(Index))}}
+    , mIndexCount{static_cast<u32>(createInfo.Indices.size())}
 {
     glCreateVertexArrays(1, &mVertexArray);
 

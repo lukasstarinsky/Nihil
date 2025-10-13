@@ -7,6 +7,7 @@
 #include "Buffer.hpp"
 #include "Mesh.hpp"
 #include "Texture.hpp"
+#include "UniformBuffer.hpp"
 
 class RendererBackend
 {
@@ -25,9 +26,11 @@ public:
 
     virtual auto CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr = 0;
     virtual auto CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr = 0;
+    virtual auto CreateUniformBuffer(const UniformBufferCreateInfo& createInfo) const -> UniformBufferPtr = 0;
     virtual auto CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr = 0;
     virtual auto CreateMesh(const MeshCreateInfo& createInfo) const -> MeshPtr = 0;
     virtual auto CreateTexture(const TextureCreateInfo& CreateInfo) const -> TexturePtr = 0;
 
     virtual void Draw(const SubMesh& subMesh) const = 0;
+    virtual void DrawInstanced(const MeshPtr& mesh, i32 instanceCount) const = 0;
 };

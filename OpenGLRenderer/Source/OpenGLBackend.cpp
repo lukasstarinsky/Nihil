@@ -1,11 +1,13 @@
 #include "OpenGLBackend.hpp"
 
 #include <print>
+
 #include "OpenGLShader.hpp"
 #include "OpenGLBuffer.hpp"
 #include "OpenGLMaterial.hpp"
 #include "OpenGLMesh.hpp"
 #include "OpenGLTexture.hpp"
+#include "OpenGLUniformBuffer.hpp"
 
 static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, GLenum severity, [[maybe_unused]] GLsizei length, const GLchar* msg, [[maybe_unused]] const void* user_param)
 {
@@ -133,6 +135,11 @@ auto OpenGLBackend::CreateMaterial(const MaterialCreateInfo& createInfo) const -
     return std::make_shared<OpenGLMaterial>(createInfo);
 }
 
+auto OpenGLBackend::CreateUniformBuffer(const UniformBufferCreateInfo& createInfo) const -> UniformBufferPtr
+{
+    return std::make_shared<OpenGLUniformBuffer>(createInfo);
+}
+
 auto OpenGLBackend::CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr
 {
     return std::make_shared<OpenGLBuffer>(createInfo);
@@ -151,6 +158,11 @@ auto OpenGLBackend::CreateTexture(const TextureCreateInfo& createInfo) const -> 
 void OpenGLBackend::Draw(const SubMesh& subMesh) const
 {
     glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.IndexCount), GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(subMesh.BaseIndex * sizeof(u32)), static_cast<GLsizei>(subMesh.BaseVertex));
+}
+
+void OpenGLBackend::DrawInstanced(const MeshPtr& mesh, i32 instanceCount) const
+{
+    glDrawElementsInstanced(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, nullptr, instanceCount);
 }
 
 extern "C"

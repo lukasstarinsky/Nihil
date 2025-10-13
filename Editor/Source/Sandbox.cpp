@@ -21,10 +21,20 @@ void Sandbox::OnInitialize()
     }
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
-    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get());
 
     auto* rootWidget = new UI::Panel(nullptr);
-    mUIManager->SetRootWidget(rootWidget);
+    rootWidget->SetPosition({100.0f, 100.0f, 0.0f});
+    rootWidget->SetSize({400.0f, 300.0f, 0.0f});
+
+    auto* panel = new UI::Panel(rootWidget);
+    panel->SetPosition({550.0f, 250.0f, 0.0f});
+    panel->SetSize({200.0f, 150.0f, 0.0f});
+
+    auto* panel2 = new UI::Panel(rootWidget);
+    panel2->SetPosition({900.0f, 50.0f, 0.0f});
+    panel2->SetSize({150.0f, 100.0f, 0.0f});
+
+    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), rootWidget);
 
     mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));

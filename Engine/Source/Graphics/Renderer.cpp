@@ -3,8 +3,8 @@
 
 struct RendererState
 {
-    BufferPtr CameraUniformBuffer;
-    BufferPtr ObjectUniformBuffer;
+    UniformBufferPtr CameraUniformBuffer;
+    UniformBufferPtr ObjectUniformBuffer;
 };
 
 static DynamicLibrary sRendererModule;
@@ -35,21 +35,19 @@ void Renderer::Initialize(const ApplicationConfig& config)
         std::rethrow_exception(exception);
     }
 
-    BufferCreateInfo cameraUBOCreateInfo {
-        .Type = BufferType::Uniform,
+    UniformBufferCreateInfo cameraUBOCreateInfo {
         .Data = nullptr,
         .Size = sizeof(CameraData),
         .UniformBinding = UniformBinding::Camera
     };
-    sState.CameraUniformBuffer = Buffer::Create(cameraUBOCreateInfo);
+    sState.CameraUniformBuffer = UniformBuffer::Create(cameraUBOCreateInfo);
 
-    BufferCreateInfo objectUBOCreateInfo {
-        .Type = BufferType::Uniform,
+    UniformBufferCreateInfo objectUBOCreateInfo {
         .Data = nullptr,
         .Size = sizeof(ObjectData),
         .UniformBinding = UniformBinding::Object
     };
-    sState.ObjectUniformBuffer = Buffer::Create(objectUBOCreateInfo);
+    sState.ObjectUniformBuffer = UniformBuffer::Create(objectUBOCreateInfo);
 
     EventDispatcher::AddListener<ApplicationEvent>(OnAppEvent);
 }
@@ -164,6 +162,13 @@ void Renderer::Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOver
     }
 }
 
+void Renderer::DrawInstanced(const MeshPtr& mesh, i32 instanceCount)
+{
+    ASSERT(sRendererBackend);
+    mesh->Bind();
+    sRendererBackend->DrawInstanced(mesh, instanceCount);
+}
+
 auto Renderer::ApiToModuleString(RendererAPI api) -> const char*
 {
     switch (api)
@@ -186,6 +191,12 @@ auto Material::Create(const MaterialCreateInfo& createInfo) -> MaterialPtr
 {
     ASSERT(sRendererBackend);
     return sRendererBackend->CreateMaterial(createInfo);
+}
+
+auto UniformBuffer::Create(const UniformBufferCreateInfo& createInfo) -> UniformBufferPtr
+{
+    ASSERT(sRendererBackend);
+    return sRendererBackend->CreateUniformBuffer(createInfo);
 }
 
 auto Buffer::Create(const BufferCreateInfo& createInfo) -> BufferPtr

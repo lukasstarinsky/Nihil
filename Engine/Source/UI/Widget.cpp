@@ -9,7 +9,6 @@ Widget::Widget(UI::Widget* parent)
     if (parent)
     {
         parent->AddWidget(this);
-        mAssetManager = parent->mAssetManager;
     }
 }
 
@@ -21,39 +20,28 @@ Widget::~Widget()
     }
 }
 
-void Widget::Render() const
-{
-    for (const auto* child: mChildren)
-    {
-        child->Render();
-    }
-}
-
-void Widget::InitializeDefaultResources()
-{
-    mQuadMesh = mAssetManager->Get<Mesh>(DefaultResource::QuadMesh);
-    mUIBaseMaterial = mAssetManager->Get<Material>(DefaultResource::UIMaterial);
-}
-
 void Widget::AddWidget(UI::Widget* widget)
 {
     mChildren.push_back(widget);
     widget->mParent = this;
 }
 
-void Widget::SetAssetManager(AssetManager* assetManager)
+void Widget::SetPosition(const Vec3f& position)
 {
-    mAssetManager = assetManager;
+    mInstanceData.Position = position;
+}
 
-    if (!mQuadMesh || !mUIBaseMaterial)
-    {
-        InitializeDefaultResources();
-    }
+void Widget::SetSize(const Vec3f& size)
+{
+    mInstanceData.Size = size;
+}
 
-    OnInitialize();
-    for (auto* child: mChildren)
+auto Widget::CollectInstanceData(std::vector<WidgetInstanceData>& outData) const -> void
+{
+    outData.push_back(mInstanceData);
+    for (const auto* child: mChildren)
     {
-        child->SetAssetManager(assetManager);
+        child->CollectInstanceData(outData);
     }
 }
 

@@ -8,25 +8,29 @@
 namespace UI
 {
 
+struct WidgetInstanceData
+{
+    Vec3f Position {};
+    Vec3f Size {};
+};
+
 class Widget
 {
 public:
     explicit Widget(Widget* parent = nullptr);
     virtual ~Widget();
 
-    virtual void OnInitialize() = 0;
-    virtual void Render() const;
-
-    void InitializeDefaultResources();
     void AddWidget(Widget* widget);
-    void SetAssetManager(AssetManager* assetManager);
-protected:
-    Widget* mParent {};
-    AssetManager* mAssetManager {};
-    std::vector<Widget*> mChildren {};
 
-    MeshPtr mQuadMesh {};
-    MaterialPtr mUIBaseMaterial {};
+    void SetPosition(const Vec3f& position);
+    void SetSize(const Vec3f& size);
+
+    auto CollectInstanceData(std::vector<WidgetInstanceData>& outData) const -> void;
+protected:
+    WidgetInstanceData mInstanceData {};
+
+    Widget* mParent {};
+    std::vector<Widget*> mChildren {};
 };
 
 }

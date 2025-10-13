@@ -4,7 +4,7 @@
 
 #include "Material.hpp"
 #include "Resource.hpp"
-#include "Buffer.hpp"
+#include "UniformBuffer.hpp"
 
 struct MaterialInstanceSpecification
 {
@@ -47,7 +47,7 @@ public:
     static auto Create(const MaterialInstanceCreateInfo& createInfo) -> MaterialInstancePtr;
 private:
     MaterialPtr mBaseMaterial {};
-    BufferPtr mUniformBuffer {};
+    UniformBufferPtr mUniformBuffer {};
     std::vector<std::byte> mUniformData {};
     std::unordered_map<i32, TexturePtr> mTextures {};
 };

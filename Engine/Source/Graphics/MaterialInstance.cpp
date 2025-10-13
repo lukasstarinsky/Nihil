@@ -7,13 +7,12 @@ MaterialInstance::MaterialInstance(const MaterialInstanceCreateInfo& createInfo)
 {
     ASSERT(!mBaseMaterial->mLayout.empty());
 
-    BufferCreateInfo bufferCreateInfo {
-        .Type = BufferType::Uniform,
+    UniformBufferCreateInfo bufferCreateInfo {
         .Data = nullptr,
         .Size = mBaseMaterial->mLayoutSize,
         .UniformBinding = UniformBinding::Material
     };
-    mUniformBuffer = Buffer::Create(bufferCreateInfo);
+    mUniformBuffer = UniformBuffer::Create(bufferCreateInfo);
 
     if (static_cast<i32>(mUniformData.size()) != mBaseMaterial->mLayoutSize)
     {

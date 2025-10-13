@@ -25,6 +25,4 @@ namespace DefaultResource
     constexpr Nihil::UUID UIMaterial(11);
 
     constexpr Nihil::UUID Texture(20);
-
-    constexpr Nihil::UUID QuadMesh(30);
 }

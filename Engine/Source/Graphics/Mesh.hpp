@@ -2,6 +2,7 @@
 
 #include "Vertex.hpp"
 #include "Resource.hpp"
+#include "Buffer.hpp"
 #include "MaterialInstance.hpp"
 #include "Platform/UUID.hpp"
 
