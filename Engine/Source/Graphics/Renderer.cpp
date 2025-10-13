@@ -97,6 +97,18 @@ void Renderer::EndFrame()
     sRendererBackend->EndFrame();
 }
 
+void Renderer::Enable(RenderState state)
+{
+    ASSERT(sRendererBackend);
+    sRendererBackend->Enable(state);
+}
+
+void Renderer::Disable(RenderState state)
+{
+    ASSERT(sRendererBackend);
+    sRendererBackend->Disable(state);
+}
+
 void Renderer::BeginScene(const Camera& camera)
 {
     ASSERT(sRendererBackend);
@@ -130,6 +142,32 @@ void Renderer::Draw(const MeshPtr& mesh, const Mat4f& model, u32 subMeshIndex)
         {
             auto material = mesh->GetMaterial(subMesh.MaterialIndex);
             material->Bind();
+            sRendererBackend->Draw(subMesh);
+        }
+    }
+}
+
+void Renderer::Draw(const MeshPtr& mesh, const MaterialInstancePtr& materialOverride, const Mat4f& model, u32 subMeshIndex)
+{
+    ASSERT(sRendererBackend);
+
+    ObjectData objectData {
+        .Model = model
+    };
+    sState.ObjectUniformBuffer->SetData(&objectData, sizeof(ObjectData), 0);
+
+    mesh->Bind();
+    if (subMeshIndex != UINT32_MAX)
+    {
+        const auto& subMesh = mesh->GetSubMeshes()[subMeshIndex];
+        materialOverride->Bind();
+        sRendererBackend->Draw(subMesh);
+    }
+    else
+    {
+        for (const auto& subMesh: mesh->GetSubMeshes())
+        {
+            materialOverride->Bind();
             sRendererBackend->Draw(subMesh);
         }
     }

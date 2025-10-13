@@ -20,6 +20,22 @@ static void OpenGLDebugCallback([[maybe_unused]] GLenum src, [[maybe_unused]] GL
     }
 }
 
+static auto RenderStateToGLenum(RenderState state) -> GLenum
+{
+    switch (state)
+    {
+        case RenderState::DepthTest:
+            return GL_DEPTH_TEST;
+        case RenderState::CullFace:
+            return GL_CULL_FACE;
+        case RenderState::Blend:
+            return GL_BLEND;
+        default:
+            Ensure(false, "OpenGL: Unknown render state");
+            return 0;
+    }
+}
+
 OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig, const PlatformState& platformState)
     : mPlatformState{platformState}
 {
@@ -62,8 +78,6 @@ OpenGLBackend::OpenGLBackend(const ApplicationConfig& appConfig, const PlatformS
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(OpenGLDebugCallback, nullptr);
 #endif
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
     glViewport(0, 0, appConfig.WindowWidth, appConfig.WindowHeight);
 }
 
@@ -97,6 +111,16 @@ void OpenGLBackend::EndFrame() const
 #ifdef NIHIL_PLATFORM_WINDOWS
     ::SwapBuffers(mPlatformState.DeviceContext);
 #endif
+}
+
+void OpenGLBackend::Enable(RenderState state) const
+{
+    glEnable(RenderStateToGLenum(state));
+}
+
+void OpenGLBackend::Disable(RenderState state) const
+{
+    glDisable(RenderStateToGLenum(state));
 }
 
 auto OpenGLBackend::CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr

@@ -8,14 +8,17 @@
 
 struct MaterialParameter
 {
-    enum class Type
+    enum class Type : u32
     {
-        Float = 4,
-        Mat4 = 64,
+        Float = sizeof(f32),
+        Vec3 = sizeof(Vec3f),
+        Vec4 = sizeof(Vec4f),
+        Mat4 = sizeof(Mat4f)
     };
 
     std::string Name;
     MaterialParameter::Type Type {};
+    u32 Offset {};
 };
 
 struct MaterialSpecification
@@ -50,10 +53,14 @@ protected:
     explicit Material(const MaterialCreateInfo& createInfo)
         : mLayout{createInfo.Layout}
     {
-
+        for (const auto& param: mLayout)
+        {
+            mLayoutSize += static_cast<i32>(param.Type);
+        }
     }
 
     std::vector<MaterialParameter> mLayout {};
+    i32 mLayoutSize {};
 
     friend class MaterialInstance;
 };

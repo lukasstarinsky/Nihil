@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include "Common/Defines.hpp"
 
 class Vec2f

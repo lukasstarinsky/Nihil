@@ -26,11 +26,43 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
         .VertexShaderUUID = DefaultResource::ObjectVertexShader,
         .FragmentShaderUUID = DefaultResource::ObjectFragmentShader,
         .Layout = {
-            { "Test", MaterialParameter::Type::Mat4 },
+            { "uBaseColor", MaterialParameter::Type::Vec4, 0 },
         }
     };
     mManifest.AddAsset(DefaultResource::ObjectMaterialName.data(), defaultMatSpec.UUID);
     pakWriter.Serialize<MaterialSpecification>(defaultMatSpec);
+
+    MaterialSpecification uiBaseMatSpec {
+        .UUID = DefaultResource::UIMaterial,
+        .VertexShaderUUID = DefaultResource::UIVertexShader,
+        .FragmentShaderUUID = DefaultResource::UIFragmentShader,
+        .Layout = {
+            { "uBaseColor", MaterialParameter::Type::Vec4, 0 },
+        }
+    };
+    mManifest.AddAsset(DefaultResource::UIMaterialName.data(), uiBaseMatSpec.UUID);
+    pakWriter.Serialize<MaterialSpecification>(uiBaseMatSpec);
+
+    // Default meshes
+    MeshSpecification uiMeshCreateInfo {
+        .UUID = DefaultResource::QuadMesh,
+        .Vertices = {
+            {.Position = {0.0f, 0.0f, 0.0f}, .TexCoord = {0.0f, 0.0f}},
+            {.Position = {1.0f, 0.0f, 0.0f}, .TexCoord = {1.0f, 0.0f}},
+            {.Position = {1.0f, 1.0f, 0.0f}, .TexCoord = {1.0f, 1.0f}},
+            {.Position = {0.0f, 1.0f, 0.0f}, .TexCoord = {0.0f, 1.0f}},
+        },
+        .Indices = {
+            0, 1, 2,
+            0, 2, 3
+        },
+        .SubMeshes = {
+            {.MaterialIndex = 0, .BaseVertex = 0, .BaseIndex = 0, .IndexCount = 6}
+        },
+        .Materials = {}
+    };
+    mManifest.AddAsset("Quad", uiMeshCreateInfo.UUID);
+    pakWriter.Serialize<MeshSpecification>(uiMeshCreateInfo);
 
     for (const auto& entry: std::filesystem::recursive_directory_iterator(mRoot / "Textures"))
     {
@@ -82,6 +114,14 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
             else if (assetName == DefaultResource::ObjectFragmentShaderFile)
             {
                 shaderSpec.UUID = DefaultResource::ObjectFragmentShader;
+            }
+            else if (assetName == DefaultResource::UIVertexShaderFile)
+            {
+                shaderSpec.UUID = DefaultResource::UIVertexShader;
+            }
+            else if (assetName == DefaultResource::UIFragmentShaderFile)
+            {
+                shaderSpec.UUID = DefaultResource::UIFragmentShader;
             }
 
             mManifest.AddAsset(assetName, shaderSpec.UUID);

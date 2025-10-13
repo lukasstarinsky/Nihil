@@ -12,6 +12,7 @@ Engine::Engine(Application* application)
     mApplication->OnInitialize();
 
     EventDispatcher::AddListener<ApplicationEvent>(std::bind_front(&Engine::OnAppEvent, this));
+    EventDispatcher::Dispatch(ApplicationEvent{ .Width = application->Config.WindowWidth, .Height = application->Config.WindowHeight, .Type = EventType::ApplicationResize });
 }
 
 Engine::~Engine()
@@ -33,8 +34,14 @@ void Engine::Run() const
         {
             Renderer::BeginFrame(0.1f, 0.1f, 0.1f, 1.0f);
 
+            Renderer::Enable(RenderState::DepthTest);
+            Renderer::Enable(RenderState::CullFace);
             mApplication->OnUpdate(static_cast<f32>(deltaTimeSeconds));
             mApplication->OnRender();
+
+            Renderer::Disable(RenderState::DepthTest);
+            Renderer::Disable(RenderState::CullFace);
+            mApplication->OnUIRender();
 
             Renderer::EndFrame();
         }

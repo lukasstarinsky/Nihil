@@ -117,7 +117,8 @@ public:
 
                 MaterialParameter param {
                     .Name = std::move(name),
-                    .Type = static_cast<enum class MaterialParameter::Type>(paramEntry.Type)
+                    .Type = static_cast<enum class MaterialParameter::Type>(paramEntry.Type),
+                    .Offset = paramEntry.Offset
                 };
                 spec.Layout.push_back(param);
             }

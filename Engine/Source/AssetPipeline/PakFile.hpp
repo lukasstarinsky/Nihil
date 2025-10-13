@@ -51,6 +51,7 @@ struct MaterialParameterEntry
 {
     u32 NameLength;
     u32 Type;
+    u32 Offset;
     // Followed by array of bytes
 };
 

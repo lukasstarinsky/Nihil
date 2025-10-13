@@ -1,10 +1,8 @@
 #pragma once
 
-#include <array>
-
 #include "Common/Defines.hpp"
 
-class Vec3f
+class alignas(16) Vec3f
 {
 public:
     union

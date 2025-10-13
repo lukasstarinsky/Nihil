@@ -129,7 +129,8 @@ public:
             {
                 MaterialParameterEntry paramEntry {
                     .NameLength = static_cast<u32>(param.Name.size()),
-                    .Type = static_cast<u32>(param.Type)
+                    .Type = static_cast<u32>(param.Type),
+                    .Offset = param.Offset
                 };
                 Write(entry, paramEntry);
                 WriteRaw(entry, param.Name.data(), paramEntry.NameLength);

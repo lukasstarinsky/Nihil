@@ -16,6 +16,9 @@ public:
     void OnResize(i32 width, i32 height) const override;
     void EndFrame() const override;
 
+    void Enable(RenderState state) const override;
+    void Disable(RenderState state) const override;
+
     auto CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr override;
     auto CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr override;
     auto CreateBuffer(const BufferCreateInfo& createInfo) const -> BufferPtr override;

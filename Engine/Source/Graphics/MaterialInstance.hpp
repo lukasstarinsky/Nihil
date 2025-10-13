@@ -32,7 +32,16 @@ public:
     explicit MaterialInstance(const MaterialInstanceCreateInfo& createInfo);
 
     void Bind() const;
-//    void SetTexture(i32 slot, const TexturePtr& texture);
+
+    template <typename T>
+    void SetData(const std::string& name, const T& data)
+    {
+        auto it = std::find_if(mBaseMaterial->mLayout.begin(), mBaseMaterial->mLayout.end(), [&name](const MaterialParameter& param) {
+            return param.Name == name;
+        });
+        ASSERT(it != mBaseMaterial->mLayout.end(), "Material parameter not found: {}", name);
+        std::memcpy(mUniformData.data() + it->Offset, &data, sizeof(T));
+    }
     void UploadData() const;
 
     static auto Create(const MaterialInstanceCreateInfo& createInfo) -> MaterialInstancePtr;

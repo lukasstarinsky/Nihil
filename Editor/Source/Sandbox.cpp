@@ -17,14 +17,14 @@ void Sandbox::OnInitialize()
     if (!mAssetPipeline.ValidateManifest())
     {
         Logger::Warn("Asset manifest is not valid, rebuilding all assets...");
-        mAssetPipeline.BuildAll("Assets/01.npack", 1, MEGABYTE(1));
+        mAssetPipeline.BuildAll("Assets/01.npack", 1, MEGABYTE(2000));
     }
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
-//    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get());
-//
-//    auto* button = new UI::Button(nullptr);
-//    mUIManager->SetRootWidget(button);
+    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get());
+
+    auto* rootWidget = new UI::Panel(nullptr);
+    mUIManager->SetRootWidget(rootWidget);
 
     mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
@@ -46,14 +46,19 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
 void Sandbox::OnResize()
 {
     mCamera.OnResize(Config.WindowWidth, Config.WindowHeight);
+    mUIManager->OnResize(Config.WindowWidth, Config.WindowHeight);
 }
 
 void Sandbox::OnRender()
 {
     Renderer::BeginScene(mCamera);
     Renderer::Draw(mMesh, Mat4f::Scale({0.02f, 0.02f, 0.02f}));
+}
 
-//    mUIManager->Render();
+void Sandbox::OnUIRender()
+{
+    Renderer::BeginScene(mUIManager->GetCamera());
+    mUIManager->Render();
 }
 
 void Sandbox::OnShutdown()

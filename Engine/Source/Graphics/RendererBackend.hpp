@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RenderState.hpp"
 #include "RendererAPI.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
@@ -18,6 +19,9 @@ public:
     virtual void BeginFrame(f32 r, f32 g, f32 b, f32 a) const = 0;
     virtual void OnResize(i32 width, i32 height) const = 0;
     virtual void EndFrame() const = 0;
+
+    virtual void Enable(RenderState state) const = 0;
+    virtual void Disable(RenderState state) const = 0;
 
     virtual auto CreateShader(const ShaderCreateInfo& createInfo) const -> ShaderPtr = 0;
     virtual auto CreateMaterial(const MaterialCreateInfo& createInfo) const -> MaterialPtr = 0;

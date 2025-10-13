@@ -8,6 +8,7 @@
 #include <AssetPipeline/AssetPipeline.hpp>
 #include <AssetPipeline/AssetManager.hpp>
 #include <AssetPipeline/AssetImporter.hpp>
+#include <UI/UI.hpp>
 #include <Graphics/Renderer.hpp>
 #include <Platform/Platform.hpp>
 #include <Platform/UUID.hpp>

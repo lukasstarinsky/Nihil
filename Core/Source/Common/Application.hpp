@@ -32,6 +32,7 @@ public:
     virtual void OnUpdate(f32 deltaTimeSeconds) = 0;
     virtual void OnResize() = 0;
     virtual void OnRender() = 0;
+    virtual void OnUIRender() = 0;
     virtual void OnShutdown() = 0;
 public:
     ApplicationConfig Config {};

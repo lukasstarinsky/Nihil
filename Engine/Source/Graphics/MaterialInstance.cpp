@@ -7,24 +7,25 @@ MaterialInstance::MaterialInstance(const MaterialInstanceCreateInfo& createInfo)
 {
     ASSERT(!mBaseMaterial->mLayout.empty());
 
-    i32 bufferSize = 0;
-    for (const auto& param: mBaseMaterial->mLayout)
-    {
-        bufferSize += static_cast<i32>(param.Type);
-    }
-
     BufferCreateInfo bufferCreateInfo {
         .Type = BufferType::Uniform,
         .Data = nullptr,
-        .Size = bufferSize,
+        .Size = mBaseMaterial->mLayoutSize,
         .UniformBinding = UniformBinding::Material
     };
     mUniformBuffer = Buffer::Create(bufferCreateInfo);
+
+    if (static_cast<i32>(mUniformData.size()) != mBaseMaterial->mLayoutSize)
+    {
+        mUniformData.resize(mBaseMaterial->mLayoutSize);
+        UploadData();
+    }
 }
 
 void MaterialInstance::Bind() const
 {
     mBaseMaterial->Bind();
+    mUniformBuffer->Bind();
     for (const auto& [slot, texture]: mTextures)
     {
         texture->Bind(slot);

@@ -11,6 +11,7 @@ public:
     void OnUpdate(f32 deltaTimeSeconds) override;
     void OnResize() override;
     void OnRender() override;
+    void OnUIRender() override;
     void OnShutdown() override;
 
     auto OnMouseEvent(const MouseEvent& e) -> bool;
@@ -21,5 +22,5 @@ private:
 
     AssetPipeline mAssetPipeline;
     std::unique_ptr<AssetManager> mAssetManager {};
-//    std::unique_ptr<UI::Manager> mUIManager {};
+    std::unique_ptr<UI::Manager> mUIManager {};
 };
