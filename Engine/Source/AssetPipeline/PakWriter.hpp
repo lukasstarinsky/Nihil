@@ -109,6 +109,7 @@ public:
                 WriteRaw(entry, spec.Vertices.data(), vertexBlobSize);
                 WriteRaw(entry, spec.Indices.data(), indexBlobSize);
                 entry.Size -= vertexBlobSize + indexBlobSize;
+                entry.Size += uncompressedSize;
             }
             WriteRaw(entry, spec.Materials.data(), static_cast<u32>(header.MaterialCount * sizeof(Nihil::UUID)));
             WriteRaw(entry, spec.SubMeshes.data(), static_cast<u32>(header.SubMeshCount * sizeof(SubMesh)));
