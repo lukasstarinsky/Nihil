@@ -26,12 +26,12 @@ void Widget::AddWidget(UI::Widget* widget)
     widget->mParent = this;
 }
 
-void Widget::SetPosition(const Vec3f& position)
+void Widget::SetPosition(const Vec2f& position)
 {
     mInstanceData.Position = position;
 }
 
-void Widget::SetSize(const Vec3f& size)
+void Widget::SetSize(const Vec2f& size)
 {
     mInstanceData.Size = size;
 }

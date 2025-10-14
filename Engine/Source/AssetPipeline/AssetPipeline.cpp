@@ -133,20 +133,18 @@ void AssetPipeline::BuildAll(const std::filesystem::path& outputFile, u32 compre
                 .SubMeshes = std::move(importedMesh.SubMeshes),
                 .Materials = std::vector<Nihil::UUID>(importedMesh.Materials.size()),
             };
-            for (size_t i = 0; i < importedMesh.Materials.size(); ++i)
+
+            for (const auto& [i, importedMat]: importedMesh.Materials | std::views::enumerate)
             {
-                auto& importedMat = importedMesh.Materials[i];
                 MaterialInstanceSpecification materialSpec {
                     .UUID = Nihil::UUID::Generate(),
                     .BaseMaterialUUID = DefaultResource::ObjectMaterial
                 };
                 meshSpec.Materials[i] = materialSpec.UUID;
 
-                for (i32 j = 0; j < static_cast<i32>(importedMat.TextureNames.size()); ++j)
+                for (const auto& [j, textureName]: importedMat.TextureNames | std::views::enumerate)
                 {
-                    materialSpec.Textures[j] = mManifest.HasAsset(importedMat.TextureNames[j])
-                                                 ? mManifest.GetUUID(importedMat.TextureNames[j])
-                                                 : DefaultResource::Texture;
+                    materialSpec.Textures[j] = mManifest.HasAsset(textureName) ? mManifest.GetUUID(textureName) : DefaultResource::Texture;
                 }
 
                 mManifest.AddAsset(std::format("{}/mat_{}", assetName, importedMat.Name), materialSpec.UUID);

@@ -10,8 +10,8 @@ namespace UI
 
 struct WidgetInstanceData
 {
-    Vec3f Position {};
-    Vec3f Size {};
+    Vec2f Position {};
+    Vec2f Size {};
 };
 
 class Widget
@@ -22,8 +22,8 @@ public:
 
     void AddWidget(Widget* widget);
 
-    void SetPosition(const Vec3f& position);
-    void SetSize(const Vec3f& size);
+    void SetPosition(const Vec2f& position);
+    void SetSize(const Vec2f& size);
 
     auto CollectInstanceData(std::vector<WidgetInstanceData>& outData) const -> void;
 protected:

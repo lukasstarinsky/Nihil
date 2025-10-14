@@ -48,8 +48,8 @@ Manager::Manager(AssetManager* assetManager, Widget* root)
     mInstanceVertexLayout = {
         .Stride = sizeof(WidgetInstanceData),
         .Attributes = {
-            { 2, VertexAttribute::Type::Float3, offsetof(WidgetInstanceData, Position), 1, true },
-            { 3, VertexAttribute::Type::Float3, offsetof(WidgetInstanceData, Size), 1, true }
+            { 2, VertexAttribute::Type::Float2, offsetof(WidgetInstanceData, Position), 1, true },
+            { 3, VertexAttribute::Type::Float2, offsetof(WidgetInstanceData, Size), 1, true }
         }
     };
 
@@ -71,6 +71,8 @@ void Manager::Render() const
     std::vector<WidgetInstanceData> instanceDatas;
     instanceDatas.reserve(MAX_WIDGETS);
     mRootWidget->CollectInstanceData(instanceDatas);
+
+    // TODO: Sort by WidgetInstanceData::Layer
     ASSERT(instanceDatas.size() <= MAX_WIDGETS, "Max supported widgets: {}, current widgets: {}", MAX_WIDGETS, instanceDatas.size());
 
     mQuadMesh->GetMaterial(0)->Bind();

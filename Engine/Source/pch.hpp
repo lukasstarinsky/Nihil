@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <span>
 #include <filesystem>
+#include <ranges>
 
 #include "Common/Defines.hpp"
 #include "Common/Logger.hpp"
