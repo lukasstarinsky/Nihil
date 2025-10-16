@@ -30,6 +30,7 @@ struct MouseEvent
 {
     Button Button {};
     Vec2f Delta {};
+    Vec2f Position {};
     EventType Type = EventType::MousePress;
 };
 

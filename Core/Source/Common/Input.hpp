@@ -101,7 +101,7 @@ namespace Input
 {
     void ProcessKey(Key key, bool isPressed);
     void ProcessKey(Key key, bool isPressed, bool wasPressed);
-    void ProcessButton(Button button, bool isPressed);
+    void ProcessButton(Button button, bool isPressed, Vec2f position = {});
 
     auto NIHIL_API IsKeyDown(Key key) -> bool;
     auto NIHIL_API IsButtonDown(Button button) -> bool;

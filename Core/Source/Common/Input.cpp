@@ -31,7 +31,7 @@ void Input::ProcessKey(Key key, bool isPressed, bool wasPressed)
     }
 }
 
-void Input::ProcessButton(Button button, bool isPressed)
+void Input::ProcessButton(Button button, bool isPressed, Vec2f position)
 {
     i32 index = static_cast<i32>(button);
 
@@ -40,7 +40,7 @@ void Input::ProcessButton(Button button, bool isPressed)
 
     if (sState.LastButtons[index] != isPressed)
     {
-        EventDispatcher::Dispatch(MouseEvent { .Button = button, .Delta = {}, .Type = isPressed ? EventType::MousePress : EventType::MouseRelease });
+        EventDispatcher::Dispatch(MouseEvent { .Button = button, .Position = position, .Type = isPressed ? EventType::MousePress : EventType::MouseRelease });
     }
 }
 

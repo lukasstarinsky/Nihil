@@ -165,7 +165,7 @@ auto ProcessMessage(HWND handle, u32 msg, WPARAM wParam, LPARAM lParam) -> LRESU
                     break;
             }
 
-            Input::ProcessButton(button, isPressed);
+            Input::ProcessButton(button, isPressed, { static_cast<f32>(GET_X_LPARAM(lParam)), static_cast<f32>(GET_Y_LPARAM(lParam)) });
             break;
         }
     }
