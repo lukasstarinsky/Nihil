@@ -9,7 +9,7 @@ Camera::Camera(CameraProjection projection, const Vec3f& position, const Vec3f& 
 {
     if (projection == CameraProjection::Orthographic)
     {
-        mProjectionMatrix = Mat4f::Orthographic(0, fovDegreesOrWidth, 0, aspectRatioOrHeight, -1.0f, 1.0f);
+        mProjectionMatrix = Mat4f::Orthographic(0, fovDegreesOrWidth, aspectRatioOrHeight, 0, -1.0f, 1.0f);
         mViewMatrix = Mat4f::Identity();
     }
     else
@@ -70,7 +70,7 @@ void Camera::OnResize(i32 width, i32 height)
 {
     if (mProjection == CameraProjection::Orthographic)
     {
-        mProjectionMatrix = Mat4f::Orthographic(0, width, 0, height, -1.0f, 1.0f);
+        mProjectionMatrix = Mat4f::Orthographic(0.0f, static_cast<f32>(width), static_cast<f32>(height), 0.0f, -1.0f, 1.0f);
     }
     else
     {

@@ -10,4 +10,11 @@ Panel::Panel(Widget* parent)
 {
 }
 
+auto Panel::OnMouseClick() const -> bool
+{
+    if (mOnMouseClick)
+        mOnMouseClick();
+    return true;
+}
+
 }

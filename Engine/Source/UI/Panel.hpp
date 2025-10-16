@@ -10,6 +10,8 @@ class Panel : public Widget
 {
 public:
     explicit Panel(Widget* parent);
+
+    auto OnMouseClick() const -> bool override;
 };
 
 }

@@ -15,7 +15,7 @@ layout(std140, binding = 0) uniform CameraUniformBuffer
 
 void main()
 {
-    vec2 scaledPos = inVertexPosition.xy * 0.5 * inInstanceSize + inInstancePosition;
+    vec2 scaledPos = inVertexPosition.xy * inInstanceSize + inInstancePosition;
     gl_Position = uProjection * vec4(scaledPos, 0.0, 1.0);
     outFragColor = vec4(1.0, 0.0, 1.0, 1.0);
 }

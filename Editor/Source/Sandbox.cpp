@@ -25,14 +25,23 @@ void Sandbox::OnInitialize()
     auto* rootWidget = new UI::Panel(nullptr);
     rootWidget->SetPosition({100.0f, 100.0f});
     rootWidget->SetSize({400.0f, 300.0f});
+    rootWidget->SetOnMouseClick([]() {
+        Logger::Info("Root panel clicked");
+    });
 
     auto* panel = new UI::Panel(rootWidget);
     panel->SetPosition({550.0f, 250.0f});
     panel->SetSize({200.0f, 150.0f});
+    panel->SetOnMouseClick([]() {
+        Logger::Info("Child panel clicked");
+    });
 
     auto* panel2 = new UI::Panel(rootWidget);
     panel2->SetPosition({900.0f, 50.0f});
     panel2->SetSize({150.0f, 100.0f});
+    panel2->SetOnMouseClick([]() {
+        Logger::Info("Second child panel clicked");
+    });
 
     mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), rootWidget);
 

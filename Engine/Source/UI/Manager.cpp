@@ -10,7 +10,7 @@ namespace UI
 Manager::Manager(AssetManager* assetManager, Widget* root)
     : mAssetManager{assetManager}
     , mRootWidget{root}
-    , mCamera{CameraProjection::Orthographic, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 1920.0f, 1080.0f}
+    , mCamera{CameraProjection::Orthographic, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 1280.0f, 960.0f}
 {
     MaterialInstanceCreateInfo materialInstanceCreateInfo {
         .BaseMaterial = mAssetManager->Get<Material>(DefaultResource::UIMaterial),
@@ -54,6 +54,13 @@ Manager::Manager(AssetManager* assetManager, Widget* root)
     };
 
     mQuadMesh->SetVertexBuffer(mQuadInstanceBuffer.get(), mInstanceVertexLayout, 1);
+
+    EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Manager::OnMouseEvent, this));
+}
+
+Manager::~Manager()
+{
+    delete mRootWidget;
 }
 
 auto Manager::GetCamera() const -> const Camera&
@@ -77,12 +84,18 @@ void Manager::Render() const
 
     mQuadMesh->GetMaterial(0)->Bind();
     mQuadInstanceBuffer->SetData(instanceDatas.data(), static_cast<i32>(sizeof(WidgetInstanceData) * instanceDatas.size()), 0);
-    Renderer::DrawInstanced(mQuadMesh, instanceDatas.size());
+    Renderer::DrawInstanced(mQuadMesh, static_cast<i32>(instanceDatas.size()));
 }
 
-Manager::~Manager()
+auto Manager::OnMouseEvent(const MouseEvent& event) const -> bool
 {
-    delete mRootWidget;
+    if (event.Type != EventType::MousePress)
+        return false;
+
+    const auto* target = mRootWidget->GetLastWidgetAt(event.Position);
+    if (target)
+        return target->OnMouseClick();
+    return false;
 }
 
 }
