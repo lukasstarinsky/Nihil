@@ -33,6 +33,9 @@ auto Widget::HitTest(const Vec2f& point) const -> bool
 
 auto Widget::CollectInstanceData(std::vector<WidgetInstanceData>& outData) const -> void
 {
+    if (!mVisible)
+        return;
+
     outData.push_back({ .Position = GetAbsoluteRect().Position, .Size = mRect.Size });
     for (const auto* child: mChildren)
     {
@@ -55,13 +58,16 @@ auto Widget::GetAbsoluteRect() const -> Rect
 
 auto Widget::GetLastWidgetAt(const Vec2f& point) const -> const Widget*
 {
+    if (!mVisible)
+        return nullptr;
+
     for (auto it = mChildren.rbegin(); it != mChildren.rend(); ++it)
     {
         auto* child = *it;
-        if (child->HitTest(point))
+        if (child->HitTest(point) && child->mVisible)
         {
             const auto* hit = child->GetLastWidgetAt(point);
-            if (hit)
+            if (hit && hit->mVisible)
                 return hit;
             return child;
         }
@@ -84,6 +90,31 @@ void Widget::SetPosition(const Vec2f& position)
 void Widget::SetSize(const Vec2f& size)
 {
     mRect.Size = size;
+}
+
+void Widget::Toggle()
+{
+    mVisible ? Hide() : Show();
+}
+
+void Widget::Show()
+{
+    mVisible = true;
+
+    for (auto* child: mChildren)
+    {
+        child->Show();
+    }
+}
+
+void Widget::Hide()
+{
+    mVisible = false;
+
+    for (auto* child: mChildren)
+    {
+        child->Hide();
+    }
 }
 
 }

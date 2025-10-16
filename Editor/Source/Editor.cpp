@@ -1,8 +1,8 @@
-#include "Sandbox.hpp"
+#include "Editor.hpp"
 
 #define MOUSE_SENSITIVITY 0.008f
 
-Sandbox::Sandbox()
+Editor::Editor()
     : mCamera{CameraProjection::Perspective, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 90.0f, 1280.0f / 960.0f}
     , mAssetPipeline{"Assets/"}
 {
@@ -12,7 +12,7 @@ Sandbox::Sandbox()
     Config.RendererAPI = RendererAPI::OpenGL;
 }
 
-void Sandbox::OnInitialize()
+void Editor::OnInitialize()
 {
     if (!mAssetPipeline.ValidateManifest())
     {
@@ -46,11 +46,11 @@ void Sandbox::OnInitialize()
     mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), rootWidget);
 
     mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
-    EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Sandbox::OnMouseEvent, this));
-    EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Sandbox::OnKeyEvent, this));
+    EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Editor::OnMouseEvent, this));
+    EventDispatcher::AddListener<KeyEvent>(std::bind_front(&Editor::OnKeyEvent, this));
 }
 
-void Sandbox::OnUpdate(f32 deltaTimeSeconds)
+void Editor::OnUpdate(f32 deltaTimeSeconds)
 {
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
@@ -62,30 +62,30 @@ void Sandbox::OnUpdate(f32 deltaTimeSeconds)
     }
 }
 
-void Sandbox::OnResize()
+void Editor::OnResize()
 {
     mCamera.OnResize(Config.WindowWidth, Config.WindowHeight);
     mUIManager->OnResize(Config.WindowWidth, Config.WindowHeight);
 }
 
-void Sandbox::OnRender()
+void Editor::OnRender()
 {
     Renderer::BeginScene(mCamera);
     Renderer::Draw(mMesh, Mat4f::Scale({0.02f, 0.02f, 0.02f}));
 }
 
-void Sandbox::OnUIRender()
+void Editor::OnUIRender()
 {
     Renderer::BeginScene(mUIManager->GetCamera());
     mUIManager->Render();
 }
 
-void Sandbox::OnShutdown()
+void Editor::OnShutdown()
 {
 
 }
 
-auto Sandbox::OnMouseEvent(const MouseEvent& e) -> bool
+auto Editor::OnMouseEvent(const MouseEvent& e) -> bool
 {
     if (e.Type == EventType::MouseMove)
     {
@@ -95,7 +95,15 @@ auto Sandbox::OnMouseEvent(const MouseEvent& e) -> bool
     return false;
 }
 
-auto Sandbox::OnKeyEvent(const KeyEvent& e) -> bool
+auto Editor::OnKeyEvent(const KeyEvent& e) -> bool
 {
+    if (e.Type == EventType::KeyPress)
+    {
+        if (e.Key == Key::F2)
+        {
+            mUIManager->GetRootWidget()->Toggle();
+        }
+    }
+
     return true;
 }

@@ -2,10 +2,10 @@
 
 #include <Nihil.hpp>
 
-class Sandbox : public Application
+class Editor : public Application
 {
 public:
-    Sandbox();
+    Editor();
 
     void OnInitialize() override;
     void OnUpdate(f32 deltaTimeSeconds) override;

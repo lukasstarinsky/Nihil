@@ -34,11 +34,15 @@ public:
     void SetOnMouseClick(const EventCallback& callback);
     void SetPosition(const Vec2f& position);
     void SetSize(const Vec2f& size);
+    void Toggle();
+    void Show();
+    void Hide();
 protected:
     Rect mRect {};
     Widget* mParent {};
     std::vector<Widget*> mChildren {};
     EventCallback mOnMouseClick {};
+    bool mVisible = true;
 };
 
 }

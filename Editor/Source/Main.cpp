@@ -1,6 +1,6 @@
-#include "Sandbox.hpp"
+#include "Editor.hpp"
 
 i32 main()
 {
-    CREATE_APPLICATION(Sandbox);
+    CREATE_APPLICATION(Editor);
 }

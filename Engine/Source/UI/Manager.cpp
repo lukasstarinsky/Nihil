@@ -63,6 +63,11 @@ Manager::~Manager()
     delete mRootWidget;
 }
 
+auto Manager::GetRootWidget() const -> Widget*
+{
+    return mRootWidget;
+}
+
 auto Manager::GetCamera() const -> const Camera&
 {
     return mCamera;

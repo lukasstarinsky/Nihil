@@ -14,6 +14,7 @@ public:
     explicit Manager(AssetManager* assetManager, Widget* root);
     ~Manager();
 
+    auto GetRootWidget() const -> Widget*;
     auto GetCamera() const -> const Camera&;
     void OnResize(i32 width, i32 height);
     void Render() const;
