@@ -5,7 +5,12 @@ enable_testing()
 
 find_package(GTest CONFIG REQUIRED)
 
-add_executable(${PROJECT_NAME} Mat4.tests.cpp Vec3.tests.cpp UUID.tests.cpp)
+add_executable(${PROJECT_NAME}
+    Mat4.tests.cpp
+    Vec3.tests.cpp
+    UUID.tests.cpp
+    Rect.tests.cpp
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest_main NihilCore)
 
 include(GoogleTest)
