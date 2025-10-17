@@ -9,7 +9,6 @@ void Platform::Initialize(const ApplicationConfig& config)
 {
     Logger::Trace("Initializing Win32 Platform...");
     sState.Instance = GetModuleHandle(nullptr);
-    Ensure(QueryPerformanceFrequency(&sState.Frequency), "Win32: QueryPerformanceFrequency() failed with error code: {}", GetLastError());
 
     WNDCLASSEX wndClass {
         .cbSize = sizeof(WNDCLASSEX),

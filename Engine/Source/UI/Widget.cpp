@@ -22,6 +22,14 @@ Widget::~Widget()
     }
 }
 
+void Widget::Update(f32 deltaTimeSeconds)
+{
+    for (auto* child: mChildren)
+    {
+        child->Update(deltaTimeSeconds);
+    }
+}
+
 auto Widget::OnMouseClick() const -> bool
 {
     if (mOnMouseClick)
@@ -36,6 +44,11 @@ void Widget::AddWidget(UI::Widget* widget)
 {
     mChildren.push_back(widget);
     widget->mParent = this;
+
+    if (const auto layout = dynamic_cast<Layout*>(this))
+    {
+        layout->MarkDirty();
+    }
 }
 
 auto Widget::HitTest(const Vec2f& point) const -> bool

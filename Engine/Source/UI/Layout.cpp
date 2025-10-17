@@ -10,9 +10,11 @@ Layout::Layout(LayoutType type, Widget* parent)
     SetRenderable(false);
 }
 
-void Layout::Update() const
+void Layout::Update(f32 deltaTimeSeconds)
 {
-    if (mChildren.empty())
+    Widget::Update(deltaTimeSeconds);
+
+    if (!mIsDirty)
         return;
 
     if (mType == LayoutType::Vertical)
@@ -33,6 +35,7 @@ void Layout::Update() const
             x += child->GetSize().x + mSpacing;
         }
     }
+    mIsDirty = false;
 }
 
 void Layout::SetSpacing(f32 spacing)
@@ -43,6 +46,11 @@ void Layout::SetSpacing(f32 spacing)
 void Layout::SetPadding(f32 padding)
 {
     mPadding = padding;
+}
+
+void Layout::MarkDirty()
+{
+    mIsDirty = true;
 }
 
 }

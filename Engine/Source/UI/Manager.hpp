@@ -16,9 +16,11 @@ public:
 
     auto GetRootWidget() const -> Widget*;
     auto GetCamera() const -> const Camera&;
-    void OnResize(i32 width, i32 height);
+
+    void Update(f32 deltaTimeSeconds);
     void Render() const;
 
+    void OnResize(i32 width, i32 height);
     auto OnMouseEvent(const MouseEvent& event) const -> bool;
 private:
     AssetManager* mAssetManager {};

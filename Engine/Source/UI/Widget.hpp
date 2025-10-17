@@ -24,6 +24,7 @@ public:
     explicit Widget(Widget* parent = nullptr);
     virtual ~Widget();
 
+    virtual void Update(f32 deltaTimeSeconds);
     virtual auto OnMouseClick() const -> bool;
 
     void AddWidget(Widget* widget);

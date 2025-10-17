@@ -74,9 +74,9 @@ auto Manager::GetCamera() const -> const Camera&
     return mCamera;
 }
 
-void Manager::OnResize(i32 width, i32 height)
+void Manager::Update(f32 deltaTimeSeconds)
 {
-    mCamera.OnResize(width, height);
+    mRootWidget->Update(deltaTimeSeconds);
 }
 
 void Manager::Render() const
@@ -91,6 +91,11 @@ void Manager::Render() const
     mQuadMesh->GetMaterial(0)->Bind();
     mQuadInstanceBuffer->SetData(instanceDatas.data(), static_cast<i32>(sizeof(WidgetInstanceData) * instanceDatas.size()), 0);
     Renderer::DrawInstanced(mQuadMesh, static_cast<i32>(instanceDatas.size()));
+}
+
+void Manager::OnResize(i32 width, i32 height)
+{
+    mCamera.OnResize(width, height);
 }
 
 auto Manager::OnMouseEvent(const MouseEvent& event) const -> bool

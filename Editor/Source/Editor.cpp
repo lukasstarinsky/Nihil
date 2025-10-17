@@ -22,24 +22,31 @@ void Editor::OnInitialize()
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
 
-    auto* layout = new UI::Layout(UI::LayoutType::Vertical, nullptr);
+    auto* layout = new UI::Layout(UI::LayoutType::Horizontal, nullptr);
     layout->SetPosition({200.0f, 50.0f});
     layout->SetSize({700.0f, 700.0f});
 
-    auto* panel = new UI::Panel(layout);
-    panel->SetSize({200.0f, 150.0f});
-    panel->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
-    panel->SetOnMouseClick([]() {
-        Logger::Info("Child panel clicked");
-    });
+    auto* nestedLayout0 = new UI::Layout(UI::LayoutType::Vertical, layout);
+    nestedLayout0->SetSize({330.0f, 680.0f});
 
-    auto* panel2 = new UI::Panel(layout);
-    panel2->SetSize({150.0f, 100.0f});
-    panel2->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
-    panel2->SetOnMouseClick([]() {
-        Logger::Info("Second child panel clicked");
-    });
-    layout->Update();
+    auto* nestedLayout1 = new UI::Layout(UI::LayoutType::Horizontal, layout);
+    nestedLayout1->SetSize({330.0f, 680.0f});
+
+    auto* panel0 = new UI::Panel(nestedLayout0);
+    panel0->SetSize({310.0f, 150.0f});
+    panel0->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+
+    auto* panel1 = new UI::Panel(nestedLayout0);
+    panel1->SetSize({310.0f, 150.0f});
+    panel1->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+
+    auto* panel2 = new UI::Panel(nestedLayout1);
+    panel2->SetSize({155.0f, 150.0f});
+    panel2->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+
+    auto* panel3 = new UI::Panel(nestedLayout1);
+    panel3->SetSize({155.0f, 150.0f});
+    panel3->SetColor({1.0f, 0.0f, 1.0f, 1.0f});
 
     mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), layout);
 
@@ -50,6 +57,8 @@ void Editor::OnInitialize()
 
 void Editor::OnUpdate(f32 deltaTimeSeconds)
 {
+    mUIManager->Update(deltaTimeSeconds);
+
     if (Input::IsKeyDown(Key::W) || Input::IsKeyDown(Key::S) || Input::IsKeyDown(Key::A) || Input::IsKeyDown(Key::D))
     {
         Vec3f moveVector;
