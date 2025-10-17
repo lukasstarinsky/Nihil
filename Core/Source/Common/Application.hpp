@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "Defines.hpp"
 
 enum class RendererAPI : u32;
@@ -16,7 +18,7 @@ struct ApplicationState
 {
     bool IsRunning = true;
     bool IsSuspended;
-    f64 LastFrameTime;
+    std::chrono::steady_clock::time_point LastFrameTime {};
 };
 
 ///

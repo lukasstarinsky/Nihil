@@ -15,6 +15,5 @@ public:
     static void PollEvents();
     static void Print(std::string_view message, LogLevel severity);
 
-    static auto GetTimeSeconds() -> f64;
     static auto GetState() -> const PlatformState&;
 };

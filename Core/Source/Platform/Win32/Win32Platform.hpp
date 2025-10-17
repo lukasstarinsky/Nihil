@@ -11,5 +11,4 @@ struct PlatformState
     HWND WindowHandle;
     HINSTANCE Instance;
     HDC DeviceContext;
-    LARGE_INTEGER Frequency;
 };

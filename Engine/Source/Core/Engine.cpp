@@ -24,11 +24,15 @@ Engine::~Engine()
 
 void Engine::Run() const
 {
+    mApplication->State.LastFrameTime = std::chrono::steady_clock::now();
+
     while (mApplication->State.IsRunning)
     {
-        f64 time = Platform::GetTimeSeconds();
-        f64 deltaTimeSeconds = time - mApplication->State.LastFrameTime;
+        auto time = std::chrono::steady_clock::now();
+        auto deltaTime = time - mApplication->State.LastFrameTime;
+
         mApplication->State.LastFrameTime = time;
+        auto deltaTimeSeconds = std::chrono::duration<f32>(deltaTime).count();
 
         if (!mApplication->State.IsSuspended)
         {
@@ -36,7 +40,7 @@ void Engine::Run() const
 
             Renderer::Enable(RenderState::DepthTest);
             Renderer::Enable(RenderState::CullFace);
-            mApplication->OnUpdate(static_cast<f32>(deltaTimeSeconds));
+            mApplication->OnUpdate(deltaTimeSeconds);
             mApplication->OnRender();
 
             Renderer::Disable(RenderState::DepthTest);
