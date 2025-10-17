@@ -42,6 +42,8 @@ public:
     void UpdateAnchors(const Vec2f& parentSize);
 
     auto GetSize() const -> Vec2f;
+    auto GetWidth() const -> f32;
+    auto GetHeight() const -> f32;
     auto GetAbsoluteRect() const -> Rect;
     auto GetLastWidgetAt(const Vec2f& point) const -> const Widget*;
     auto GetSizePolicy() const -> std::pair<SizePolicy, SizePolicy>;
@@ -50,6 +52,8 @@ public:
     void SetOnMouseClick(const EventCallback& callback);
     void SetPosition(const Vec2f& position);
     void SetSize(const Vec2f& size);
+    void SetWidth(f32 width);
+    void SetHeight(f32 height);
     void SetRenderable(bool renderable);
     void SetColor(const Vec4f& color);
     void SetVisible(bool visible);

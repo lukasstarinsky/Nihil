@@ -17,6 +17,8 @@ public:
     explicit Layout(LayoutType type, Widget* parent = nullptr);
 
     void Update(f32 deltaTimeSeconds) override;
+    auto GetSpacing() const -> f32;
+    auto GetPadding() const -> f32;
     void SetSpacing(f32 spacing);
     void SetPadding(f32 padding);
 private:

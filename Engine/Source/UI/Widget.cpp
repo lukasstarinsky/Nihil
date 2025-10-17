@@ -121,6 +121,16 @@ void Widget::UpdateAnchors(const Vec2f& parentSize)
     }
 }
 
+auto Widget::GetWidth() const -> f32
+{
+    return mRect.Size.x;
+}
+
+auto Widget::GetHeight() const -> f32
+{
+    return mRect.Size.y;
+}
+
 auto Widget::GetSize() const -> Vec2f
 {
     return mRect.Size;
@@ -196,6 +206,16 @@ void Widget::SetSize(const Vec2f& size)
     {
         MarkDirty();
     }
+}
+
+void Widget::SetWidth(f32 width)
+{
+    SetSize({ width, mRect.Size.y });
+}
+
+void Widget::SetHeight(f32 height)
+{
+    SetSize({ mRect.Size.x, height });
 }
 
 void Widget::SetRenderable(bool renderable)

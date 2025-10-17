@@ -26,7 +26,7 @@ void Layout::Update(f32 deltaTimeSeconds)
                 const auto [_, heightPolicy] = child->GetSizePolicy();
                 if (heightPolicy == SizePolicy::Fixed)
                 {
-                    totalFixedHeight += child->GetSize().y;
+                    totalFixedHeight += child->GetHeight();
                 }
                 else if (heightPolicy == SizePolicy::Stretch)
                 {
@@ -34,7 +34,7 @@ void Layout::Update(f32 deltaTimeSeconds)
                 }
             }
 
-            auto heightAvailable = GetSize().y - 2 * mPadding - mSpacing * (static_cast<f32>(mChildren.size()) - 1) - totalFixedHeight;
+            auto heightAvailable = GetHeight() - 2 * mPadding - mSpacing * (static_cast<f32>(mChildren.size()) - 1) - totalFixedHeight;
             if (heightAvailable < 0.0f)
             {
                 heightAvailable = 0.0f;
@@ -47,15 +47,15 @@ void Layout::Update(f32 deltaTimeSeconds)
 
                 if (widthPolicy == SizePolicy::Stretch)
                 {
-                    child->SetSize({ GetSize().x - 2 * mPadding, child->GetSize().y });
+                    child->SetWidth(GetWidth() - 2 * mPadding);
                 }
                 if (heightPolicy == SizePolicy::Stretch)
                 {
-                    child->SetSize({ child->GetSize().x, heightAvailable / static_cast<f32>(verticalStretchCount) });
+                    child->SetHeight(heightAvailable / static_cast<f32>(verticalStretchCount));
                 }
 
                 child->SetPosition({ mPadding, currentY });
-                currentY += child->GetSize().y + mSpacing;
+                currentY += child->GetHeight() + mSpacing;
             }
         }
         else if (mType == LayoutType::Horizontal)
@@ -68,7 +68,7 @@ void Layout::Update(f32 deltaTimeSeconds)
                 const auto [widthPolicy, _] = child->GetSizePolicy();
                 if (widthPolicy == SizePolicy::Fixed)
                 {
-                    totalFixedWidth += child->GetSize().x;
+                    totalFixedWidth += child->GetWidth();
                 }
                 else if (widthPolicy == SizePolicy::Stretch)
                 {
@@ -76,7 +76,7 @@ void Layout::Update(f32 deltaTimeSeconds)
                 }
             }
 
-            auto widthAvailable = GetSize().x - 2 * mPadding - mSpacing * (static_cast<f32>(mChildren.size()) - 1) - totalFixedWidth;
+            auto widthAvailable = GetWidth() - 2 * mPadding - mSpacing * (static_cast<f32>(mChildren.size()) - 1) - totalFixedWidth;
             if (widthAvailable < 0.0f)
             {
                 widthAvailable = 0.0f;
@@ -87,17 +87,17 @@ void Layout::Update(f32 deltaTimeSeconds)
             {
                 const auto [widthPolicy, heightPolicy] = child->GetSizePolicy();
 
-                if (heightPolicy == SizePolicy::Stretch)
-                {
-                    child->SetSize({ child->GetSize().x, GetSize().y - 2 * mPadding });
-                }
                 if (widthPolicy == SizePolicy::Stretch && horizontalStretchCount > 0)
                 {
-                    child->SetSize({widthAvailable / static_cast<f32>(horizontalStretchCount), child->GetSize().y });
+                    child->SetWidth(widthAvailable / static_cast<f32>(horizontalStretchCount));
+                }
+                if (heightPolicy == SizePolicy::Stretch)
+                {
+                    child->SetHeight(GetHeight() - 2 * mPadding);
                 }
 
                 child->SetPosition({ currentX, mPadding });
-                currentX += child->GetSize().x + mSpacing;
+                currentX += child->GetWidth() + mSpacing;
             }
         }
 
@@ -105,14 +105,26 @@ void Layout::Update(f32 deltaTimeSeconds)
     }
 }
 
+auto Layout::GetSpacing() const -> f32
+{
+    return mSpacing;
+}
+
+auto Layout::GetPadding() const -> f32
+{
+    return mPadding;
+}
+
 void Layout::SetSpacing(f32 spacing)
 {
     mSpacing = spacing;
+    MarkDirty();
 }
 
 void Layout::SetPadding(f32 padding)
 {
     mPadding = padding;
+    MarkDirty();
 }
 
 }

@@ -13,7 +13,6 @@ Editor::Editor()
 }
 
 UI::Panel* leftPanel = nullptr;
-UI::Panel* rightPanel = nullptr;
 
 void Editor::OnInitialize()
 {
@@ -31,7 +30,7 @@ void Editor::OnInitialize()
 
     leftPanel = new UI::Panel(root);
     leftPanel->SetSizePolicy(UI::SizePolicy::Fixed, UI::SizePolicy::Stretch);
-    leftPanel->SetSize({300.0f, 300.0f});
+    leftPanel->SetWidth(300.0f);
     leftPanel->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
     auto* leftLayout = leftPanel->SetLayout(UI::LayoutType::Vertical);
 
@@ -39,16 +38,15 @@ void Editor::OnInitialize()
     {
         auto* p = new UI::Panel(leftLayout);
         p->SetSizePolicy(UI::SizePolicy::Stretch, UI::SizePolicy::Stretch);
-        p->SetSize({0.0f, 0.0f});
     }
 
     auto* spacer = new UI::Panel(root);
     spacer->SetSizePolicy(UI::SizePolicy::Stretch, UI::SizePolicy::Stretch);
-    spacer->SetVisible(false);
+    spacer->SetRenderable(false);
 
-    rightPanel = new UI::Panel(root);
+    auto* rightPanel = new UI::Panel(root);
     rightPanel->SetSizePolicy(UI::SizePolicy::Fixed, UI::SizePolicy::Stretch);
-    rightPanel->SetSize({300.0f, 300.0f});
+    rightPanel->SetWidth(300.0f);
     rightPanel->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
     mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), root);
@@ -111,13 +109,16 @@ auto Editor::OnKeyEvent(const KeyEvent& e) -> bool
     {
         if (e.Key == Key::F2)
         {
-//            auto* root = mUIManager->GetRootWidget();
-//            root->SetVisible(!root->IsVisible());
-            leftPanel->SetSize({700.0f, 300.0f});
+            auto* root = mUIManager->GetRootWidget();
+            root->SetVisible(!root->IsVisible());
         }
         else if (e.Key == Key::F3)
         {
-            leftPanel->SetSize({300.0f, 300.0f});
+            leftPanel->SetWidth(800.0f);
+        }
+        else if (e.Key == Key::F4)
+        {
+            leftPanel->SetWidth(300.0f);
         }
     }
 
