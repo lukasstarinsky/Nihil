@@ -24,11 +24,21 @@ public:
 
     }
 
+    constexpr auto operator*(const Vec2f& other) const -> Vec2f
+    {
+        return Vec2f{x * other.x, y * other.y};
+    }
+
     constexpr auto operator*(f32 scalar) const -> Vec2f
     {
         Vec2f out = *this;
         out *= scalar;
         return out;
+    }
+
+    constexpr auto operator-(const Vec2f& other) const -> Vec2f
+    {
+        return Vec2f{x - other.x, y - other.y};
     }
 
     constexpr auto operator+(const Vec2f& other) const -> Vec2f

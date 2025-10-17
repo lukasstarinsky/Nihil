@@ -15,7 +15,7 @@ public:
 
     auto GetProjectionMatrix() const -> const Mat4f&;
     auto GetViewMatrix() const -> const Mat4f&;
-    void OnResize(i32 width, i32 height);
+    void OnWindowResize(i32 width, i32 height);
 
     auto Front() const -> const Vec3f&;
     auto Right() const -> const Vec3f&;

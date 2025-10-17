@@ -24,6 +24,15 @@ Widget::~Widget()
 
 void Widget::Update(f32 deltaTimeSeconds)
 {
+    if (mIsDirty)
+    {
+        if (mUseAnchors && mParent)
+        {
+            UpdateAnchors(mParent->GetSize());
+        }
+        mIsDirty = false;
+    }
+
     for (auto* child: mChildren)
     {
         child->Update(deltaTimeSeconds);
@@ -38,6 +47,20 @@ auto Widget::OnMouseClick() const -> bool
         return true;
     }
     return false;
+}
+
+void Widget::OnWindowResize(i32 width, i32 height)
+{
+    // No parent but using anchors means parent is the window
+    if (mUseAnchors && !mParent)
+    {
+        UpdateAnchors({ static_cast<f32>(width), static_cast<f32>(height) });
+    }
+
+    for (auto* child: mChildren)
+    {
+        child->OnWindowResize(width, height);
+    }
 }
 
 void Widget::AddWidget(UI::Widget* widget)
@@ -61,13 +84,41 @@ auto Widget::CollectInstanceData(std::vector<WidgetInstanceData>& outData) const
     if (!mVisible)
         return;
 
-    if (true)
+    if (mRenderable)
     {
         outData.push_back({ .Position = GetAbsoluteRect().Position, .Size = mRect.Size, .Color = mColor });
     }
     for (const auto* child: mChildren)
     {
         child->CollectInstanceData(outData);
+    }
+}
+
+void Widget::UpdateAnchors(const Vec2f& parentSize)
+{
+    auto anchoredMin = mAnchor.Min * parentSize;
+    auto anchoredMax = mAnchor.Max * parentSize;
+
+    // Horizontal anchor
+    mRect.Position.x = anchoredMin.x;
+    if (anchoredMin.x != anchoredMax.x)
+    {
+        mRect.Size.x = anchoredMax.x - anchoredMin.x;
+    }
+    else if (mAnchor.Min.x == 1.0f)
+    {
+        mRect.Position.x -= mRect.Size.x;
+    }
+
+    // Vertical anchor
+    mRect.Position.y = anchoredMin.y;
+    if (anchoredMin.y != anchoredMax.y)
+    {
+        mRect.Size.y = anchoredMax.y - anchoredMin.y;
+    }
+    else if (mAnchor.Min.y == 1.0f)
+    {
+        mRect.Position.y -= mRect.Size.y;
     }
 }
 
@@ -152,6 +203,30 @@ void Widget::SetVisible(bool visible)
     for (auto* child: mChildren)
     {
         child->SetVisible(visible);
+    }
+}
+
+void Widget::SetHorizontalAnchor(UI::AnchorType type)
+{
+    mAnchor.SetHorizontal(type);
+    mUseAnchors = true;
+    MarkDirty();
+}
+
+void Widget::SetVerticalAnchor(UI::AnchorType type)
+{
+    mAnchor.SetVertical(type);
+    mUseAnchors = true;
+    MarkDirty();
+}
+
+void Widget::MarkDirty()
+{
+    mIsDirty = true;
+
+    for (auto* child: mChildren)
+    {
+        child->MarkDirty();
     }
 }
 

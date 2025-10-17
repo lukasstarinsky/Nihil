@@ -19,13 +19,10 @@ public:
     void Update(f32 deltaTimeSeconds) override;
     void SetSpacing(f32 spacing);
     void SetPadding(f32 padding);
-
-    void MarkDirty();
 private:
     LayoutType mType {};
     f32 mSpacing = 5.0f;
     f32 mPadding = 5.0f;
-    bool mIsDirty = true;
 };
 
 }

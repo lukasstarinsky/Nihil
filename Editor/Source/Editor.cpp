@@ -22,33 +22,32 @@ void Editor::OnInitialize()
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
 
-    auto* layout = new UI::Layout(UI::LayoutType::Horizontal, nullptr);
-    layout->SetPosition({200.0f, 50.0f});
-    layout->SetSize({700.0f, 700.0f});
+    auto* root = new UI::Layout(UI::LayoutType::Horizontal);
+    root->SetHorizontalAnchor(UI::AnchorType::Stretch);
+    root->SetVerticalAnchor(UI::AnchorType::Stretch);
 
-    auto* nestedLayout0 = new UI::Layout(UI::LayoutType::Vertical, layout);
-    nestedLayout0->SetSize({330.0f, 680.0f});
+    auto* leftPanel = new UI::Panel(root);
+    leftPanel->SetHorizontalAnchor(UI::AnchorType::Left);
+    leftPanel->SetVerticalAnchor(UI::AnchorType::Stretch);
+    leftPanel->SetSize({300.0f, 0.0f});
+    leftPanel->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+    auto* leftLayout = leftPanel->SetLayout(UI::LayoutType::Vertical);
 
-    auto* nestedLayout1 = new UI::Layout(UI::LayoutType::Horizontal, layout);
-    nestedLayout1->SetSize({330.0f, 680.0f});
+    auto* p1 = new UI::Panel(leftLayout);
+    p1->SetSize({50.0f, 50.0f});
+    p1->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
 
-    auto* panel0 = new UI::Panel(nestedLayout0);
-    panel0->SetSize({310.0f, 150.0f});
-    panel0->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+    auto* p2 = new UI::Panel(leftLayout);
+    p2->SetSize({50.0f, 50.0f});
+    p2->SetColor({1.0f, 0.0f, 1.0f, 1.0f});
 
-    auto* panel1 = new UI::Panel(nestedLayout0);
-    panel1->SetSize({310.0f, 150.0f});
-    panel1->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+    auto* rightPanel = new UI::Panel(root);
+    rightPanel->SetHorizontalAnchor(UI::AnchorType::Right);
+    rightPanel->SetVerticalAnchor(UI::AnchorType::Stretch);
+    rightPanel->SetSize({300.0f, 0.0f});
+    rightPanel->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
-    auto* panel2 = new UI::Panel(nestedLayout1);
-    panel2->SetSize({155.0f, 150.0f});
-    panel2->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
-
-    auto* panel3 = new UI::Panel(nestedLayout1);
-    panel3->SetSize({155.0f, 150.0f});
-    panel3->SetColor({1.0f, 0.0f, 1.0f, 1.0f});
-
-    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), layout);
+    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), root);
 
     mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Editor::OnMouseEvent, this));
@@ -69,10 +68,10 @@ void Editor::OnUpdate(f32 deltaTimeSeconds)
     }
 }
 
-void Editor::OnResize()
+void Editor::OnWindowResize()
 {
-    mCamera.OnResize(Config.WindowWidth, Config.WindowHeight);
-    mUIManager->OnResize(Config.WindowWidth, Config.WindowHeight);
+    mCamera.OnWindowResize(Config.WindowWidth, Config.WindowHeight);
+    mUIManager->OnWindowResize(Config.WindowWidth, Config.WindowHeight);
 }
 
 void Editor::OnRender()

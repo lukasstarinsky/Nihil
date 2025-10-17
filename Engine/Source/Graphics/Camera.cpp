@@ -66,7 +66,7 @@ void Camera::Translate(const Vec3f& translation)
     mViewMatrix = Mat4f::LookAt(mPosition, mPosition + mLookAt, mUp);
 }
 
-void Camera::OnResize(i32 width, i32 height)
+void Camera::OnWindowResize(i32 width, i32 height)
 {
     if (mProjection == CameraProjection::Orthographic)
     {

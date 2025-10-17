@@ -32,7 +32,7 @@ public:
     virtual ~Application() = default;
     virtual void OnInitialize() = 0;
     virtual void OnUpdate(f32 deltaTimeSeconds) = 0;
-    virtual void OnResize() = 0;
+    virtual void OnWindowResize() = 0;
     virtual void OnRender() = 0;
     virtual void OnUIRender() = 0;
     virtual void OnShutdown() = 0;

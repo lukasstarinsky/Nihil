@@ -20,7 +20,7 @@ public:
     void Update(f32 deltaTimeSeconds);
     void Render() const;
 
-    void OnResize(i32 width, i32 height);
+    void OnWindowResize(i32 width, i32 height);
     auto OnMouseEvent(const MouseEvent& event) const -> bool;
 private:
     AssetManager* mAssetManager {};

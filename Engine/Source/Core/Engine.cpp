@@ -73,7 +73,7 @@ auto Engine::OnAppEvent(const ApplicationEvent& e) -> bool
         else
         {
             mApplication->State.IsSuspended = false;
-            mApplication->OnResize();
+            mApplication->OnWindowResize();
         }
     }
 

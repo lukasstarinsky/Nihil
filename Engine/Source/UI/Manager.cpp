@@ -93,9 +93,10 @@ void Manager::Render() const
     Renderer::DrawInstanced(mQuadMesh, static_cast<i32>(instanceDatas.size()));
 }
 
-void Manager::OnResize(i32 width, i32 height)
+void Manager::OnWindowResize(i32 width, i32 height)
 {
-    mCamera.OnResize(width, height);
+    mCamera.OnWindowResize(width, height);
+    mRootWidget->OnWindowResize(width, height);
 }
 
 auto Manager::OnMouseEvent(const MouseEvent& event) const -> bool

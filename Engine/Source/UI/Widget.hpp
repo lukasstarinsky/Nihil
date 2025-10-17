@@ -5,6 +5,7 @@
 
 #include "AssetPipeline/AssetManager.hpp"
 #include "Math/Math.hpp"
+#include "Anchor.hpp"
 
 namespace UI
 {
@@ -26,10 +27,12 @@ public:
 
     virtual void Update(f32 deltaTimeSeconds);
     virtual auto OnMouseClick() const -> bool;
+    virtual void OnWindowResize(i32 width, i32 height);
 
     void AddWidget(Widget* widget);
     auto HitTest(const Vec2f& point) const -> bool;
     auto CollectInstanceData(std::vector<WidgetInstanceData>& outData) const -> void;
+    void UpdateAnchors(const Vec2f& parentSize);
 
     auto GetSize() const -> Vec2f;
     auto GetAbsoluteRect() const -> Rect;
@@ -42,12 +45,18 @@ public:
     void SetRenderable(bool renderable);
     void SetColor(const Vec4f& color);
     void SetVisible(bool visible);
+    void SetHorizontalAnchor(AnchorType type);
+    void SetVerticalAnchor(AnchorType type);
+    void MarkDirty();
 protected:
     Rect mRect {};
     Widget* mParent {};
     std::vector<Widget*> mChildren {};
     EventCallback mOnMouseClick {};
     Vec4f mColor {};
+    Anchor mAnchor {};
+    bool mUseAnchors = false;
+    bool mIsDirty = true;
     bool mVisible = true;
     bool mRenderable = true;
 };

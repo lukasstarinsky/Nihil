@@ -16,4 +16,12 @@ auto Panel::OnMouseClick() const -> bool
     return true;
 }
 
+auto Panel::SetLayout(LayoutType type) -> Layout*
+{
+    auto* layout = new Layout(type, this);
+    layout->SetHorizontalAnchor(AnchorType::Stretch);
+    layout->SetVerticalAnchor(AnchorType::Stretch);
+    return layout;
+}
+
 }
