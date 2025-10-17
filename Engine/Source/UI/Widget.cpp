@@ -231,11 +231,6 @@ void Widget::SetColor(const Vec4f& color)
 void Widget::SetVisible(bool visible)
 {
     mVisible = visible;
-
-    for (auto* child: mChildren)
-    {
-        child->SetVisible(visible);
-    }
 }
 
 void Widget::SetHorizontalAnchor(UI::AnchorType type)

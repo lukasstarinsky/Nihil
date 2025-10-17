@@ -42,7 +42,7 @@ void Editor::OnInitialize()
 
     auto* spacer = new UI::Panel(root);
     spacer->SetSizePolicy(UI::SizePolicy::Stretch, UI::SizePolicy::Stretch);
-    spacer->SetRenderable(false);
+    spacer->SetVisible(false);
 
     auto* rightPanel = new UI::Panel(root);
     rightPanel->SetSizePolicy(UI::SizePolicy::Fixed, UI::SizePolicy::Stretch);
