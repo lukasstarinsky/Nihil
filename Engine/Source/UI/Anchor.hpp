@@ -17,7 +17,8 @@ struct Anchor
     void SetHorizontal(AnchorType type);
     void SetVertical(AnchorType type);
 public:
-    // Top-Left default
+    AnchorType Horizontal = AnchorType::Left;
+    AnchorType Vertical = AnchorType::Top;
     Vec2f Min {};
     Vec2f Max {};
 };

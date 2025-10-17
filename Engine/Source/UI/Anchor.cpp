@@ -5,6 +5,8 @@ namespace UI
 
 void Anchor::SetHorizontal(UI::AnchorType type)
 {
+    Horizontal = type;
+
     switch (type)
     {
         case AnchorType::Left:
@@ -26,6 +28,8 @@ void Anchor::SetHorizontal(UI::AnchorType type)
 
 void Anchor::SetVertical(UI::AnchorType type)
 {
+    Vertical = type;
+
     switch (type)
     {
         case AnchorType::Top:

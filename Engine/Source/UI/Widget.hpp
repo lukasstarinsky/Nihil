@@ -10,6 +10,13 @@
 namespace UI
 {
 
+enum class SizePolicy
+{
+    Fixed = 0,
+    Expand,
+    Stretch
+};
+
 struct WidgetInstanceData
 {
     Vec2f Position {};
@@ -37,6 +44,7 @@ public:
     auto GetSize() const -> Vec2f;
     auto GetAbsoluteRect() const -> Rect;
     auto GetLastWidgetAt(const Vec2f& point) const -> const Widget*;
+    auto GetSizePolicy() const -> std::pair<SizePolicy, SizePolicy>;
     auto IsVisible() const -> bool;
     auto IsRenderable() const -> bool;
     void SetOnMouseClick(const EventCallback& callback);
@@ -47,14 +55,37 @@ public:
     void SetVisible(bool visible);
     void SetHorizontalAnchor(AnchorType type);
     void SetVerticalAnchor(AnchorType type);
+    void SetSizePolicy(SizePolicy widthPolicy, SizePolicy heightPolicy);
     void MarkDirty();
+
+    template <typename T>
+    auto MarkParentDirty() -> bool
+    {
+        auto* parent = dynamic_cast<T*>(mParent);
+        while (parent)
+        {
+            if (auto newParent = dynamic_cast<T*>(parent->mParent))
+            {
+                parent = newParent;
+            }
+            else
+            {
+                parent->MarkDirty();
+                return true;
+            }
+        }
+        return false;
+    }
 protected:
     Rect mRect {};
     Widget* mParent {};
+    Vec2f mNullParentSize {};
     std::vector<Widget*> mChildren {};
     EventCallback mOnMouseClick {};
     Vec4f mColor {};
     Anchor mAnchor {};
+    SizePolicy mWidthPolicy = SizePolicy::Fixed;
+    SizePolicy mHeightPolicy = SizePolicy::Fixed;
     bool mUseAnchors = false;
     bool mIsDirty = true;
     bool mVisible = true;

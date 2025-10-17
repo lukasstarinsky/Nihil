@@ -12,6 +12,9 @@ Editor::Editor()
     Config.RendererAPI = RendererAPI::OpenGL;
 }
 
+UI::Panel* leftPanel = nullptr;
+UI::Panel* rightPanel = nullptr;
+
 void Editor::OnInitialize()
 {
     if (!mAssetPipeline.ValidateManifest())
@@ -23,28 +26,29 @@ void Editor::OnInitialize()
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
 
     auto* root = new UI::Layout(UI::LayoutType::Horizontal);
-    root->SetHorizontalAnchor(UI::AnchorType::Stretch);
     root->SetVerticalAnchor(UI::AnchorType::Stretch);
+    root->SetHorizontalAnchor(UI::AnchorType::Stretch);
 
-    auto* leftPanel = new UI::Panel(root);
-    leftPanel->SetHorizontalAnchor(UI::AnchorType::Left);
-    leftPanel->SetVerticalAnchor(UI::AnchorType::Stretch);
-    leftPanel->SetSize({300.0f, 0.0f});
+    leftPanel = new UI::Panel(root);
+    leftPanel->SetSizePolicy(UI::SizePolicy::Fixed, UI::SizePolicy::Stretch);
+    leftPanel->SetSize({300.0f, 300.0f});
     leftPanel->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
     auto* leftLayout = leftPanel->SetLayout(UI::LayoutType::Vertical);
 
-    auto* p1 = new UI::Panel(leftLayout);
-    p1->SetSize({50.0f, 50.0f});
-    p1->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
+    for (i32 i = 0; i < 5; i++)
+    {
+        auto* p = new UI::Panel(leftLayout);
+        p->SetSizePolicy(UI::SizePolicy::Stretch, UI::SizePolicy::Stretch);
+        p->SetSize({0.0f, 0.0f});
+    }
 
-    auto* p2 = new UI::Panel(leftLayout);
-    p2->SetSize({50.0f, 50.0f});
-    p2->SetColor({1.0f, 0.0f, 1.0f, 1.0f});
+    auto* spacer = new UI::Panel(root);
+    spacer->SetSizePolicy(UI::SizePolicy::Stretch, UI::SizePolicy::Stretch);
+    spacer->SetVisible(false);
 
-    auto* rightPanel = new UI::Panel(root);
-    rightPanel->SetHorizontalAnchor(UI::AnchorType::Right);
-    rightPanel->SetVerticalAnchor(UI::AnchorType::Stretch);
-    rightPanel->SetSize({300.0f, 0.0f});
+    rightPanel = new UI::Panel(root);
+    rightPanel->SetSizePolicy(UI::SizePolicy::Fixed, UI::SizePolicy::Stretch);
+    rightPanel->SetSize({300.0f, 300.0f});
     rightPanel->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
     mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), root);
@@ -107,8 +111,13 @@ auto Editor::OnKeyEvent(const KeyEvent& e) -> bool
     {
         if (e.Key == Key::F2)
         {
-            auto* root = mUIManager->GetRootWidget();
-            root->SetVisible(!root->IsVisible());
+//            auto* root = mUIManager->GetRootWidget();
+//            root->SetVisible(!root->IsVisible());
+            leftPanel->SetSize({700.0f, 300.0f});
+        }
+        else if (e.Key == Key::F3)
+        {
+            leftPanel->SetSize({300.0f, 300.0f});
         }
     }
 

@@ -52,6 +52,11 @@ public:
         y *= scalar;
         return *this;
     }
+
+    constexpr auto operator==(const Vec2f& other) const -> bool
+    {
+        return x == other.x && y == other.y;
+    }
 };
 
 template <>

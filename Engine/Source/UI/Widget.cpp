@@ -24,13 +24,16 @@ Widget::~Widget()
 
 void Widget::Update(f32 deltaTimeSeconds)
 {
-    if (mIsDirty)
+    if (mUseAnchors)
     {
-        if (mUseAnchors && mParent)
+        if (mParent)
         {
             UpdateAnchors(mParent->GetSize());
         }
-        mIsDirty = false;
+        else
+        {
+            UpdateAnchors(mNullParentSize);
+        }
     }
 
     for (auto* child: mChildren)
@@ -54,7 +57,7 @@ void Widget::OnWindowResize(i32 width, i32 height)
     // No parent but using anchors means parent is the window
     if (mUseAnchors && !mParent)
     {
-        UpdateAnchors({ static_cast<f32>(width), static_cast<f32>(height) });
+        mNullParentSize = { static_cast<f32>(width), static_cast<f32>(height) };
     }
 
     for (auto* child: mChildren)
@@ -67,11 +70,7 @@ void Widget::AddWidget(UI::Widget* widget)
 {
     mChildren.push_back(widget);
     widget->mParent = this;
-
-    if (const auto layout = dynamic_cast<Layout*>(this))
-    {
-        layout->MarkDirty();
-    }
+    MarkParentDirty<Layout>();
 }
 
 auto Widget::HitTest(const Vec2f& point) const -> bool
@@ -161,6 +160,11 @@ auto Widget::GetLastWidgetAt(const Vec2f& point) const -> const Widget*
     return nullptr;
 }
 
+auto Widget::GetSizePolicy() const -> std::pair<SizePolicy, SizePolicy>
+{
+    return { mWidthPolicy, mHeightPolicy };
+}
+
 auto Widget::IsVisible() const -> bool
 {
     return mVisible;
@@ -179,11 +183,19 @@ void Widget::SetOnMouseClick(const UI::Widget::EventCallback& callback)
 void Widget::SetPosition(const Vec2f& position)
 {
     mRect.Position = position;
+    if (!MarkParentDirty<Layout>())
+    {
+        MarkDirty();
+    }
 }
 
 void Widget::SetSize(const Vec2f& size)
 {
     mRect.Size = size;
+    if (!MarkParentDirty<Layout>())
+    {
+        MarkDirty();
+    }
 }
 
 void Widget::SetRenderable(bool renderable)
@@ -208,16 +220,40 @@ void Widget::SetVisible(bool visible)
 
 void Widget::SetHorizontalAnchor(UI::AnchorType type)
 {
+    if (mAnchor.Horizontal == type)
+        return;
+
     mAnchor.SetHorizontal(type);
     mUseAnchors = true;
-    MarkDirty();
+    if (!MarkParentDirty<Layout>())
+    {
+        MarkDirty();
+    }
 }
 
 void Widget::SetVerticalAnchor(UI::AnchorType type)
 {
+    if (mAnchor.Vertical == type)
+        return;
+
     mAnchor.SetVertical(type);
     mUseAnchors = true;
-    MarkDirty();
+    if (!MarkParentDirty<Layout>())
+    {
+        MarkDirty();
+    }
+}
+
+void Widget::SetSizePolicy(UI::SizePolicy widthPolicy, UI::SizePolicy heightPolicy)
+{
+    ASSERT(dynamic_cast<Layout*>(mParent), "SizePolicy can only be set for widgets inside a Layout");
+
+    mWidthPolicy = widthPolicy;
+    mHeightPolicy = heightPolicy;
+    if (!MarkParentDirty<Layout>())
+    {
+        MarkDirty();
+    }
 }
 
 void Widget::MarkDirty()
