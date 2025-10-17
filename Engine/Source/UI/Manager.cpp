@@ -49,7 +49,8 @@ Manager::Manager(AssetManager* assetManager, Widget* root)
         .Stride = sizeof(WidgetInstanceData),
         .Attributes = {
             { 2, VertexAttribute::Type::Float2, offsetof(WidgetInstanceData, Position), 1, true },
-            { 3, VertexAttribute::Type::Float2, offsetof(WidgetInstanceData, Size), 1, true }
+            { 3, VertexAttribute::Type::Float2, offsetof(WidgetInstanceData, Size), 1, true },
+            { 4, VertexAttribute::Type::Float3, offsetof(WidgetInstanceData, Color), 1, true }
         }
     };
 

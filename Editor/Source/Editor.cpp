@@ -22,28 +22,26 @@ void Editor::OnInitialize()
 
     mAssetManager = std::make_unique<AssetManager>("Assets/01.npack");
 
-    auto* rootWidget = new UI::Panel(nullptr);
-    rootWidget->SetPosition({100.0f, 100.0f});
-    rootWidget->SetSize({400.0f, 300.0f});
-    rootWidget->SetOnMouseClick([]() {
-        Logger::Info("Root panel clicked");
-    });
+    auto* layout = new UI::Layout(UI::LayoutType::Vertical, nullptr);
+    layout->SetPosition({200.0f, 50.0f});
+    layout->SetSize({700.0f, 700.0f});
 
-    auto* panel = new UI::Panel(rootWidget);
-    panel->SetPosition({550.0f, 250.0f});
+    auto* panel = new UI::Panel(layout);
     panel->SetSize({200.0f, 150.0f});
+    panel->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
     panel->SetOnMouseClick([]() {
         Logger::Info("Child panel clicked");
     });
 
-    auto* panel2 = new UI::Panel(rootWidget);
-    panel2->SetPosition({900.0f, 50.0f});
+    auto* panel2 = new UI::Panel(layout);
     panel2->SetSize({150.0f, 100.0f});
+    panel2->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
     panel2->SetOnMouseClick([]() {
         Logger::Info("Second child panel clicked");
     });
+    layout->Update();
 
-    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), rootWidget);
+    mUIManager = std::make_unique<UI::Manager>(mAssetManager.get(), layout);
 
     mMesh = mAssetManager->Get<Mesh>(mAssetPipeline.GetManifest().GetUUID("sponza"));
     EventDispatcher::AddListener<MouseEvent>(std::bind_front(&Editor::OnMouseEvent, this));
@@ -101,7 +99,8 @@ auto Editor::OnKeyEvent(const KeyEvent& e) -> bool
     {
         if (e.Key == Key::F2)
         {
-            mUIManager->GetRootWidget()->Toggle();
+            auto* root = mUIManager->GetRootWidget();
+            root->SetVisible(!root->IsVisible());
         }
     }
 

@@ -1,5 +1,7 @@
 #include "Widget.hpp"
 
+#include "Layout.hpp"
+
 namespace UI
 {
 
@@ -20,6 +22,16 @@ Widget::~Widget()
     }
 }
 
+auto Widget::OnMouseClick() const -> bool
+{
+    if (mOnMouseClick)
+    {
+        mOnMouseClick();
+        return true;
+    }
+    return false;
+}
+
 void Widget::AddWidget(UI::Widget* widget)
 {
     mChildren.push_back(widget);
@@ -36,23 +48,31 @@ auto Widget::CollectInstanceData(std::vector<WidgetInstanceData>& outData) const
     if (!mVisible)
         return;
 
-    outData.push_back({ .Position = GetAbsoluteRect().Position, .Size = mRect.Size });
+    if (true)
+    {
+        outData.push_back({ .Position = GetAbsoluteRect().Position, .Size = mRect.Size, .Color = mColor });
+    }
     for (const auto* child: mChildren)
     {
         child->CollectInstanceData(outData);
     }
 }
 
+auto Widget::GetSize() const -> Vec2f
+{
+    return mRect.Size;
+}
+
 auto Widget::GetAbsoluteRect() const -> Rect
 {
-//    if (mParent)
-//    {
-//        Rect parentRect = mParent->GetAbsoluteRect();
-//        return {
-//            parentRect.Position + mRect.Position,
-//            mRect.Size
-//        };
-//    }
+    if (mParent)
+    {
+        Rect parentRect = mParent->GetAbsoluteRect();
+        return {
+            parentRect.Position + mRect.Position,
+            mRect.Size
+        };
+    }
     return mRect;
 }
 
@@ -77,6 +97,16 @@ auto Widget::GetLastWidgetAt(const Vec2f& point) const -> const Widget*
     return nullptr;
 }
 
+auto Widget::IsVisible() const -> bool
+{
+    return mVisible;
+}
+
+auto Widget::IsRenderable() const -> bool
+{
+    return mRenderable;
+}
+
 void Widget::SetOnMouseClick(const UI::Widget::EventCallback& callback)
 {
     mOnMouseClick = callback;
@@ -92,28 +122,23 @@ void Widget::SetSize(const Vec2f& size)
     mRect.Size = size;
 }
 
-void Widget::Toggle()
+void Widget::SetRenderable(bool renderable)
 {
-    mVisible ? Hide() : Show();
+    mRenderable = renderable;
 }
 
-void Widget::Show()
+void Widget::SetColor(const Vec4f& color)
 {
-    mVisible = true;
+    mColor = color;
+}
+
+void Widget::SetVisible(bool visible)
+{
+    mVisible = visible;
 
     for (auto* child: mChildren)
     {
-        child->Show();
-    }
-}
-
-void Widget::Hide()
-{
-    mVisible = false;
-
-    for (auto* child: mChildren)
-    {
-        child->Hide();
+        child->SetVisible(visible);
     }
 }
 

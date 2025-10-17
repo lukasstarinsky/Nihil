@@ -12,8 +12,7 @@ Panel::Panel(Widget* parent)
 
 auto Panel::OnMouseClick() const -> bool
 {
-    if (mOnMouseClick)
-        mOnMouseClick();
+    Widget::OnMouseClick();
     return true;
 }
 
